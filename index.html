@@ -6,552 +6,642 @@
 <title>Sommes-nous des IA ?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
   color-scheme: light;
-  --paper:#EAE8E2;
-  --ink:#141312;
-  --ink-2:#403D38;
-  --ink-3:#6B675F;
-  --line:rgba(20,19,18,.16);
-  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
-  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --bg:rgb(234,232,226);
+  --fg:rgb(20,19,18);
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
-html{background:var(--paper)}
-body{
-  margin:0;
-  background:var(--paper) var(--paper-tex,none);
-  background-size:320px 320px;
-  color:var(--ink);
-  font-family:var(--f-body);
-  font-size:1.0625rem;
-  line-height:1.7;
-  -webkit-font-smoothing:antialiased;
-  padding-inline:clamp(16px,3vw,48px);
-}
-a{color:inherit}
-:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--fg)}
+body{font-family:var(--mono);-webkit-font-smoothing:antialiased;overscroll-behavior:none;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#grain{position:fixed;inset:0;pointer-events:none;background-image:var(--grain,none);background-size:256px 256px;mix-blend-mode:multiply;opacity:.55}
+#vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 55% 50%,transparent 58%,rgba(0,0,0,.13) 100%)}
 
-/* ——— scènes : le dessin reste, les phrases arrivent ——— */
-.scene{position:relative;height:230vh}
-.scene.hero{height:190vh}
-.stage{position:sticky;top:0;height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(15rem,21rem);gap:clamp(1.5rem,3.5vw,3.5rem);align-items:center;max-width:1320px;margin-inline:auto;padding-left:clamp(28px,3vw,40px)}
-.world{position:relative;justify-self:center;width:min(100%, calc((100vh - 4rem) * var(--ar)));width:min(100%, calc((100dvh - 4rem) * var(--ar)))}
-.world canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.words{display:flex;flex-direction:column;gap:1.1rem}
-.idx{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0}
-.phrase{margin:0;font-family:var(--f-display);font-weight:500;font-size:clamp(1.15rem,1.9vw,1.5rem);line-height:1.45;text-wrap:pretty}
-.phrase.aside{font-family:var(--f-body);font-weight:400;font-size:1rem;line-height:1.6;color:var(--ink-2)}
-.hero h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,3.6vw,3.2rem);line-height:1.08;letter-spacing:-.01em;text-wrap:balance}
-.hint{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0;display:flex;align-items:center;gap:.6rem}
-.hint::after{content:"";width:1px;height:2.2rem;background:var(--ink-3);animation:hint 2.2s ease-in-out infinite}
-@keyframes hint{0%,100%{transform:scaleY(.3);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
+.brand{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));left:clamp(18px,3vw,36px);display:flex;align-items:center;gap:.7rem;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+.brand b{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.02em;text-transform:none}
+.seal{display:inline-grid;place-items:center;width:1.9rem;height:1.9rem;font-family:var(--display);font-weight:800;font-size:1rem;background:var(--fg);color:var(--bg);border-radius:2px;transform:rotate(-2deg)}
+.brand small{font-size:.66rem;opacity:.7}
 
-.brique{margin:.4rem 0 0;padding:.85rem 1.2rem .95rem;color:var(--paper);background:var(--ink) var(--brick-tex,none) center/100% 100% no-repeat;font-family:var(--f-display);font-weight:700;font-size:clamp(1.02rem,1.5vw,1.18rem);line-height:1.4;transform:rotate(-.5deg)}
-.tex .brique{background-color:transparent}
-.brique .no{display:block;font-family:var(--f-mono);font-weight:400;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.ctrl{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:clamp(18px,3vw,36px);display:flex;gap:.5rem}
+.btn{font:500 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);background:transparent;border:1px solid var(--fg);border-radius:999px;padding:.55rem .9rem;cursor:pointer;opacity:.75}
+.btn:hover{opacity:1}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);opacity:1}
+:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
 
-html.js .reveal{opacity:0;filter:blur(7px);transform:translateY(12px);transition:opacity .9s ease,filter .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
-html.js .reveal.on{opacity:1;filter:none;transform:none}
-html.js .brique.reveal{transform:translateY(-26px) rotate(-3deg)}
-html.js .brique.reveal.on{transform:rotate(-.5deg)}
+#caps{position:fixed;left:clamp(20px,5vw,84px);top:clamp(92px,17vh,170px);width:min(40vw,31rem);pointer-events:none}
+.cap{position:absolute;left:0;top:0;width:100%;margin:0;font-family:var(--display);font-weight:500;font-size:clamp(1.45rem,2.55vw,2.55rem);line-height:1.22;letter-spacing:-.005em;text-shadow:0 0 22px var(--bg),0 0 10px var(--bg),0 0 3px var(--bg);transition:opacity 1s ease,filter 1s ease}
+.cap .w{display:inline-block;white-space:nowrap}
+.cap .ch{display:inline-block;opacity:0;filter:blur(10px);transform:translateY(.35em);transition:opacity .9s ease,filter 1.1s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.cap.in .ch{opacity:1;filter:blur(0);transform:none}
+.cap.out{opacity:0;filter:blur(8px)}
+.cap .kick{display:block;font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:1.1rem;opacity:.75}
+.cap.title{font-weight:800;font-size:clamp(2rem,4vw,3.9rem);line-height:1.06;letter-spacing:-.015em}
+.cap.final{font-size:clamp(1.6rem,3vw,3rem)}
 
-.control{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-.control label{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);width:100%}
-.control input[type=range]{flex:1 1 8rem;accent-color:var(--ink)}
-.control output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.9rem}
-.btn{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;cursor:pointer}
-.btn:hover{border-color:var(--ink);color:var(--ink)}
+#end{position:fixed;left:clamp(20px,5vw,84px);bottom:calc(74px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:.7rem;letter-spacing:.08em;opacity:0;transform:translateY(10px);transition:opacity 1.2s ease,transform 1.2s ease;pointer-events:none}
+#end.on{opacity:1;transform:none;pointer-events:auto}
 
-/* ——— pile de briques ——— */
-.pile{position:fixed;z-index:4;left:clamp(6px,1vw,14px);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-start;gap:6px}
-.pile ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column-reverse;gap:3px}
-.pile li:nth-child(even){margin-left:5px}
-.pile a{display:grid;place-items:center;width:24px;height:12px;border:1px dashed rgba(20,19,18,.3);font-family:var(--f-mono);font-size:0;color:var(--paper);text-decoration:none}
-.pile a.on{border-color:transparent;background:var(--ink) var(--brick-tex,none) center/100% 100% no-repeat;animation:drop .5s cubic-bezier(.3,1.4,.5,1) both}
-.tex .pile a.on{background-color:transparent}
-.pile p{margin:0;font-family:var(--f-mono);font-size:.62rem;color:var(--ink-3);writing-mode:vertical-rl;transform:rotate(180deg)}
-@keyframes drop{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
+#chap{position:fixed;left:clamp(18px,3vw,36px);right:clamp(18px,3vw,36px);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
+#chap button{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding-top:6px;min-width:0}
+#chap .lbl{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;opacity:.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .4s}
+#chap button.on .lbl,#chap button:hover .lbl{opacity:1}
+#chap .bar{position:relative;height:2px;overflow:hidden}
+#chap .bar::before{content:"";position:absolute;inset:0;background:var(--fg);opacity:.18}
+#chap .bar i{position:absolute;inset:0;background:var(--fg);transform-origin:left;transform:scaleX(0)}
+#chap button:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.hint{position:fixed;right:clamp(18px,3vw,36px);bottom:calc(46px + env(safe-area-inset-bottom,0px));margin:0;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;opacity:.45}
 
-/* ——— le mur ——— */
-.end{max-width:52rem;margin-inline:auto;padding:clamp(4rem,10vw,7rem) 0 3rem clamp(28px,3vw,40px)}
-.end h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.12;margin:0 0 2rem;text-wrap:balance}
-.wall{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;gap:5px}
-.wall li{padding:.65rem 1.1rem;color:var(--paper);background:var(--ink) var(--brick-tex,none) center/100% 100% no-repeat;font-family:var(--f-display);font-weight:700;font-size:1rem;line-height:1.4}
-.tex .wall li{background-color:transparent}
-.wall li:nth-child(odd){margin-right:2.5rem}
-.wall li:nth-child(even){margin-left:2.5rem}
-.wall li span{font-family:var(--f-mono);font-weight:400;font-size:.68rem;opacity:.7;margin-right:.6rem}
-.last{margin:3rem 0 0;font-family:var(--f-display);font-weight:500;font-size:clamp(1.3rem,2.6vw,1.75rem);line-height:1.45;max-width:36rem;text-wrap:balance}
-.open{margin:2.5rem 0 0;padding:0;list-style:none;display:grid;gap:.9rem;max-width:40rem}
-.open li{display:grid;grid-template-columns:1.4rem minmax(0,1fr);gap:.6rem;font-size:1.02rem;color:var(--ink-2)}
-.open li::before{content:"";width:.8rem;height:.8rem;margin-top:.45rem;border:1.5px solid var(--ink);border-radius:50%}
-footer{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--ink-3);font-size:.88rem}
-.seal{display:inline-grid;place-items:center;width:2.4rem;height:2.4rem;font-family:var(--f-display);font-weight:800;font-size:1.25rem;background:var(--ink);color:var(--paper);border-radius:3px;box-shadow:inset 0 0 0 2px var(--ink),inset 0 0 0 3.5px var(--paper);transform:rotate(-2deg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-@media (max-width:900px){
-  .scene{height:200vh}
-  .stage{grid-template-columns:minmax(0,1fr);align-content:center;gap:1.1rem;padding-left:22px}
-  .world{width:100%}
-  .words{gap:.7rem}
-  .phrase{font-size:1.05rem}
-  .phrase.aside{font-size:.92rem}
-  .hero h1{font-size:clamp(1.6rem,7vw,2.2rem)}
-  .brique{font-size:.98rem;padding:.65rem 1rem .75rem}
-  .pile a{width:14px;height:9px}
-  .pile li:nth-child(even){margin-left:3px}
-  .end{padding-left:22px}
-  .wall li:nth-child(odd),.wall li:nth-child(even){margin-inline:0}
+@media (max-aspect-ratio:23/20){
+  #caps{top:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));width:calc(100vw - 40px)}
+  .cap{top:auto;bottom:0;font-size:clamp(1.25rem,5.6vw,1.8rem)}
+  .cap.title{font-size:clamp(1.7rem,7.4vw,2.6rem)}
+  .cap.final{font-size:clamp(1.3rem,5.8vw,1.9rem)}
+  #end{bottom:auto;top:calc(64px + env(safe-area-inset-top,0px))}
+  #chap .lbl{opacity:0}
+  #chap button.on .lbl{opacity:1;overflow:visible}
+  .hint,.brand small{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .hint::after,.pile a.on{animation:none}
+  .cap,.cap .ch,#end{transition:none}
 }
 </style>
 </head>
 <body>
+<canvas id="c" aria-hidden="true"></canvas>
+<div id="grain"></div>
+<div id="vig"></div>
 
-<nav class="pile" aria-label="Briques posées">
-  <ol>
-    <li><a href="#s1" title="Brique 1 : l'IA">1</a></li>
-    <li><a href="#s2" title="Brique 2 : l'arbre">2</a></li>
-    <li><a href="#s3" title="Brique 3 : la mer">3</a></li>
-    <li><a href="#s4" title="Brique 4 : la fleur">4</a></li>
-    <li><a href="#s5" title="Brique 5 : le hasard">5</a></li>
-    <li><a href="#s6" title="Brique 6 : le cerveau">6</a></li>
-    <li><a href="#s7" title="Brique 7 : l'ADN">7</a></li>
-    <li><a href="#s8" title="Brique 8 : le corps">8</a></li>
-    <li><a href="#s9" title="Brique 9 : la vie">9</a></li>
-    <li><a href="#s10" title="Brique 10 : le pinceau">10</a></li>
-  </ol>
-  <p><span id="pile-n">0</span>/10</p>
-</nav>
+<div class="brand"><span class="seal" aria-hidden="true">人</span><b>HUman</b><small>une réflexion de Mathieu</small></div>
+<div class="ctrl">
+  <button class="btn" id="snd" type="button" aria-pressed="false">Son</button>
+  <button class="btn" id="pp" type="button">Pause</button>
+</div>
 
-<main>
+<div id="caps" aria-hidden="true"></div>
+<div id="end"><button class="btn" id="again" type="button">Revoir</button><span>Une réflexion de Mathieu, mise en images avec Claude</span></div>
+<nav id="chap" aria-label="Chapitres"></nav>
+<p class="hint">Molette : avancer, reculer</p>
 
-<section class="scene hero" id="s0">
-  <div class="stage">
-    <div class="world" data-world="hero" style="--ar:1000/600;aspect-ratio:1000/600" role="img" aria-label="Un bonhomme peint à l'encre, assis sur un rocher, le menton dans la main, regarde la mer, la Lune et des oiseaux. Une ligne pointillée part de son œil vers l'horizon, avec la formule de la distance de l'horizon."></div>
-    <div class="words">
-      <p class="idx">HUman · une réflexion de Mathieu</p>
-      <h1>Et si nous étions le plus gros LLM jamais observé ?</h1>
-      <p class="phrase reveal" data-at="-1">J'ai voulu comprendre comment marche une IA. J'ai trouvé des maths.</p>
-      <p class="phrase reveal">Alors j'ai levé les yeux.</p>
-      <p class="hint">Descendre</p>
-    </div>
-  </div>
+<section class="sr">
+  <h1>Et si nous étions le plus gros LLM jamais observé&nbsp;?</h1>
+  <p>Une expérience animée à l'encre de Chine, en neuf chapitres, qui suit la réflexion de Mathieu.</p>
+  <ol id="sr-list"></ol>
 </section>
-
-<section class="scene" id="s1">
-  <div class="stage">
-    <div class="world" data-world="ia" style="--ar:1000/520;aspect-ratio:1000/520" role="img" aria-label="Une phrase s'écrit mot par mot : « Je regarde la mer et je pense à mon enfance. » À chaque mot, des barres montrent la probabilité de chaque suite possible, puis un mot est tiré au sort."></div>
-    <div class="words">
-      <p class="idx">1 / 10 · le déclic</p>
-      <p class="phrase reveal">Pour une IA, chaque mot est une liste de nombres.</p>
-      <p class="phrase reveal">Elle calcule la probabilité du mot suivant, puis elle tire au sort. Pas toujours le plus probable.</p>
-      <p class="brique reveal"><span class="no">Brique 1</span>Une IA, c'est un calcul.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s2">
-  <div class="stage">
-    <div class="world" data-world="arbre" style="--ar:1000/620;aspect-ratio:1000/620" role="img" aria-label="Un arbre peint à l'encre pousse branche par branche, puis se balance au vent pendant que des feuilles tombent. Par-dessus apparaît la règle qui le dessine : se diviser en deux avec un angle d'environ 24 degrés et raccourcir chaque branche."></div>
-    <div class="words">
-      <p class="idx">2 / 10 · j'observe</p>
-      <p class="phrase reveal">Je regarde un arbre.</p>
-      <p class="phrase reveal">Une seule règle, répétée : se diviser en deux, un peu plus court, un peu plus fin.</p>
-      <p class="brique reveal"><span class="no">Brique 2</span>L'arbre est un calcul.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s3">
-  <div class="stage">
-    <div class="world" data-world="mer" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="La mer peinte à l'encre, avec des vagues qui bougent sans arrêt sous la Lune. En bas, les trois ondes simples qui, additionnées, forment la vague la plus proche."></div>
-    <div class="words">
-      <p class="idx">3 / 10 · j'observe</p>
-      <p class="phrase reveal">Je regarde la mer.</p>
-      <p class="phrase reveal">Chaque vague est une somme d'ondes simples. Et la Lune tire la marée.</p>
-      <p class="brique reveal"><span class="no">Brique 3</span>La mer est un calcul.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s4">
-  <div class="stage">
-    <div class="world" data-world="fleur" id="w-fleur" style="--ar:1000/600;aspect-ratio:1000/600" role="img" aria-label="Un tournesol peint à l'encre. Ses graines apparaissent une à une, chacune tournée de 137,5 degrés par rapport à la précédente, et dessinent 21 spirales dans un sens et 34 dans l'autre."></div>
-    <div class="words">
-      <p class="idx">4 / 10 · j'observe</p>
-      <p class="phrase reveal">Je regarde une fleur.</p>
-      <p class="phrase reveal">Chaque graine pousse à 137,5° de la précédente. La fleur n'a pas appris les maths : c'est la solution qui a survécu.</p>
-      <div class="control reveal">
-        <label for="angle">Change l'angle</label>
-        <input type="range" id="angle" min="135" max="140" step="0.01" value="137.51">
-        <output id="angle-out" for="angle">137,51°</output>
-        <button class="btn" type="button" id="angle-reset">Angle d'or</button>
-      </div>
-      <p class="brique reveal"><span class="no">Brique 4</span>La fleur est un calcul.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s5">
-  <div class="stage">
-    <div class="world" data-world="hasard" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="À gauche, un caillou tombe d'une falaise et atterrit exactement sur la croix calculée à l'avance. À droite, deux trajectoires de l'attracteur de Lorenz partent de points presque identiques puis se séparent complètement."></div>
-    <div class="words">
-      <p class="idx">5 / 10 · je doute</p>
-      <p class="phrase reveal">Alors, avec toutes les données, je pourrais tout prévoir ?</p>
-      <p class="phrase reveal">Le caillou, oui. La météo, non : un écart d'un millième suffit à tout changer.</p>
-      <p class="phrase aside reveal">Le monde n'est pas prévisible, il est probabiliste. Comme une IA qui tire son mot au sort.</p>
-      <p class="brique reveal"><span class="no">Brique 5</span>Tout se calcule, mais tout ne se prévoit pas.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s6">
-  <div class="stage">
-    <div class="world" data-world="cerveau" style="--ar:1000/520;aspect-ratio:1000/520" role="img" aria-label="Trois neurones peints à l'encre. Un signal parcourt l'axone du premier, se transforme en particules pour traverser la synapse, puis repart dans le neurone suivant."></div>
-    <div class="words">
-      <p class="idx">6 / 10 · je me regarde</p>
-      <p class="phrase reveal">Et moi ? Mes pensées sont des signaux entre 86 milliards de neurones.</p>
-      <p class="phrase reveal">Mon cerveau prédit la suite, lui aussi. Mais il se ré-entraîne à chaque souvenir.</p>
-      <p class="phrase aside reveal">Pas à la vitesse de l'électricité : 120 m/s au mieux. Sa force, c'est que tout travaille en même temps, avec 20 watts.</p>
-      <p class="brique reveal"><span class="no">Brique 6</span>Mon cerveau est un calcul qui apprend.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s7">
-  <div class="stage">
-    <div class="world" data-world="adn" style="--ar:1000/500;aspect-ratio:1000/500" role="img" aria-label="Une double hélice d'ADN tourne lentement. En dessous, une séquence de lettres est lue trois par trois, de ATG jusqu'à TAG, et chaque groupe devient un acide aminé."></div>
-    <div class="words">
-      <p class="idx">7 / 10 · je me regarde</p>
-      <p class="phrase reveal">Avant mes souvenirs, j'ai reçu un code. Quatre lettres, lues trois par trois.</p>
-      <p class="phrase reveal">Pas un texte à lire : la recette pour fabriquer le lecteur.</p>
-      <p class="phrase aside reveal">Ce qui s'enrichit à chaque génération, ce n'est pas l'ADN. C'est la culture.</p>
-      <p class="brique reveal"><span class="no">Brique 7</span>L'ADN construit la machine, la culture la configure.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s8">
-  <div class="stage">
-    <div class="world" data-world="miroir" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="Deux profils humains face à face. Celui de gauche est peint à l'encre. Celui de droite, identique, est fait de chiffres qui défilent le long du contour. Entre les deux, le signe « presque égal » suivi d'un point d'interrogation."></div>
-    <div class="words">
-      <p class="idx">8 / 10 · je compare</p>
-      <p class="phrase reveal">Alors, suis-je une IA ?</p>
-      <p class="phrase reveal">Pas un LLM. Un corps qui a appris à parler en dernier.</p>
-      <p class="phrase reveal">Et qui ressent. Ça, personne ne sait encore l'expliquer.</p>
-      <p class="brique reveal"><span class="no">Brique 8</span>Je suis un corps qui calcule, et qui ressent.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s9">
-  <div class="stage">
-    <div class="world" data-world="vie" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="Un grand cercle zen resté ouvert, avec une jeune pousse au centre dont les feuilles bougent. Par l'ouverture, de l'énergie entre et de la chaleur ressort."></div>
-    <div class="words">
-      <p class="idx">9 / 10 · je définis</p>
-      <p class="phrase reveal">Calculable ne veut pas dire pas vivant.</p>
-      <p class="phrase reveal">Vivre, c'est se maintenir soi-même. Une IA est maintenue ; moi, je me maintiens.</p>
-      <p class="brique reveal"><span class="no">Brique 9</span>Calcul et vie ne s'opposent pas.</p>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="s10">
-  <div class="stage">
-    <div class="world" data-world="pinceau" style="--ar:1000/600;aspect-ratio:1000/600" role="img" aria-label="Un immense pinceau en bambou dont la pointe vient de peindre le sol sous le petit bonhomme assis. De sa tête montent des pensées. En haut, la question : qui tient le pinceau ?"></div>
-    <div class="words">
-      <p class="idx">10 / 10 · je lève les yeux</p>
-      <p class="phrase reveal">Et qui a lancé le calcul ?</p>
-      <p class="phrase reveal">Peut-être personne. L'évolution est un design sans designer, comme une IA qu'on entraîne en corrigeant ses erreurs.</p>
-      <p class="brique reveal"><span class="no">Brique 10</span>La toile a pu se peindre toute seule.</p>
-    </div>
-  </div>
-</section>
-
-<section class="end" id="mur">
-  <h2>Le mur, une fois monté</h2>
-  <ol class="wall">
-    <li><span>1</span>Une IA, c'est un calcul.</li>
-    <li><span>2</span>L'arbre est un calcul.</li>
-    <li><span>3</span>La mer est un calcul.</li>
-    <li><span>4</span>La fleur est un calcul.</li>
-    <li><span>5</span>Tout se calcule, mais tout ne se prévoit pas.</li>
-    <li><span>6</span>Mon cerveau est un calcul qui apprend.</li>
-    <li><span>7</span>L'ADN construit la machine, la culture la configure.</li>
-    <li><span>8</span>Je suis un corps qui calcule, et qui ressent.</li>
-    <li><span>9</span>Calcul et vie ne s'opposent pas.</li>
-    <li><span>10</span>La toile a pu se peindre toute seule.</li>
-  </ol>
-  <p class="last">Je suis peut-être un calcul. Mais un calcul vivant, qui ressent, et qui se demande qui il est.</p>
-  <ul class="open">
-    <li>Si on prouvait que je suis entièrement calculable, qu'est-ce que je perdrais ?</li>
-    <li>Une machine qui se répare et craint qu'on l'éteigne, serait-elle vivante ?</li>
-    <li>Pourquoi le calcul ressent-il quelque chose ?</li>
-  </ul>
-  <footer>
-    <span class="seal" aria-hidden="true">人</span>
-    <span>HUman · une réflexion de Mathieu, mise à l'épreuve avec Claude.</span>
-  </footer>
-</section>
-
-</main>
 
 <script>
 (() => {
-const TAU = Math.PI * 2;
+const TAU = Math.PI * 2, GA = 137.50776 * Math.PI / 180;
 const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-if (!reduced) document.documentElement.classList.add('js');
-const INK = '20,19,18', PAPER = [234,232,226], INKV = [20,19,18];
-const FONT = {
-  display: '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif',
-  body: '"Zen Kaku Gothic New","Hiragino Sans",system-ui,sans-serif',
-  mono: '"IBM Plex Mono",ui-monospace,Menlo,monospace'
-};
-const WEIGHT = { display: 700, body: 500, mono: 400 };
-let TS = 1; // agrandit les petits textes des dessins sur écran étroit
-
-function rng(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
+const DISPLAY = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif';
+const MONO = '"IBM Plex Mono",ui-monospace,Menlo,monospace';
+const c01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const sm = v => { v = c01(v); return v * v * (3 - 2 * v); };
+const eio = v => { v = c01(v); return v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
+const rv = (T, s, d) => sm((T - s) / d);
+const sstep = (a, b, x) => sm((x - a) / (b - a));
+const lerp = (a, b, t) => a + (b - a) * t;
+function hash(a, b) {
+  let x = (Math.imul(a | 0, 374761393) + Math.imul((b | 0) + 1, 668265263)) | 0;
+  x = Math.imul(x ^ (x >>> 13), 1274126177); x ^= x >>> 16;
+  return (x >>> 0) / 4294967296;
 }
-const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
-const ease = v => { v = clamp01(v); return v * v * (3 - 2 * v); };
-const rv = (m, s, d) => m < 0 ? 0 : ease((m - s) / d);
-const fr = (v, d) => v.toFixed(d).replace('.', ',');
-function shade(a) {
-  const c = PAPER.map((p, i) => Math.round(p + (INKV[i] - p) * a));
-  return `rgb(${c[0]},${c[1]},${c[2]})`;
+const gauss = (u, v) => Math.sqrt(-2 * Math.log(u + 1e-9)) * Math.cos(TAU * v);
+const fr = s => s.replace(/ ([?:!;])/g, ' $1');
+
+/* ——— le temps ——— */
+const END = 134;
+const CH = [[0,'Ouverture'],[10,"L'IA"],[22.5,'Le monde'],[44,'La fleur'],[58.5,'Au fond'],[76.5,"L'univers"],[96.5,'Le cerveau'],[106,'Le miroir'],[120,'La question']];
+const REST = [9, 20, 43, 55, 69, 88, 104, 117, 132];
+const CAPS = [
+  { t0: 3.2, t1: 9.6, k: 'title', kick: 'HUman · une réflexion de Mathieu', text: 'Et si nous étions le plus gros LLM jamais observé ?' },
+  { t0: 11.6, t1: 16.4, text: "Pour une IA, chaque mot est un point dans l'espace." },
+  { t0: 16.8, t1: 21.6, text: 'Une phrase est un chemin. Le mot suivant : un calcul, puis un tirage au sort.' },
+  { t0: 23.6, t1: 28.4, text: "J'ai voulu comprendre l'IA. J'ai trouvé des maths." },
+  { t0: 28.9, t1: 33.4, text: "Alors j'ai levé les yeux." },
+  { t0: 33.9, t1: 38.2, text: 'Un arbre : une seule règle, répétée.' },
+  { t0: 38.6, t1: 43.6, text: "La mer : des ondes simples qui s'additionnent." },
+  { t0: 48.6, t1: 53.2, text: 'Une fleur : chaque graine à 137,5° de la précédente.' },
+  { t0: 53.6, t1: 58.4, text: "Elle n'a jamais appris les maths. C'est la solution qui a survécu." },
+  { t0: 59.2, t1: 64.6, text: 'Plus près.' },
+  { t0: 65.4, t1: 70.4, text: 'Dans chaque graine, un code. Quatre lettres, lues trois par trois.' },
+  { t0: 72.6, t1: 77.2, text: 'Et tout au fond, la nature tire au sort.' },
+  { t0: 79.8, t1: 84.6, text: 'Le monde se calcule. Il ne se prévoit pas.' },
+  { t0: 85.2, t1: 89.6, text: 'Des spirales, de la fleur à la galaxie.' },
+  { t0: 91.2, t1: 96.2, text: "Et si l'univers n'était qu'un grand algorithme ?" },
+  { t0: 97.6, t1: 102.4, text: 'Et moi ? Des signaux entre 86 milliards de neurones.' },
+  { t0: 102.8, t1: 106.8, text: 'Un cerveau qui prédit la suite. Comme une IA ?' },
+  { t0: 109.2, t1: 112.8, text: 'Suis-je une IA ?' },
+  { t0: 113.2, t1: 117.6, text: 'Pas un LLM. Un corps qui a appris à parler en dernier.' },
+  { t0: 118, t1: 122.4, text: 'Un corps qui se maintient seul, et qui ressent.' },
+  { t0: 123, t1: 1e9, k: 'final', text: "Si tout est calcul, pourquoi est-ce que ça fait quelque chose d'être moi ?" }
+];
+CAPS.forEach(c => { c.text = fr(c.text); });
+document.getElementById('sr-list').innerHTML = CAPS.map(c => `<li>${c.text}</li>`).join('');
+
+/* ——— couleurs : papier le jour, encre la nuit ——— */
+const PAPER = [234,232,226], NIGHT = [12,11,10], INKC = [20,19,18], LIGHT = [233,230,222];
+let FG = 'rgb(20,19,18)', BG = 'rgb(234,232,226)', NGT = -1;
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const root = document.documentElement;
+function setNight(n) {
+  if (Math.abs(n - NGT) < 0.002) return;
+  NGT = n;
+  FG = `rgb(${mix(INKC, LIGHT, n)})`; BG = `rgb(${mix(PAPER, NIGHT, n)})`;
+  root.style.setProperty('--fg', FG); root.style.setProperty('--bg', BG);
+  root.style.colorScheme = n > .5 ? 'dark' : 'light';
 }
 
-/* ——— pinceau : couche peinte, qui s'accumule ——— */
-function smooth(points, spacing) {
-  const P = points.map(q => ({ x: q[0], y: q[1], p: q[2] ?? 1 }));
-  if (P.length === 1) return [P[0]];
-  const out = [];
+/* ——— toiles ——— */
+const cv = document.getElementById('c'), out = cv.getContext('2d');
+const sc = document.createElement('canvas'), ctx = sc.getContext('2d');
+let W = 1, H = 1, DPR = 1, dprCap = 1.75, S0b = 1, LAND = true, CX = 0, CY = 0, MM = 1, NP = 1400, jump = true;
+let zMoon = 5, CF = [0, 0], RF = 1, PCX = 0, PCY = 0, SP = 1, PGAP = 1;
+const NS = 600, NPMAX = 1600;
+
+/* ——— taches d'encre pré-rendues ——— */
+function blotCanvas(col, seed) {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d');
+  x.fillStyle = `rgba(${col},.07)`; x.beginPath(); x.arc(32, 32, 27, 0, TAU); x.fill();
+  for (let i = 0; i < 52; i++) {
+    const a = hash(seed, i) * TAU, rr = Math.sqrt(hash(seed, i + 99)) * 10;
+    x.fillStyle = `rgba(${col},.34)`; x.beginPath(); x.arc(32 + Math.cos(a) * rr, 32 + Math.sin(a) * rr, 5 + hash(seed, i + 7) * 5.5, 0, TAU); x.fill();
+  }
+  return c;
+}
+const SPI = [0,1,2,3].map(v => blotCanvas(INKC.join(','), 100 + v));
+const SPL = [0,1,2,3].map(v => blotCanvas(LIGHT.join(','), 200 + v));
+function spr(x, y, r, a, v, sy) {
+  if (a <= 0.004 || r <= 0) return;
+  const s = r * 4, h = s * (sy || 1);
+  if (NGT < 0.999) { ctx.globalAlpha = c01(a * (1 - NGT)); ctx.drawImage(SPI[v & 3], x - s / 2, y - h / 2, s, h); }
+  if (NGT > 0.001) { ctx.globalAlpha = c01(a * NGT); ctx.drawImage(SPL[v & 3], x - s / 2, y - h / 2, s, h); }
+  ctx.globalAlpha = 1;
+}
+
+/* ——— le pinceau ——— */
+const cr = (a, b, c, d, t, t2, t3) => 0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+function dense(P, step) {
+  const o = [];
   for (let i = 0; i < P.length - 1; i++) {
     const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || P[i + 1];
-    const n = Math.max(1, Math.ceil(Math.hypot(p2.x - p1.x, p2.y - p1.y) / spacing));
-    for (let k = 0; k < n; k++) {
-      const t = k / n, t2 = t * t, t3 = t2 * t;
-      const f = (a, b, c, d) => 0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
-      out.push({ x: f(p0.x, p1.x, p2.x, p3.x), y: f(p0.y, p1.y, p2.y, p3.y), p: p1.p + (p2.p - p1.p) * t });
-    }
+    const n = Math.max(1, Math.min(48, Math.ceil(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / step)));
+    for (let k = 0; k < n; k++) { const t = k / n, t2 = t * t, t3 = t2 * t; o.push([cr(p0[0], p1[0], p2[0], p3[0], t, t2, t3), cr(p0[1], p1[1], p2[1], p3[1], t, t2, t3)]); }
   }
-  const L = P[P.length - 1]; out.push({ x: L.x, y: L.y, p: L.p });
-  return out;
+  o.push(P[P.length - 1]);
+  return o;
 }
-function normals(pts) {
-  for (let i = 0; i < pts.length; i++) {
-    const a = pts[Math.max(0, i - 2)], b = pts[Math.min(pts.length - 1, i + 2)];
-    const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1;
-    pts[i].nx = -dy / l; pts[i].ny = dx / l;
-  }
-}
-function bristles(w, r) {
-  const B = Math.max(5, Math.min(24, Math.round(5 + w * 1.1))), out = [];
-  for (let i = 0; i < B; i++) out.push({ o: i / (B - 1) * 2 - 1 + (r() - 0.5) * 0.15, k: 0.55 + r() * 0.45, d: r(), ph: r() * 50 });
-  return out;
-}
-function taper(t, a, b) {
+function taperF(t, a, b) {
   let v = 1;
   if (t < a) v = Math.sin(t / a * Math.PI / 2);
   if (t > 1 - b) v = Math.min(v, Math.sin((1 - t) / b * Math.PI / 2));
-  return Math.max(0.06, v);
+  return Math.max(0.05, v);
 }
-function stamp(ctx, it, from, to) {
-  const pts = it.pts, N = pts.length, br = it.br;
-  const ink = it.ink ?? 0.9, dry = it.dry ?? 0.3, w = it.w ?? 6, halo = it.halo ?? 1;
-  const ta = it.taper ? it.taper[0] : 0.12, tb = it.taper ? it.taper[1] : 0.3;
-  for (let j = from; j < to && j < N; j++) {
-    const q = pts[j], t = N > 1 ? j / (N - 1) : 0.5, W = w * taper(t, ta, tb) * q.p;
-    if (halo > 0 && j % 3 === 0) {
-      ctx.fillStyle = `rgba(${INK},${(ink * 0.02 * halo).toFixed(4)})`;
-      ctx.beginPath(); ctx.arc(q.x, q.y, W * 0.8 + 1.4, 0, TAU); ctx.fill();
-    }
-    const rad = Math.max(0.4, W / br.length * 1.5 + 0.3);
-    const fade = 1 - dry * Math.pow(t, 1.4) * 0.75, gap = dry * Math.pow(t, 1.1);
-    for (let b = 0; b < br.length; b++) {
-      const s = br[b];
-      if (gap > 0 && s.d < gap && Math.sin(j * 0.09 + s.ph) > -0.2) continue;
-      ctx.fillStyle = `rgba(${INK},${(ink * s.k * 0.3 * fade).toFixed(3)})`;
-      ctx.beginPath(); ctx.arc(q.x + q.nx * s.o * W * 0.5, q.y + q.ny * s.o * W * 0.5, rad, 0, TAU); ctx.fill();
-    }
-  }
-}
-function blot(ctx, d, r) {
-  const ink = d.ink ?? 0.85;
-  ctx.fillStyle = `rgba(${INK},${(ink * 0.07).toFixed(3)})`;
-  ctx.beginPath(); ctx.arc(d.x, d.y, d.r * 1.7, 0, TAU); ctx.fill();
-  const n = Math.max(7, Math.round(d.r * 3.2));
-  for (let i = 0; i < n; i++) {
-    const a = r() * TAU, rr = Math.sqrt(r()) * d.r * 0.62;
-    ctx.fillStyle = `rgba(${INK},${(ink * 0.34).toFixed(3)})`;
-    ctx.beginPath(); ctx.arc(d.x + Math.cos(a) * rr, d.y + Math.sin(a) * rr, d.r * (0.32 + r() * 0.34), 0, TAU); ctx.fill();
-  }
-}
-function drawItem(ctx, it, from, to) {
-  if (it.type === 'stroke') stamp(ctx, it, from, to);
-  else if (it.type === 'multi') for (const p of it.parts) drawItem(ctx, p, Math.min(from, p.total), Math.min(to, p.total));
-  else if (it.type === 'dots') for (let k = from; k < to && k < it.list.length; k++) blot(ctx, it.list[k], rng(it.seed * 131 + k));
-}
-function rate(it) {
-  if (it.type === 'stroke') return (it.speed || 12) / (it.spacing || 0.8);
-  if (it.type === 'multi' || it.type === 'dots') return it.perFrame || 2;
-  return 1;
-}
-function prep(item, seed) {
-  const it = Object.assign({}, item, { seed, prog: 0 });
-  if (it.type === 'stroke') { it.pts = smooth(item.pts, it.spacing || 0.8); normals(it.pts); it.br = bristles(it.w ?? 6, rng(seed)); it.total = it.pts.length; }
-  else if (it.type === 'multi') { it.parts = item.parts.map((p, k) => prep(p, seed * 7 + k)); it.total = Math.max(...it.parts.map(p => p.total)); }
-  else if (it.type === 'dots') it.total = it.list.length;
-  else it.total = it.frames || 10;
-  return it;
-}
-
-/* ——— couche vivante, redessinée à chaque image ——— */
-const SPR = [];
-for (let v = 0; v < 4; v++) {
-  const c = document.createElement('canvas'); c.width = c.height = 64;
-  blot(c.getContext('2d'), { x: 32, y: 32, r: 16, ink: 1 }, rng(100 + v));
-  SPR.push(c);
-}
-function spr(c, x, y, r, a, v) {
-  c.globalAlpha = clamp01(a);
-  c.drawImage(SPR[(v || 0) & 3], x - r * 2, y - r * 2, r * 4, r * 4);
-  c.globalAlpha = 1;
-}
-function font(c, f, size) { c.font = `${WEIGHT[f]} ${size <= 20 ? size * TS : size}px ${FONT[f]}`; }
-function label(c, s, x, y, o) {
+function ribbon(P, w, o) {
   o = o || {};
-  font(c, o.font || 'mono', o.size || 16);
-  c.textAlign = o.align || 'left'; c.textBaseline = o.base || 'middle';
-  c.fillStyle = `rgba(${INK},${clamp01(o.a ?? 0.85).toFixed(3)})`;
-  c.fillText(s, x, y);
+  const al = o.alpha ?? 0.9, prog = o.prog ?? 1;
+  if (al <= 0.004 || w < 0.12 || P.length < 2 || prog <= 0) return;
+  const Q = o.raw ? P : dense(P, Math.max(2.5, Math.min(10, w * 0.8)));
+  const n = Q.length, L = new Float32Array(n);
+  for (let i = 1; i < n; i++) L[i] = L[i - 1] + Math.hypot(Q[i][0] - Q[i - 1][0], Q[i][1] - Q[i - 1][1]);
+  const tot = L[n - 1] || 1, cut = tot * Math.min(1, prog);
+  const ta = o.taper ? o.taper[0] : 0.12, tb = o.taper ? o.taper[1] : 0.3, sd = o.seed || 1;
+  const lx = [], ly = [], rx = [], ry = [], cx = [], cy = [], nx = [], ny = [], ww = [];
+  for (let i = 0; i < n; i++) {
+    let x = Q[i][0], y = Q[i][1], d = L[i];
+    if (i > 0 && d > cut) { const f = (cut - L[i - 1]) / ((d - L[i - 1]) || 1); x = Q[i - 1][0] + (x - Q[i - 1][0]) * f; y = Q[i - 1][1] + (y - Q[i - 1][1]) * f; d = cut; }
+    const a = Q[Math.max(0, i - 1)], b = Q[Math.min(n - 1, i + 1)];
+    const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, Nx = -dy / l, Ny = dx / l;
+    const wv = w * taperF(d / tot, ta, tb) * (1 + 0.12 * Math.sin(d / Math.max(4, w * 1.3) + sd)) * 0.5;
+    lx.push(x + Nx * wv); ly.push(y + Ny * wv); rx.push(x - Nx * wv); ry.push(y - Ny * wv);
+    cx.push(x); cy.push(y); nx.push(Nx); ny.push(Ny); ww.push(wv);
+    if (L[i] >= cut) break;
+  }
+  const m = lx.length; if (m < 2) return;
+  ctx.globalAlpha = c01(al); ctx.fillStyle = FG;
+  ctx.beginPath(); ctx.moveTo(lx[0], ly[0]);
+  for (let i = 1; i < m; i++) ctx.lineTo(lx[i], ly[i]);
+  for (let i = m - 1; i >= 0; i--) ctx.lineTo(rx[i], ry[i]);
+  ctx.closePath(); ctx.fill();
+  if (prog < 1) { ctx.beginPath(); ctx.arc(cx[m - 1], cy[m - 1], ww[m - 1], 0, TAU); ctx.fill(); }
+  const dry = o.dry ?? 0.35;
+  if (dry > 0 && w > 3.5) {
+    ctx.strokeStyle = BG;
+    for (const k of [-0.78, -0.3, 0.62, 0.84]) {
+      const h1 = hash(sd, Math.round(k * 100)), h2 = hash(sd, Math.round(k * 100) + 7);
+      ctx.lineWidth = Math.max(0.5, w * (0.018 + 0.03 * h1)); ctx.globalAlpha = c01(al * dry * (0.5 + 0.5 * h2));
+      ctx.setLineDash([w * (3 + h1 * 9), w * (0.6 + h2 * 1.8), w * (0.8 + h2 * 3), w * (2 + h1 * 5)]); ctx.lineDashOffset = sd * 13 + h1 * w * 10;
+      ctx.beginPath();
+      for (let i = 0; i < m; i++) { const f = k * ww[i]; if (i) ctx.lineTo(cx[i] + nx[i] * f, cy[i] + ny[i] * f); else ctx.moveTo(cx[i] + nx[i] * f, cy[i] + ny[i] * f); }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+  ctx.globalAlpha = 1;
 }
-function pen(c, pts, p, a, w, dash) {
-  if (p <= 0 || pts.length < 2) return;
-  c.save(); c.strokeStyle = `rgba(${INK},${a ?? 0.6})`; c.lineWidth = w || 1; c.lineCap = 'round';
-  if (dash) c.setLineDash(dash);
+function pen(P, a, w, dash, prog) {
+  if (a <= 0.004 || P.length < 2) return;
+  prog = prog ?? 1; if (prog <= 0) return;
   let L = 0; const seg = [];
-  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(l); L += l; }
-  let rem = L * Math.min(1, p);
-  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
-  for (let i = 1; i < pts.length && rem > 0; i++) {
+  for (let i = 1; i < P.length; i++) { const l = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]); seg.push(l); L += l; }
+  let rem = L * Math.min(1, prog);
+  ctx.globalAlpha = c01(a); ctx.strokeStyle = FG; ctx.lineWidth = w || 1; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(P[0][0], P[0][1]);
+  for (let i = 1; i < P.length && rem > 0; i++) {
     const l = seg[i - 1];
-    if (l <= rem) { c.lineTo(pts[i][0], pts[i][1]); rem -= l; }
-    else { const f = rem / l; c.lineTo(pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f); rem = 0; }
+    if (l <= rem) { ctx.lineTo(P[i][0], P[i][1]); rem -= l; }
+    else { const f = rem / l; ctx.lineTo(P[i - 1][0] + (P[i][0] - P[i - 1][0]) * f, P[i - 1][1] + (P[i][1] - P[i - 1][1]) * f); rem = 0; }
   }
-  c.stroke(); c.restore();
+  ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
 }
-function poly(c, pts, n, a, w, dash) {
-  n = Math.min(n, pts.length); if (n < 2) return;
-  c.save(); c.strokeStyle = `rgba(${INK},${a})`; c.lineWidth = w; c.lineJoin = 'round'; c.lineCap = 'round';
-  if (dash) c.setLineDash(dash);
-  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
-  for (let i = 1; i < n; i++) c.lineTo(pts[i][0], pts[i][1]);
-  c.stroke(); c.restore();
+function txt(s, x, y, px, f, a, align) {
+  if (a <= 0.004 || px > 500 || px < 1) return;
+  ctx.globalAlpha = c01(a); ctx.fillStyle = FG;
+  ctx.font = `${f === 'd' ? 500 : 400} ${px}px ${f === 'd' ? DISPLAY : MONO}`;
+  ctx.textAlign = align || 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y); ctx.globalAlpha = 1;
 }
-function inkLine(c, pts, w, a) {
-  const n = pts.length; if (n < 2) return;
-  c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
-  c.strokeStyle = `rgba(${INK},${(a * 0.07).toFixed(3)})`; c.lineWidth = w * 3.2;
-  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < n; i++) c.lineTo(pts[i][0], pts[i][1]); c.stroke();
-  c.strokeStyle = shade(a);
-  for (let i = 1; i < n; i++) {
-    const t = i / (n - 1), ww = w * (0.3 + 0.7 * Math.sin(Math.PI * clamp01(t))) * (pts[i][2] ?? 1);
-    c.lineWidth = Math.max(0.6, ww);
-    c.beginPath(); c.moveTo(pts[i - 1][0], pts[i - 1][1]); c.lineTo(pts[i][0], pts[i][1]); c.stroke();
-  }
-  if (w > 2.5) { // traînées de pinceau sec
-    c.strokeStyle = `rgba(${PAPER.join(',')},.55)`; c.lineWidth = 0.7; c.setLineDash([3, 9]);
-    c.beginPath(); c.moveTo(pts[0][0], pts[0][1] + w * 0.18); for (let i = 1; i < n; i++) c.lineTo(pts[i][0], pts[i][1] + w * 0.18); c.stroke();
-  }
-  c.restore();
+function fillPoly(P, a) {
+  if (a <= 0.004) return;
+  ctx.globalAlpha = c01(a); ctx.fillStyle = BG;
+  ctx.beginPath(); P.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = 1;
 }
-function hline(x0, x1, y, step) { const o = []; for (let x = x0; x <= x1 + 0.01; x += step || 6) o.push([x, y + Math.sin(x * 0.05) * 0.8]); if (o.length < 2) o.push([x1, y]); return o; }
-function along(pts, p) {
-  let L = 0; const seg = [];
-  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(l); L += l; }
-  let rem = L * clamp01(p);
-  for (let i = 1; i < pts.length; i++) {
-    if (seg[i - 1] >= rem) { const f = rem / (seg[i - 1] || 1); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f]; }
-    rem -= seg[i - 1];
+function ensoPts(cx, cy, r, a0, sw, n, wob, seed) {
+  const P = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, a = (a0 + sw * t) * Math.PI / 180, rr = r * (1 + wob * Math.sin(a * 3 + seed) + (hash(seed, i) - 0.5) * wob * 0.5);
+    P.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
   }
-  return pts[pts.length - 1].slice();
+  return P;
 }
-function arrowPen(c, x1, y1, x2, y2, p, a) {
-  const e = along([[x1, y1], [x2, y2]], p);
-  pen(c, [[x1, y1], e], 1, a, 1.2);
-  if (p > 0.9) {
-    const ang = Math.atan2(y2 - y1, x2 - x1), h = 9;
-    pen(c, [[x2 - Math.cos(ang - 0.45) * h, y2 - Math.sin(ang - 0.45) * h], [x2, y2], [x2 - Math.cos(ang + 0.45) * h, y2 - Math.sin(ang + 0.45) * h]], 1, a, 1.2);
-  }
+function circlePts(cx, cy, r, n, wob, seed) {
+  const P = [];
+  for (let i = 0; i <= n; i++) { const a = i / n * TAU, rr = r * (1 + wob * Math.sin(a * 3 + seed) + (hash(seed, i % n) - .5) * wob); P.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]); }
+  return P;
 }
 
-/* ——— motifs ——— */
-function enso(cx, cy, r, a0, sweep, n, wob, seed) {
-  const R = rng(seed || 1), pts = [];
-  n = n || 30; wob = wob ?? 0.025;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n, a = (a0 + sweep * t) * Math.PI / 180;
-    const rr = r * (1 + wob * Math.sin(a * 3 + (seed || 1)) + (R() - 0.5) * wob * 0.6);
-    pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, 1.15 - 0.45 * t]);
-  }
-  return pts;
+/* ——— le rivage (niveau 0, unité = hauteur de la scène) ——— */
+const MOON = [0.42, -0.30];
+const MOON_PTS = ensoPts(MOON[0], MOON[1], 0.07, 200, 320, 44, 0.02, 5);
+const TH = { ox: -0.66, oy: 0.122, s: 0.00095 };
+const THINKER = [
+  { p: [[30,396],[110,386],[205,390],[290,398]], w: 30, a: .14, tp: [.25,.3], dry: .7 },
+  { p: [[36,398],[50,350],[88,312],[140,302],[182,314],[204,352],[212,398]], w: 5, a: .75, tp: [.1,.4], dry: .6 },
+  { p: [[142,98],[124,138],[110,192],[112,248],[128,300]], w: 11 },
+  { p: ensoPts(162, 62, 33, 200, 320, 22, 0.03, 3), w: 8, tp: [.06,.5] },
+  { p: [[128,300],[176,292],[224,290],[252,297]], w: 12 },
+  { p: [[252,298],[255,345],[250,392]], w: 9 },
+  { p: [[240,395],[260,397],[280,394]], w: 6 },
+  { p: [[140,312],[188,320],[226,324],[232,362],[226,394]], w: 8, a: .5 },
+  { p: [[146,118],[172,172],[204,232],[234,280]], w: 8 },
+  { p: [[236,282],[233,222],[216,152],[194,108]], w: 8 },
+  { p: [[180,100],[192,97],[200,107],[193,118]], w: 7 }
+];
+const tl = (x, y) => [TH.ox + x * TH.s, TH.oy + y * TH.s];
+THINKER.forEach(st => { st.u = st.p.map(q => tl(q[0], q[1])); });
+const ROCK = [[36,398],[50,350],[88,312],[140,302],[182,314],[204,352],[212,398],[212,420],[36,420]].map(q => tl(q[0], q[1]));
+const EYE = tl(182, 58);
+const BEACH = [[-1.5,0.47],[-0.8,0.462],[-0.3,0.468],[0.1,0.465],[0.3,0.47],[0.3,0.7],[-1.5,0.7]];
+const CLIFF = [[0.26,0.7],[0.3,0.47],[0.36,0.43],[0.45,0.405],[0.62,0.398],[0.85,0.402],[1.5,0.40],[1.5,0.7]];
+const MTN1 = [[-1.2,-0.02],[-0.85,-0.075],[-0.66,-0.1],[-0.5,-0.06],[-0.38,-0.02]];
+const MTN2 = [[-0.45,-0.02],[-0.3,-0.05],[-0.18,-0.035],[-0.06,-0.02]];
+const TB = [0.52, 0.40], TREE = [], TIPS = []; let FORK = null;
+(function () {
+  let id = 0;
+  const grow = (x, y, ang, len, w, d) => {
+    const ex = x + Math.cos(ang) * len, ey = y + Math.sin(ang) * len, j = (hash(id, 3) - 0.5) * 0.14 * len;
+    const node = { x, y, ex, ey, mx: (x + ex) / 2 - Math.sin(ang) * j, my: (y + ey) / 2 + Math.cos(ang) * j, w, d, ang, id: id++ };
+    TREE.push(node);
+    if (d === 7) { TIPS.push(node); return node; }
+    const spread = (24 + (hash(node.id, 5) - 0.5) * 10) * Math.PI / 180, skew = (hash(node.id, 6) - 0.5) * 0.25;
+    const kids = [-1, 1].map(s => grow(ex, ey, ang + s * spread + skew, len * (0.72 + (hash(node.id, 8 + s) - 0.5) * 0.1), w * 0.707, d + 1));
+    if (d === 0) FORK = { x: ex, y: ey, kids, w };
+    return node;
+  };
+  grow(TB[0], TB[1], -Math.PI / 2, 0.12, 0.017, 0);
+})();
+function sway(x, y, th) {
+  const a = th * c01((TB[1] - y) / 0.45), dx = x - TB[0], dy = y - TB[1];
+  return [TB[0] + dx * Math.cos(a) - dy * Math.sin(a), TB[1] + dx * Math.sin(a) + dy * Math.cos(a)];
 }
-function thinker(ox, oy, s) {
-  const T = pts => pts.map(p => [ox + p[0] * s, oy + p[1] * s, p[2]]);
-  const S = (pts, w, o) => Object.assign({ type: 'stroke', pts: T(pts), w: w * s, speed: 12 * Math.max(0.6, s) }, o || {});
-  return [
-    S([[30,396],[110,386],[205,390],[290,398]], 30, { ink: .14, dry: .7, taper: [.25,.3], halo: .5 }),
-    S([[36,398],[50,350],[88,312],[140,302],[182,314],[204,352],[212,398]], 5, { ink: .7, dry: .6, taper: [.1,.4] }),
-    S([[142,98],[124,138],[110,192],[112,248],[128,300]], 11, { ink: .95, dry: .3, taper: [.1,.35] }),
-    S(enso(162, 62, 33, 200, 320, 22, 0.03, 3), 8, { ink: .95, dry: .35, taper: [.06,.5] }),
-    S([[128,300],[176,292],[224,290],[252,297]], 12, { ink: .95, dry: .3, taper: [.15,.2] }),
-    S([[252,298],[255,345],[250,392]], 9, { dry: .35, taper: [.1,.3] }),
-    S([[240,395],[260,397],[280,394]], 6, { taper: [.2,.5] }),
-    S([[140,312],[188,320],[226,324],[232,362],[226,394]], 8, { ink: .45, dry: .5 }),
-    S([[146,118],[172,172],[204,232],[234,280]], 8, { ink: .9 }),
-    S([[236,282],[233,222],[216,152],[194,108]], 8, { ink: .92, taper: [.15,.2] }),
-    S([[180,100],[192,97],[200,107],[193,118]], 7, { ink: 1, taper: [.3,.3] }),
-    { type: 'dots', list: [{ x: ox + 182 * s, y: oy + 58 * s, r: 2.6 * s + 0.4 }], perFrame: 1 }
-  ];
-}
-function branch(out, x, y, ang, len, w, depth, r) {
-  const pts = [[x, y]]; let cx = x, cy = y, a = ang;
-  for (let i = 0; i < 4; i++) { a += (r() - 0.5) * 0.5; cx += Math.cos(a) * len / 4; cy += Math.sin(a) * len / 4; pts.push([cx, cy]); }
-  out.push({ type: 'stroke', pts, w, ink: .85, dry: .3, taper: [.02,.7], speed: 10, gap: 0 });
-  if (depth > 0) for (const sgn of [-1, 1]) branch(out, cx, cy, a + sgn * (0.35 + r() * 0.4), len * 0.62, w * 0.6, depth - 1, r);
-}
-function neuron(out, x, y, angles, seed) {
-  const r = rng(seed);
-  out.push({ type: 'dots', list: [{ x, y, r: 15, ink: .95 }], perFrame: 1 });
-  for (const d of angles) branch(out, x, y, d * Math.PI / 180, 64 + r() * 18, 6, 2, r);
-}
-function sea(x, t, i, s) {
-  const X = x / s;
+function seaY(x, t, i, s) {
+  const X = x * 1000 / s;
   return 0.62 * Math.sin(X / 42 - t * 1.1 + i) + 0.28 * Math.sin(X / 19 + t * 0.8 + i * 2) + 0.14 * Math.sin(X / 9 - t * 1.7 + i * 3);
 }
-function bird(c, x, y, flap) {
-  c.save(); c.strokeStyle = shade(.8); c.lineWidth = 1.6; c.lineCap = 'round';
-  c.beginPath(); c.moveTo(x - 10, y - 2 - flap); c.quadraticCurveTo(x - 4, y - 7 - flap, x, y); c.quadraticCurveTo(x + 4, y - 7 - flap, x + 10, y - 2 - flap); c.stroke();
-  c.restore();
+
+/* ——— les niveaux de zoom ——— */
+const seedPos = n => { const r = 0.92 * Math.sqrt(n / NS), a = n * GA; return [r * Math.cos(a), r * Math.sin(a)]; };
+const R_LV = [0.028, 0.03, 0.05, 0.02];
+const A_LV = [[0.08, 0.30], seedPos(60), [0, 0], [0, 0]];
+const C0 = [0, 0];
+let SK = [1, 1, 1, 1, 1];
+function computeSK() {
+  const F = [S0b, 0.38 * MM, 0.42 * MM, 0.45 * MM, 0.42 * MM];
+  let R = 1; SK = [];
+  for (let k = 0; k < 5; k++) { SK.push(F[k] / R); if (k < 4) R *= R_LV[k]; }
 }
-function vec(word) {
-  let h = 7; for (const ch of word) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const r = rng(h), f = () => (r() * 2 - 1).toFixed(2).replace('-', '−');
-  return `[${f()}, ${f()}, ${f()} …]`;
+function uOf(T) {
+  const seg = [[44,48,0,1],[56,60,1,2],[62,65,2,3],[70,73,3,4]];
+  let u = 0;
+  for (const [a, b, u0, u1] of seg) {
+    if (T >= b) { u = u1; continue; }
+    if (T > a) u = u0 + (u1 - u0) * eio((T - a) / (b - a));
+    break;
+  }
+  return u;
 }
+function buildViews(S0, k, fk) {
+  const f = new Array(5); f[k] = fk;
+  for (let j = k - 1; j >= 0; j--) f[j] = [A_LV[j][0] + R_LV[j] * f[j + 1][0], A_LV[j][1] + R_LV[j] * f[j + 1][1]];
+  for (let j = k + 1; j < 5; j++) f[j] = [(f[j - 1][0] - A_LV[j - 1][0]) / R_LV[j - 1], (f[j - 1][1] - A_LV[j - 1][1]) / R_LV[j - 1]];
+  const v = []; let S = S0;
+  for (let j = 0; j < 5; j++) { v.push({ S, fx: f[j][0], fy: f[j][1], a: 1 }); if (j < 4) S *= R_LV[j]; }
+  for (let j = 0; j < 5; j++) {
+    let a = 1;
+    if (j > 0) a *= sstep(0.02 * MM, 0.12 * MM, v[j].S);
+    if (j < 4) a *= 1 - sstep(0.18 * MM, 0.34 * MM, v[j + 1].S);
+    v[j].a = a;
+  }
+  return v;
+}
+function camera(T) {
+  if (T < 44) {
+    let z;
+    const zs = zMoon * 1.02;
+    if (T < 22) z = zMoon * (1 + 0.02 * T / 22);
+    else if (T < 28) z = Math.exp(Math.log(zs) * (1 - eio((T - 22) / 6)));
+    else z = 1 + 0.012 * Math.sin((T - 28) * 0.4);
+    const w = c01((1 - 1 / z) / (1 - 1 / zs));
+    return buildViews(S0b * z, 0, [C0[0] + (MOON[0] - C0[0]) * w, C0[1] + (MOON[1] - C0[1]) * w]);
+  }
+  const u = uOf(T);
+  let k = Math.min(3, Math.floor(u)), phi = u - k;
+  if (u >= 4) { k = 3; phi = 1; }
+  const s0 = SK[k], s1 = SK[k + 1], S0 = Math.exp(Math.log(s0) + (Math.log(s1) - Math.log(s0)) * phi);
+  const w = (1 - s0 / S0) / (1 - s0 / s1);
+  const ck = k === 0 ? C0 : [0, 0], ak = A_LV[k];
+  return buildViews(S0, k, [ck[0] + (ak[0] - ck[0]) * w, ck[1] + (ak[1] - ck[1]) * w]);
+}
+const MP = (v, x, y) => [CX + (x - v.fx) * v.S, CY + (y - v.fy) * v.S];
+
+/* ——— niveau 0 : le rivage ——— */
+function drawCoast(v, T) {
+  const a = v.a; if (a < 0.004) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
+  ribbon(MOON_PTS.map(p => m(p[0], p[1])), 0.018 * S, { alpha: .92 * a, prog: rv(T, 2.4, 2.8), taper: [.05,.5], dry: .6, seed: 3 });
+  if (T < 22.8) return;
+  for (let i = 0; i < 7; i++) {
+    const q = (i + 1) / 7, base = -0.02 + 0.46 * Math.pow(q, 1.55), A = 0.002 + i * 0.0034, s = 0.3 + 0.7 * q, ts = 0.6 + 0.4 * q;
+    const p = rv(T, 23 + i * 0.22, 2.4); if (p <= 0) continue;
+    const pts = [], x1 = -1.45 + 2.9 * p;
+    for (let x = -1.45; x <= x1; x += 0.012) pts.push(m(x, base + A * seaY(x, T * ts, i, s)));
+    ribbon(pts, (0.0012 + i * 0.0011) * S, { alpha: (.32 + .08 * i) * a, raw: true, dry: 0, taper: [.02,.02] });
+  }
+  ribbon([m(-1.45, -0.02), m(0, -0.021), m(1.45, -0.02)], 0.004 * S, { alpha: .8 * a, prog: rv(T, 23.2, 2.2), dry: .5, taper: [.02,.2] });
+  ribbon(MTN1.map(p => m(p[0], p[1])), 0.035 * S, { alpha: .15 * a, prog: rv(T, 24, 2.5), taper: [.3,.3], dry: .7 });
+  ribbon(MTN2.map(p => m(p[0], p[1])), 0.02 * S, { alpha: .11 * a, prog: rv(T, 24.6, 2.2), taper: [.3,.3], dry: .7 });
+  const ba = rv(T, 29, 2) * a;
+  if (ba > 0) for (let k = 0; k < 3; k++) {
+    const x = 1.3 - (((T - 29) * 0.05 + k * 0.6) % 2.6), y = -0.24 + k * 0.05 + 0.01 * Math.sin(T + k), fl = 0.004 * Math.sin(T * 6 + k * 2), s = 0.012;
+    pen([m(x - s, y - 0.002 - fl), m(x - s * 0.4, y - 0.007 - fl), m(x, y)], .8 * ba, Math.max(1, 0.0022 * S));
+    pen([m(x, y), m(x + s * 0.4, y - 0.007 - fl), m(x + s, y - 0.002 - fl)], .8 * ba, Math.max(1, 0.0022 * S));
+  }
+  fillPoly(BEACH.map(p => m(p[0], p[1])), rv(T, 25.4, 1.2) * a);
+  fillPoly(CLIFF.map(p => m(p[0], p[1])), rv(T, 26, 1.2) * a);
+  ribbon(BEACH.slice(0, 5).map(p => m(p[0], p[1])), 0.004 * S, { alpha: .55 * a, prog: rv(T, 25.4, 2), dry: .6 });
+  ribbon(CLIFF.slice(1, 7).map(p => m(p[0], p[1])), 0.007 * S, { alpha: .85 * a, prog: rv(T, 26, 2), dry: .5, taper: [.05,.3] });
+  ribbon([[0.34,0.47],[0.5,0.45],[0.8,0.44],[1.2,0.445]].map(p => m(p[0], p[1])), 0.03 * S, { alpha: .12 * a, prog: rv(T, 26.5, 2), taper: [.3,.3], dry: .7 });
+  fillPoly(ROCK.map(p => m(p[0], p[1])), rv(T, 25, 1) * a);
+  THINKER.forEach((st, i) => {
+    const p = rv(T, 25 + i * 0.34, 0.55); if (p <= 0) return;
+    ribbon(st.u.map(q => m(q[0], q[1])), st.w * TH.s * S, { alpha: (st.a ?? .92) * a, prog: p, taper: st.tp || [.12,.3], dry: st.dry ?? .3, seed: i + 11 });
+  });
+  const ep = m(EYE[0], EYE[1]); spr(ep[0], ep[1], Math.max(0.8, 0.0026 * S), .95 * a * rv(T, 29, .4), 1);
+  ribbon([m(0.08,0.47), m(0.074,0.39), m(0.08,0.328)], 0.006 * S, { alpha: .9 * a, prog: rv(T, 27.5, 1.2), taper: [.05,.1] });
+  ribbon([m(0.078,0.41), m(0.10,0.395), m(0.12,0.40)], 0.012 * S, { alpha: .8 * a, prog: rv(T, 28.3, .8), taper: [.45,.55] });
+  ribbon([m(0.077,0.43), m(0.055,0.415), m(0.035,0.42)], 0.011 * S, { alpha: .8 * a, prog: rv(T, 28.6, .8), taper: [.45,.55] });
+  const hp = rv(T, 29, 1.2);
+  if (hp > 0) {
+    for (let k = 0; k < 21; k++) {
+      const an = k * TAU / 21, r1 = 0.026, r2 = 0.046;
+      ribbon([m(0.08 + Math.cos(an) * r1, 0.30 + Math.sin(an) * r1), m(0.08 + Math.cos(an) * r2, 0.30 + Math.sin(an) * r2)], 0.009 * S, { alpha: .5 * a * hp, taper: [.4,.55], dry: 0 });
+    }
+    const hc = m(0.08, 0.30); spr(hc[0], hc[1], 0.017 * S, .95 * a * hp, 2);
+  }
+  const th = 0.03 * Math.sin(T * 0.8) + 0.012 * Math.sin(T * 2.1 + 1);
+  TREE.forEach(nd => {
+    const g = rv(T, 28.6 + nd.d * 0.75, 0.85); if (g <= 0) return;
+    const e = [nd.x + (nd.ex - nd.x) * g, nd.y + (nd.ey - nd.y) * g];
+    const P = g < 0.6 ? [[nd.x, nd.y], e] : [[nd.x, nd.y], [nd.mx, nd.my], e];
+    ribbon(P.map(q => { const s2 = sway(q[0], q[1], th); return m(s2[0], s2[1]); }), nd.w * S, { alpha: (.95 - nd.d * .03) * a, taper: [.02,.3], dry: .3 + nd.d * .04, seed: nd.id });
+  });
+  const la = rv(T, 34.8, 1.6) * a;
+  if (la > 0) TIPS.forEach((tp, i) => {
+    for (let k = 0; k < 2; k++) {
+      const s2 = sway(tp.ex + (hash(i, k) - .5) * 0.02, tp.ey + (hash(i, k + 5) - .5) * 0.016, th), p = m(s2[0], s2[1]);
+      spr(p[0], p[1], (0.003 + hash(i, k + 9) * 0.004) * S, la * (.35 + hash(i, k + 3) * .5), i + k);
+    }
+  });
+  if (T > 36) for (let j = 0; j < 5; j++) {
+    const cyc = 6, tt = T - 36 + j * 1.2, n = Math.floor(tt / cyc), t = tt - n * cyc;
+    const tp = TIPS[Math.floor(hash(j, n) * TIPS.length)];
+    const tLand = Math.pow(Math.max(0, 0.395 - tp.ey) / 0.02, 1 / 1.3);
+    let y = tp.ey + 0.02 * Math.pow(t, 1.3), fade = 1;
+    if (y > 0.395) { y = 0.395; fade = 1 - c01((t - tLand) / 1.2); }
+    const p = m(tp.ex + 0.02 * Math.min(t, tLand + 0.2) + 0.01 * Math.sin(t * 2 + j), y);
+    ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(Math.sin(t * 2.2 + j) * 0.9);
+    spr(0, 0, 0.004 * S, .8 * a * fade, j, 0.5); ctx.restore();
+  }
+  if (T > 35.5) {
+    const ta = rv(T, 36, 1.5) * a;
+    if (FORK && ta > 0) {
+      const F = sway(FORK.x, FORK.y, th), Fm = m(F[0], F[1]), k1 = FORK.kids[0], k2 = FORK.kids[1];
+      const up = sway(FORK.x, FORK.y - 0.06, th);
+      pen([Fm, m(up[0], up[1])], .55 * ta, 1, [4, 4]);
+      const r = 0.035 * S, a0 = -Math.PI / 2 + th, a1 = k2.ang + th;
+      ctx.globalAlpha = .6 * ta; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(Fm[0], Fm[1], r, a0, a0 + (a1 - a0) * rv(T, 36.3, 1)); ctx.stroke(); ctx.globalAlpha = 1;
+      txt(`θ ≈ ${Math.round((k2.ang + Math.PI / 2) * 180 / Math.PI)}°`, Fm[0] + r * 1.1, Fm[1] + 10, 13, 'm', .85 * rv(T, 37, 1));
+      const km = sway((k1.x + k1.ex) / 2, (k1.y + k1.ey) / 2, th), kp = m(km[0], km[1]);
+      txt('× 0,72', kp[0] - 12, kp[1], 13, 'm', .85 * rv(T, 37.6, 1), 'right');
+    }
+    const sa = rv(T, 38.8, 1.5) * a;
+    if (sa > 0) {
+      const comps = [[0.62, (X, t) => X / 42 - t * 1.1 + 4], [0.28, (X, t) => X / 19 + t * 0.8 + 8], [0.14, (X, t) => X / 9 - t * 1.7 + 12]];
+      const s = 0.3 + 0.7 * 5 / 7, ts = 0.6 + 0.4 * 5 / 7, A = 0.002 + 4 * 0.0034;
+      comps.forEach(([wt, g], j) => {
+        const y0 = 0.19 - j * 0.03, P = [];
+        for (let x = -0.3; x <= 0.12; x += 0.006) P.push(m(x, y0 + wt * A * 2.2 * Math.sin(g(x * 1000 / s, T * ts))));
+        pen(P, .55 * sa, 1, null, rv(T, 38.8 + j * .3, 1.2));
+        const e = m(0.13, y0); txt(`onde ${j + 1}`, e[0] + 6, e[1], 12, 'm', .7 * sa);
+      });
+      const e = m(0.13, 0.253); txt('= la vague', e[0] + 6, e[1] - 8, 12, 'm', .7 * rv(T, 40, 1) * a);
+    }
+    const ha = rv(T, 40.2, 1.5) * a;
+    if (ha > 0) {
+      pen([m(EYE[0], EYE[1]), m(0.25, -0.02)], .5 * ha, 1, [5, 5], rv(T, 40.2, 1.5));
+      const lp = m(-0.14, 0.05); txt('horizon : d ≈ 3,57 √h ≈ 11 km', lp[0], lp[1], 13, 'm', .8 * rv(T, 41, 1), 'center');
+    }
+    const fla = rv(T, 42, 1) * a;
+    if (fla > 0) { pen([m(0.105, 0.315), m(0.15, 0.36)], .6 * fla, 1); const lp = m(0.152, 0.36); txt('137,5°', lp[0] + 5, lp[1] + 2, 13, 'm', .85 * fla); }
+  }
+}
+
+/* ——— niveau 1 : la fleur ——— */
+function drawFlower(v, T) {
+  const a = v.a; if (a < 0.004) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
+  ribbon([m(0, 0.95), m(0.03, 2.5), m(0.06, 5)], 0.13 * S, { alpha: .85 * a, taper: [.02,.02], dry: .4 });
+  for (let k = 0; k < 34; k++) {
+    const an = k * TAU / 34 + 0.03 * Math.sin(k * 2.3) + 0.02 * Math.sin(T * 0.7 + k), r1 = 0.98, r2 = 1.5 + 0.08 * Math.sin(k * 1.7), rm = (r1 + r2) / 2;
+    ribbon([m(Math.cos(an) * r1, Math.sin(an) * r1), m(Math.cos(an + .03) * rm, Math.sin(an + .03) * rm), m(Math.cos(an + .015) * r2, Math.sin(an + .015) * r2)], 0.17 * S, { alpha: .5 * a, taper: [.4,.55], dry: .5, seed: k });
+  }
+  ribbon(circlePts(0, 0, 0.975, 60, 0.006, 4).map(p => m(p[0], p[1])), 0.02 * S, { alpha: .6 * a, dry: .4, taper: [.02,.05] });
+}
+function drawFlowerOverlay(v, T) {
+  const a = v.a; if (a < 0.004) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
+  const da = rv(T, 49.5, 1) * (1 - rv(T, 53.5, 1)) * a;
+  if (da > 0) {
+    const c = m(0, 0), r0 = 0.55;
+    for (let n = 1; n <= 3; n++) { const an = n * GA; pen([c, m(Math.cos(an) * r0, Math.sin(an) * r0)], .65 * da, 1, n === 3 ? [3, 3] : null, rv(T, 49.5 + n * .3, .8)); }
+    ctx.globalAlpha = .65 * da; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(c[0], c[1], 0.26 * S, GA, GA + GA * rv(T, 50.3, 1), false); ctx.stroke(); ctx.globalAlpha = 1;
+    txt('137,5°', c[0] + Math.cos(1.5 * GA) * 0.36 * S, c[1] + Math.sin(1.5 * GA) * 0.36 * S, 16, 'm', .95 * da, 'center');
+  }
+  const spa = rv(T, 53.8, 1.8) * a;
+  if (spa > 0) {
+    for (const [fam, dash] of [[21, null], [34, [4, 4]]]) {
+      for (const k0 of [599, 592, 585, 578]) {
+        const P = []; for (let k = k0; k >= 1; k -= fam) { const p = seedPos(k); P.push(m(p[0], p[1])); }
+        pen(P, .55 * spa, 1.1, dash, rv(T, 53.8, 2.2));
+      }
+      const e = seedPos(599 - (fam === 21 ? 0 : 7)), ang = Math.atan2(e[1], e[0]), p = m(e[0] + Math.cos(ang) * 0.1, e[1] + Math.sin(ang) * 0.1);
+      txt(String(fam), p[0], p[1], 16, 'm', .9 * spa, 'center');
+    }
+  }
+}
+
+/* ——— niveau 2 : la graine et ses cellules ——— */
+const SEED_OUT = [];
+for (let i = 0; i <= 64; i++) { const th = i / 64 * TAU, f = 0.66 + 0.34 * (1 + Math.cos(th)) / 2; SEED_OUT.push([0.78 * Math.sin(th) * f, -Math.cos(th)]); }
+function inPoly(x, y, P) { let ins = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) { const xi = P[i][0], yi = P[i][1], xj = P[j][0], yj = P[j][1]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) ins = !ins; } return ins; }
+const CELLS = [];
+for (let j = -7; j <= 7; j++) for (let i = -6; i <= 6; i++) {
+  const x = i * 0.2 + (Math.abs(j) % 2) * 0.1, y = j * 0.173;
+  if (inPoly(x / 0.86, y / 0.86, SEED_OUT)) CELLS.push({ x, y, c: i === 0 && j === 0, k: CELLS.length });
+}
+function drawSeed(v, T) {
+  const a = v.a; if (a < 0.004) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
+  ribbon(SEED_OUT.map(p => m(p[0], p[1])), 0.03 * S, { alpha: .85 * a, dry: .45, taper: [.02,.05] });
+  CELLS.forEach(c => {
+    ribbon(circlePts(c.x, c.y, 0.088, 16, 0.07, c.k).map(p => m(p[0], p[1])), 0.01 * S, { alpha: .55 * a, dry: 0, taper: [.02,.05], seed: c.k });
+    if (c.c) {
+      ribbon(circlePts(0, 0, 0.05, 24, 0.03, 9).map(p => m(p[0], p[1])), 0.006 * S, { alpha: .8 * a, dry: 0, taper: [.02,.05] });
+      for (let k = 0; k < 6; k++) { const p = m((hash(k, 1) - .5) * 0.05, (hash(k, 2) - .5) * 0.05); spr(p[0], p[1], 0.006 * S, .6 * a, k); }
+    } else {
+      const p = m(c.x + (hash(c.k, 3) - .5) * 0.04, c.y + (hash(c.k, 4) - .5) * 0.04); spr(p[0], p[1], 0.022 * S, .75 * a, c.k);
+    }
+  });
+}
+
+/* ——— niveau 3 : le noyau et l'ADN ——— */
+const CHROM = [];
+for (let k = 0; k < 9; k++) {
+  let x = (hash(k, 1) - .5) * 1.2, y = (hash(k, 2) - .5) * 1.2, an = hash(k, 3) * TAU; const P = [];
+  for (let s = 0; s < 24; s++) {
+    an += (hash(k, s + 10) - .5) * 1.4; x += Math.cos(an) * 0.06; y += Math.sin(an) * 0.06;
+    const r = Math.hypot(x, y); if (r > 0.84) { x *= 0.84 / r; y *= 0.84 / r; an += Math.PI; }
+    if (Math.abs(y) < 0.12 && Math.abs(x) < 0.65) y += (y < 0 ? -1 : 1) * 0.04;
+    P.push([x, y]);
+  }
+  CHROM.push(P);
+}
+const CODONS = [['ATG','Met'],['GCC','Ala'],['ATT','Ile'],['GTA','Val'],['AAG','Lys'],['GGC','Gly'],['CGC','Arg'],['TTC','Phe'],['AAG','Lys'],['GGT','Gly'],['GCC','Ala'],['TAG','stop']];
+function drawNucleus(v, T) {
+  const a = v.a; if (a < 0.004) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
+  for (const R of [1, 0.93]) for (let k = 0; k < 12; k++) {
+    const P = []; for (let s = 0; s <= 8; s++) { const an = (k * 30 + 4 + s * 22 / 8) * Math.PI / 180; P.push(m(Math.cos(an) * R, Math.sin(an) * R)); }
+    ribbon(P, 0.012 * S, { alpha: .7 * a, dry: 0, taper: [.2,.2], seed: k });
+  }
+  CHROM.forEach((P, k) => ribbon(P.map(p => m(p[0], p[1])), 0.012 * S, { alpha: .28 * a, dry: .3, seed: k }));
+  const A = 0.075, lam = 0.24, ph0 = T * 1.2, back = [], front = [];
+  for (const off of [0, Math.PI * 0.8]) for (let x = -0.6; x < 0.6; x += 0.012) {
+    const a1 = TAU * x / lam + ph0 + off, a2 = TAU * (x + 0.012) / lam + ph0 + off, z = Math.cos((a1 + a2) / 2);
+    (z < 0 ? back : front).push([x, A * Math.sin(a1), x + 0.012, A * Math.sin(a2), z]);
+  }
+  const segs = L => {
+    ctx.strokeStyle = FG; ctx.lineCap = 'round';
+    for (const [x1, y1, x2, y2, z] of L) {
+      const e = Math.pow(Math.max(0, 1 - Math.abs(x1) / 0.6), 0.4);
+      ctx.globalAlpha = a * e * (0.3 + 0.62 * (z + 1) / 2); ctx.lineWidth = (0.006 + 0.012 * (z + 1) / 2) * S;
+      const p = m(x1, y1), q = m(x2, y2); ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  };
+  segs(back);
+  ctx.strokeStyle = FG; ctx.lineWidth = Math.max(0.6, 0.004 * S);
+  for (let x = -0.58; x < 0.58; x += 0.03) {
+    const ya = A * Math.sin(TAU * x / lam + ph0), yb = A * Math.sin(TAU * x / lam + ph0 + Math.PI * 0.8);
+    if (Math.abs(ya - yb) < 0.012) continue;
+    ctx.globalAlpha = .45 * a * Math.pow(1 - Math.abs(x) / 0.6, 0.4);
+    const p = m(x, ya), q = m(x, yb); ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  segs(front);
+  const ca = rv(T, 64.6, 1) * a;
+  if (ca > 0) {
+    const px = 0.034 * S;
+    if (px < 500) {
+      ctx.font = `400 ${px}px ${MONO}`;
+      const cw = ctx.measureText('ATG ').width, bw = ctx.measureText('ATG').width, x0 = m(-0.5, 0.2);
+      const cur = Math.floor((T - 65.4) * 2.3);
+      CODONS.forEach(([cod], i) => {
+        txt(cod, x0[0] + i * cw, x0[1], px, 'm', (i <= cur ? .95 : .5) * ca);
+        if (i === cur) { ctx.globalAlpha = .7 * ca; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0[0] + i * cw - px * .2, x0[1] - px * .75, bw + px * .4, px * 1.5); ctx.globalAlpha = 1; }
+      });
+      if (cur >= 0) { const y = m(0, 0.27); txt(CODONS.slice(0, Math.min(cur + 1, 12)).map(c => c[1]).join(' – '), x0[0], y[1], 0.022 * S, 'm', .8 * ca); }
+      const t = m(-0.5, -0.17); txt('ATG = commence · TAG = stop', t[0], t[1], 0.022 * S, 'm', .75 * ca);
+    }
+  }
+}
+
+/* ——— niveau 4 : l'atome ——— */
+function drawAtom(v, T) {
+  const a = v.a * (1 - rv(T, 76.5, 1.5)); if (a < 0.004) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
+  for (let k = 0; k < 14; k++) { const p = m((hash(k, 31) - .5) * 0.09, (hash(k, 32) - .5) * 0.09); spr(p[0], p[1], 0.018 * S, .9 * a, k); }
+  const lp = m(0, 0.98); txt("l'électron : une probabilité, pas une place", lp[0], lp[1], 13, 'm', .75 * rv(T, 73.5, 1) * a, 'center');
+}
+
+/* ——— l'espace : réseau cosmique, neurones, visages, ensō ——— */
+const NODES = [[0, 0]];
+for (let k = 0; NODES.length < 44 && k < 4000; k++) {
+  const x = hash(k, 51) * 2 - 1, y = hash(k, 52) * 2 - 1;
+  if (NODES.every(n => Math.hypot((n[0] - x) * 1.5, n[1] - y) > 0.25)) NODES.push([x, y]);
+}
+const EDGES = [], ADJ = NODES.map(() => []);
+NODES.forEach((n, i) => {
+  NODES.map((o, j) => [j, Math.hypot((o[0] - n[0]) * 1.5, o[1] - n[1])]).filter(e => e[0] !== i).sort((p, q) => p[1] - q[1]).slice(0, 3).forEach(([j]) => {
+    if (!EDGES.some(e => (e[0] === i && e[1] === j) || (e[0] === j && e[1] === i))) { EDGES.push([i, j, hash(i * 97 + j, 7) - .5]); ADJ[i].push([j, EDGES.length - 1]); ADJ[j].push([i, EDGES.length - 1]); }
+  });
+});
+const nodeXY = (i, kw) => [CX + NODES[i][0] * W * 0.54 * kw, CY + NODES[i][1] * H * 0.54 * kw];
+function edgePt(e, t, kw) {
+  const E = EDGES[e], A = nodeXY(E[0], kw), B = nodeXY(E[1], kw);
+  const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2, dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy) || 1;
+  const cx = mx - dy / L * E[2] * 0.3 * L, cy = my + dx / L * E[2] * 0.3 * L, u = 1 - t;
+  return [u * u * A[0] + 2 * u * t * cx + t * t * B[0], u * u * A[1] + 2 * u * t * cy + t * t * B[1], -dy / L, dx / L];
+}
+const kwOf = T => lerp(2.3, 1, eio((T - 89.3) / 5.5));
 const PROFILE = {
   back: [[150,40],[110,50],[78,95],[70,150],[82,210],[100,250],[108,300],[102,350],[96,410]],
   face: [[150,40],[185,52],[205,92],[207,128],[214,142],[236,186],[220,196],[214,204],[222,218],[212,228],[218,242],[206,272],[180,290],[166,300],[168,350],[176,410]],
@@ -560,610 +650,336 @@ const PROFILE = {
   ear: [[112,160],[124,150],[134,168],[126,190],[114,192]],
   eye: [[184,134],[197,137]]
 };
-const IA_STEPS = [
-  { c: [['à', .62], ['que', .21], ['aux', .09], ['souvent', .03]], pick: 0, sp: ' ', hops: [1, 0, 2, 0, 1, 3, 0, 0] },
-  { c: [['la', .31], ['mon', .24], ['l’', .18], ['rien', .04]], pick: 1, sp: ' ', hops: [0, 2, 1, 0, 3, 0, 2, 1] },
-  { c: [['père', .29], ['enfance', .26], ['avenir', .11], ['chat', .02]], pick: 1, sp: ' ', hops: [0, 2, 0, 1, 3, 0, 2, 1] },
-  { c: [['.', .57], [',', .23], ['et', .12], ['!', .05]], pick: 0, sp: '', hops: [1, 0, 2, 1, 0, 3, 1, 0] }
+const PROF_KEYS = ['face', 'back', 'ear', 'eye', 'shB', 'shF'];
+const OUTL = []; PROF_KEYS.forEach(k => dense(PROFILE[k], 6).forEach(p => OUTL.push(p)));
+const HEADPOLY = PROFILE.face.concat(PROFILE.back.slice().reverse());
+const INS = [];
+for (let k = 0; INS.length < 700 && k < 20000; k++) { const x = 60 + hash(k, 61) * 190, y = 40 + hash(k, 62) * 380; if (inPoly(x, y, HEADPOLY)) INS.push([x, y]); }
+const lmap = (x, y) => [PCX - PGAP / 2 - (236 - x) * SP, PCY + (y - 251) * SP];
+const rmap = (x, y) => { const p = lmap(x, y); return [2 * PCX - p[0], p[1]]; };
+function drawSpace(T) {
+  if (T > 89 && T < 108) {
+    const kw = kwOf(T), ha = rv(T, 90, 3) * (1 - rv(T, 96.5, 2));
+    if (ha > 0) NODES.forEach((n, i) => { const p = nodeXY(i, kw); spr(p[0], p[1], (10 + hash(i, 3) * 14) * Math.min(1.6, kw), .18 * ha, i); });
+    const na = rv(T, 96.8, 2.2) * (1 - rv(T, 105.5, 2));
+    if (na > 0) {
+      EDGES.forEach((E, e) => {
+        const P = []; for (let s = 0; s <= 10; s++) { const q = edgePt(e, s / 10, kw); P.push([q[0], q[1]]); }
+        ribbon(P, 3.6, { alpha: .65 * na, taper: [.02,.7], dry: 0, seed: e, prog: rv(T, 96.8 + hash(e, 2) * 1.2, 1.2) });
+      });
+      NODES.forEach((n, i) => {
+        const p = nodeXY(i, kw);
+        for (let k = 0; k < 3; k++) {
+          const an = hash(i, k + 40) * TAU, L = MM * (0.02 + hash(i, k + 44) * 0.025);
+          ribbon([p, [p[0] + Math.cos(an) * L * .5, p[1] + Math.sin(an) * L * .5 + 2], [p[0] + Math.cos(an + .3) * L, p[1] + Math.sin(an + .3) * L]], 2.2, { alpha: .55 * na, taper: [.02,.8], dry: 0 });
+        }
+        spr(p[0], p[1], 3.5 + hash(i, 9) * 2.5, .95 * na, i);
+      });
+      if (T > 97.5) {
+        ctx.globalCompositeOperation = 'lighter';
+        for (let p = 0; p < 16; p++) {
+          const rate = 1.2 + hash(p, 3) * 0.8, sf = (T - 97.5) * rate + hash(p, 4) * 3, st = Math.floor(sf), f2 = sf - st;
+          let cur = Math.floor(hash(p, 5) * NODES.length), prev = -1, edge = -1, dir = 1;
+          for (let q = 0; q <= st; q++) {
+            let opts = ADJ[cur].filter(o => o[0] !== prev); if (!opts.length) opts = ADJ[cur];
+            if (!opts.length) break;
+            const ch = opts[Math.floor(hash(p * 131 + q, 6) * opts.length)];
+            edge = ch[1]; dir = EDGES[edge][0] === cur ? 1 : -1;
+            if (q < st) { prev = cur; cur = ch[0]; }
+          }
+          if (edge < 0) continue;
+          for (let k = 5; k >= 0; k--) { const t = f2 - k * 0.04; if (t < 0) continue; const q = edgePt(edge, dir > 0 ? t : 1 - t, kw); spr(q[0], q[1], k ? 3.5 - k * .4 : 5, na * (k ? .22 : .9), k); }
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+    const la = rv(T, 98, 1.5) * (1 - rv(T, 105, 1.5));
+    txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : 92, 12, 'm', .7 * la, 'right');
+  }
+  if (T > 105.5 && T < 122) {
+    const pa = rv(T, 107, 1) * (1 - rv(T, 119, 1.5));
+    PROF_KEYS.forEach((key, i) => {
+      const w = key === 'ear' || key === 'eye' ? 4 : key === 'back' ? 9 : 7;
+      ribbon(PROFILE[key].map(q => lmap(q[0], q[1])), w * SP * 1.1, { alpha: .92 * pa, prog: rv(T, 107 + i * 0.5, 1.6), taper: [.08,.35], dry: .35, seed: i + 30 });
+    });
+    txt('≈', PCX, PCY - 0.02 * H, Math.round(0.07 * MM), 'd', .8 * rv(T, 109, 1.5) * (1 - rv(T, 118.5, 1.5)), 'center');
+    const da = rv(T, 109.5, 1.5) * (1 - rv(T, 118.5, 1.5));
+    if (da > 0) {
+      const DIG = '0.71−0.350.920.08−0.440.13';
+      for (let k = 0; k < OUTL.length; k += 4) { const p = rmap(OUTL[k][0], OUTL[k][1]); txt(DIG[(k + Math.floor(T * 7)) % DIG.length], p[0] + 7, p[1], 11, 'm', .7 * da, 'center'); }
+    }
+  }
+  if (T > 120.3) ribbon(ensoPts(CF[0], CF[1], RF, 200, 320, 50, 0.02, 7), 0.06 * RF, { alpha: .93, prog: rv(T, 120.5, 3), taper: [.04,.55], dry: .6, seed: 7 });
+}
+
+/* ——— les particules : le fil rouge ——— */
+const PA = new Float32Array(NPMAX), PB = new Float32Array(NPMAX), PC = new Float32Array(NPMAX), PD = new Float32Array(NPMAX), GX = new Float32Array(NPMAX), GY = new Float32Array(NPMAX), GZ = new Float32Array(NPMAX);
+for (let i = 0; i < NPMAX; i++) { PA[i] = hash(i, 1); PB[i] = hash(i, 2); PC[i] = hash(i, 3); PD[i] = hash(i, 4); GX[i] = gauss(hash(i, 11), hash(i, 12)); GY[i] = gauss(hash(i, 13), hash(i, 14)); GZ[i] = gauss(hash(i, 15), hash(i, 16)); }
+const WORDS = ['je', 'regarde', 'la', 'mer', 'et', 'pense', 'à', 'l’', 'univers'];
+const CL = WORDS.map((w, k) => { const a = hash(k, 71) * TAU, b = Math.acos(hash(k, 72) * 2 - 1), r = 0.45 + hash(k, 73) * 0.3; return [r * Math.sin(b) * Math.cos(a), r * Math.cos(b), r * Math.sin(b) * Math.sin(a)]; });
+const NC = 900;
+function proj(x, y, z, T, V) {
+  const ay = T * 0.2, ax = 0.35 + 0.08 * Math.sin(T * 0.3);
+  const x1 = x * Math.cos(ay) + z * Math.sin(ay), z1 = -x * Math.sin(ay) + z * Math.cos(ay);
+  const y1 = y * Math.cos(ax) - z1 * Math.sin(ax), z2 = y * Math.sin(ax) + z1 * Math.cos(ax);
+  const p = 1.8 / (1.8 + z2);
+  return [V.moonC[0] + x1 * p * V.moonR * 0.82, V.moonC[1] + y1 * p * V.moonR * 0.82, p];
+}
+const O1 = { x: 0, y: 0, s: 0, a: 0 }, O2 = { x: 0, y: 0, s: 0, a: 0 };
+function shape(name, i, T, V, o) {
+  switch (name) {
+    case 'ring': {
+      const th = i / NP * TAU + PA[i] * 0.02, rr = V.moonR * (1 + (PB[i] - .5) * .07);
+      o.x = V.moonC[0] + Math.cos(th) * rr; o.y = V.moonC[1] + Math.sin(th) * rr; o.s = 1.1 + PC[i] * 1.1; o.a = .75; return;
+    }
+    case 'cloud': {
+      if (i >= NC) { shape('ring', i, T, V, o); o.a = 0; return; }
+      const c = CL[i % 9], q = proj(c[0] + GX[i] * .075, c[1] + GY[i] * .075, c[2] + GZ[i] * .075, T, V);
+      o.x = q[0]; o.y = q[1]; o.s = (0.7 + 0.9 * q[2]) * 1.2; o.a = Math.max(.15, Math.min(.95, .25 + .6 * (q[2] - .55))); return;
+    }
+    case 'seed': {
+      if (i >= NS) { o.a = 0; o.x = -99; o.y = -99; o.s = 0; return; }
+      const n = i + 1, p = seedPos(n), q = MP(V.v[1], p[0], p[1]), s = 0.028 * V.v[1].S * 0.9;
+      o.x = q[0]; o.y = q[1]; o.s = Math.max(0.7, s);
+      o.a = .92 * rv(T, 48.3 + n * 0.0105, .5) * V.v[1].a * (1 - sstep(0.05 * MM, 0.2 * MM, s)); return;
+    }
+    case 'atom': {
+      const k = Math.floor(T * 8 + PA[i] * 8), u1 = hash(i, k * 5 + 1), u2 = hash(i, k * 5 + 2), u3 = hash(i, k * 5 + 3), u4 = hash(i, k * 5 + 4);
+      let x, y;
+      if (u1 < 0.7) { const al = (u2 < .5 ? -1 : 1) * (0.2 + 0.62 * Math.pow(u3, 0.6)); x = (u4 - .5) * 2 * 0.34 * Math.sin(Math.PI * c01((Math.abs(al) - 0.2) / 0.62)); y = al; }
+      else { const an = u2 * TAU, rr = 0.36 + (u3 - .5) * 0.12; x = Math.cos(an) * rr; y = Math.sin(an) * rr * 0.22; }
+      const q = MP(V.v[4], x, y); o.x = q[0]; o.y = q[1]; o.s = 1.3; o.a = .85 * V.v[4].a; return;
+    }
+    case 'bang': {
+      o.x = W / 2 + (PA[i] - .5) * 1.3 * W; o.y = H / 2 + (PB[i] - .5) * 1.3 * H; o.s = 0.5 + Math.pow(PC[i], 4) * 2.6;
+      o.a = .3 + .6 * (.5 + .5 * Math.sin(T * 1.7 + PD[i] * 40)); return;
+    }
+    case 'galaxy': {
+      const gs = lerp(1, 0.05, eio((T - 89.3) / 4)), gR = 0.44 * MM * gs;
+      let th, rad;
+      if (PC[i] < 0.22) { rad = gR * 0.1 * Math.abs(GX[i]); th = PB[i] * TAU; }
+      else { const t = Math.pow(PA[i], 0.8), arm = i % 2; th = arm * Math.PI + t * 5.2 + GY[i] * 0.18 * (1.1 - t); rad = gR * (0.08 + 0.92 * t); }
+      th += T * 0.06;
+      const x = Math.cos(th) * rad, y = Math.sin(th) * rad * 0.62, tl2 = -0.4;
+      o.x = CX + x * Math.cos(tl2) - y * Math.sin(tl2); o.y = CY + x * Math.sin(tl2) + y * Math.cos(tl2);
+      o.s = (0.6 + (1 - PA[i]) * 1.3 + Math.pow(PD[i], 6) * 2) * (0.4 + 0.6 * gs); o.a = .4 + .5 * PD[i]; return;
+    }
+    case 'web': case 'neurons': {
+      const kw = kwOf(T), neu = name === 'neurons';
+      if (hash(i, 21) < 0.3) { const q = nodeXY(Math.floor(hash(i, 22) * NODES.length), kw), sg = (neu ? 0.006 : 0.013) * MM; o.x = q[0] + GX[i] * sg; o.y = q[1] + GY[i] * sg; }
+      else { const q = edgePt(i % EDGES.length, PA[i], kw), sg = (neu ? 0.0015 : 0.007) * MM * GZ[i]; o.x = q[0] + q[2] * sg; o.y = q[1] + q[3] * sg; }
+      o.s = neu ? 0.9 : 0.6 + Math.pow(PC[i], 3) * 1.6; o.a = neu ? .75 : .5 + .35 * PD[i]; return;
+    }
+    case 'profile': {
+      if (i < NP * 0.55) { const q = OUTL[i % OUTL.length], p = rmap(q[0], q[1]); o.x = p[0] + GX[i] * 1.2; o.y = p[1] + GY[i] * 1.2; o.s = 1.3; o.a = .9; }
+      else { const q = INS[i % INS.length], p = rmap(q[0], q[1]); o.x = p[0]; o.y = p[1]; o.s = 0.9; o.a = .32; }
+      return;
+    }
+    case 'enso': {
+      const th = (200 + 320 * (i / NP)) * Math.PI / 180 + GX[i] * 0.01, rr = RF * (1 + GY[i] * 0.03);
+      o.x = CF[0] + Math.cos(th) * rr; o.y = CF[1] + Math.sin(th) * rr; o.s = 1.1; o.a = .85; return;
+    }
+  }
+}
+const KF = [
+  { t: 10, s: 'ring', d: .8 }, { t: 11.4, s: 'cloud', d: 2.5 }, { t: 20.5, s: 'ring', d: 1.6 }, { t: 23.2, s: 'hidden', d: 1.5 },
+  { t: 46.5, s: 'seed', d: .1 }, { t: 71, s: 'atom', d: .1 }, { t: 77, s: 'bang', d: 2.5 }, { t: 81.2, s: 'galaxy', d: 4 },
+  { t: 89.5, s: 'web', d: 3.5 }, { t: 96.5, s: 'neurons', d: 2 }, { t: 105.5, s: 'profile', d: 3 }, { t: 118.5, s: 'enso', d: 2.5 }, { t: 124.5, s: 'hidden', d: 2.5 }
 ];
-const CODONS = [['ATG','Met'],['GCC','Ala'],['ATT','Ile'],['GTA','Val'],['AAG','Lys'],['GGC','Gly'],['CGC','Arg'],['TTC','Phe'],['AAG','Lys'],['GGT','Gly'],['GCC','Ala'],['TAG','stop']];
-
-/* ——— les dessins ——— */
-const WORLDS = {
-  hero: { w: 1000, h: 600, seed: 3,
-    paint: () => [
-      { type: 'stroke', pts: [[300,300],[650,302],[995,299]], w: 3, ink: .7, dry: .5, taper: [.05,.3], speed: 22 },
-      { type: 'stroke', pts: [[560,300],[610,276],[670,266],[730,284],[775,300]], w: 16, ink: .16, dry: .5, taper: [.3,.3] },
-      { type: 'stroke', pts: enso(860, 120, 40, 210, 320, 24, .03, 5), w: 7, ink: .85, dry: .4, taper: [.06,.5] },
-      ...thinker(40, 195, 1)
-    ],
-    live: (c, f) => {
-      const t = f.t, cfg = [[318,1.5,.35,.8,.35],[350,3,.55,1.3,.5],[398,5,.75,2,.65],[470,8,1,3,.8]];
-      cfg.forEach(([b, A, s, w, a], i) => {
-        const pts = []; for (let x = 300; x <= 1000; x += 8) pts.push([x, b + A * sea(x, t, i, s)]);
-        inkLine(c, pts, w, a);
-      });
-      for (let k = 0; k < 2; k++) bird(c, 1040 - ((t * 16 + k * 330) % 1150), 165 + k * 42 + 6 * Math.sin(t * 1.4 + k), 3 * Math.sin(t * 6 + k * 2));
-      const m = f.m;
-      pen(c, [[222,253],[720,300]], rv(m, 0, 50), .55, 1, [5,5]);
-      label(c, 'horizon : d ≈ 3,57 √h ≈ 11 km', 470, 250, { size: 17, align: 'center', a: .85 * rv(m, 40, 30) });
-      label(c, 'h ≈ 10 m', 150, 440, { size: 15, align: 'center', a: .7 * rv(m, 60, 30) });
-      label(c, '384 400 km', 860, 188, { size: 15, align: 'center', a: .75 * rv(m, 80, 30) });
+function drawParticles(T, V) {
+  let j = -1; for (let k = 0; k < KF.length; k++) if (KF[k].t <= T) j = k;
+  if (j < 0) return;
+  const cur = KF[j], prevS = j > 0 ? KF[j - 1].s : 'hidden';
+  for (let i = 0; i < NP; i++) {
+    const e = eio((T - cur.t - PD[i] * cur.d * 0.6) / cur.d);
+    let x, y, s, a;
+    if (e >= 1 || prevS === 'hidden') {
+      if (cur.s === 'hidden') continue;
+      shape(cur.s, i, T, V, O2); x = O2.x; y = O2.y; s = O2.s; a = O2.a * (prevS === 'hidden' ? e : 1);
+    } else if (e <= 0) {
+      shape(prevS, i, T, V, O1); x = O1.x; y = O1.y; s = O1.s; a = O1.a;
+    } else {
+      shape(prevS, i, T, V, O1);
+      if (cur.s === 'hidden') { x = O1.x; y = O1.y; s = O1.s; a = O1.a * (1 - e); }
+      else { shape(cur.s, i, T, V, O2); x = lerp(O1.x, O2.x, e); y = lerp(O1.y, O2.y, e); s = lerp(O1.s, O2.s, e); a = lerp(O1.a, O2.a, e); }
     }
-  },
-
-  ia: { w: 1000, h: 520, seed: 5,
-    paint: () => [
-      { type: 'stroke', pts: [[40,140],[500,143],[960,138]], w: 5, ink: .45, dry: .7, speed: 22 },
-      { type: 'stroke', pts: [[300,215],[301,340],[302,470]], w: 3, ink: .3, dry: .6, speed: 18 }
-    ],
-    live: (c, f) => {
-      const D = 3.6, CY = IA_STEPS.length * D + 2.6, ct = f.t % CY, si = Math.floor(ct / D), lt = ct - si * D;
-      let s = 'Je regarde la mer et je pense', last = 'pense';
-      for (let i = 0; i < Math.min(si, IA_STEPS.length); i++) { const st = IA_STEPS[i]; s += st.sp + st.c[st.pick][0]; last = st.c[st.pick][0]; }
-      const cur = si < IA_STEPS.length ? IA_STEPS[si] : null;
-      const landed = cur && lt >= 3.0;
-      let sentence = s;
-      if (landed) { sentence = s + cur.sp + cur.c[cur.pick][0]; last = cur.c[cur.pick][0]; }
-      font(c, 'display', 34); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = shade(.92);
-      c.fillText(sentence, 40, 112);
-      if (cur && !landed && Math.floor(f.T * 2) % 2 === 0) { const wS = c.measureText(s + cur.sp).width; c.fillRect(40 + wS + 2, 84, 2.5, 34); }
-      if (cur) {
-        const u = ease(lt / 1.0);
-        cur.c.forEach(([w, p], j) => {
-          const y = 250 + j * 60, chosen = j === cur.pick, dim = lt > 2.2 && !chosen;
-          label(c, w, 285, y, { font: 'body', size: 26, align: 'right', a: landed && chosen ? .3 : dim ? .3 : .9 });
-          const len = p * 560 * u;
-          if (len > 4) inkLine(c, hline(305, 305 + len, y, 6), 18, dim ? .3 : chosen && lt > 2.2 ? .95 : .8);
-          label(c, `${Math.round(p * 100)} %`, 305 + len + 14, y, { size: 19, a: dim ? .3 : .75 });
-        });
-        if (lt >= 1.2) {
-          const u2 = clamp01((lt - 1.2) / 1.0), seq = cur.hops.concat([cur.pick]);
-          const k = Math.min(seq.length - 1, Math.floor(seq.length * (1 - (1 - u2) * (1 - u2))));
-          spr(c, 70, 250 + seq[k] * 60, 7, .9, 0);
-          if (lt < 2.2) label(c, 'tirage…', 70, 215, { size: 15, align: 'center', a: .6 });
-        }
-        if (lt >= 2.2 && cur.pick !== 0) label(c, 'tiré au sort, pas le plus probable', 305, 250 + cur.pick * 60 + 30, { size: 15, a: .75 });
-        if (lt >= 2.2 && lt < 3.0) {
-          const u3 = ease((lt - 2.2) / 0.8), word = cur.c[cur.pick][0];
-          font(c, 'display', 34); const tx = 40 + c.measureText(s + cur.sp).width;
-          font(c, 'body', 26); const sx = 285 - c.measureText(word).width, sy = 250 + cur.pick * 60 + 9;
-          font(c, 'display', 26 + 8 * u3); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = shade(.92);
-          c.fillText(word, sx + (tx - sx) * u3, sy + (112 - sy) * u3);
-        }
-      }
-      const m = f.m;
-      label(c, 'P(mot | contexte)', 960, 250, { size: 17, align: 'right', a: .8 * rv(m, 0, 30) });
-      label(c, '= e^zᵢ / Σ e^zⱼ', 960, 276, { size: 17, align: 'right', a: .8 * rv(m, 10, 30) });
-      label(c, `« ${last} » en nombres :`, 960, 340, { size: 15, align: 'right', a: .7 * rv(m, 30, 30) });
-      label(c, vec(last), 960, 366, { size: 15, align: 'right', a: .8 * rv(m, 30, 30) });
-    }
-  },
-
-  arbre: { w: 1000, h: 620, seed: 41, layers: ['a', 'b'], sway: [500, 582],
-    init: () => {
-      const S = {}, r = rng(41), levels = [], tips = [], MAX = 7;
-      const grow = (x, y, ang, len, w, d) => {
-        const ex = x + Math.cos(ang) * len, ey = y + Math.sin(ang) * len, j = (r() - 0.5) * 0.12 * len;
-        (levels[d] = levels[d] || []).push({ type: 'stroke', pts: [[x,y],[(x + ex) / 2 - Math.sin(ang) * j,(y + ey) / 2 + Math.cos(ang) * j],[ex,ey]], w, ink: .95 - d * .04, dry: .3 + d * .04, taper: [.02,.25] });
-        const node = { x, y, ex, ey, ang, len, w, d };
-        if (d === MAX) { tips.push(node); return node; }
-        const spread = (24 + (r() - 0.5) * 10) * Math.PI / 180, skew = (r() - 0.5) * 0.25;
-        const kids = [-1, 1].map(sg => grow(ex, ey, ang + sg * spread + skew, len * (0.72 + (r() - 0.5) * 0.1), w * 0.707, d + 1));
-        if (d === 0) S.fork = { x: ex, y: ey, ang, kids, w };
-        return node;
-      };
-      grow(500, 582, -Math.PI / 2, 150, 26, 0);
-      S.levels = levels; S.tips = tips; S.leafDots = [];
-      const r2 = rng(77);
-      for (const tp of tips) for (let k = 0; k < 3; k++) S.leafDots.push({ x: tp.ex + (r2() - 0.5) * 18, y: tp.ey + (r2() - 0.5) * 14, r: 2.5 + r2() * 3.5, ink: .3 + r2() * .55 });
-      return S;
-    },
-    paint: S => [
-      { type: 'stroke', pts: [[180,588],[500,580],[830,590]], w: 14, ink: .22, dry: .6, taper: [.3,.3], speed: 24 },
-      { type: 'stroke', pts: [[120,592],[500,590],[880,594]], w: 3, ink: .6, dry: .6, speed: 26 },
-      ...S.levels.map(parts => ({ type: 'multi', layer: 'b', perFrame: 6, parts, gap: 2 })),
-      { type: 'dots', layer: 'b', list: S.leafDots, perFrame: 10 }
-    ],
-    live: (c, f) => {
-      const S = f.S, t = f.t, m = f.m;
-      const th = m >= 0 ? (0.006 * Math.sin(t * 0.9) + 0.003 * Math.sin(t * 2.3 + 1)) * rv(m, 0, 60) : 0;
-      f.w.cv.b.style.transform = `rotate(${th.toFixed(5)}rad)`;
-      c.save(); c.translate(500, 582); c.rotate(th); c.translate(-500, -582);
-      const F = S.fork;
-      if (F && m >= 0) {
-        const [k1, k2] = F.kids;
-        pen(c, [[F.x, F.y], [F.x, F.y - 80]], rv(m, 0, 30), .5, 1, [4, 4]);
-        const aEnd = k2.ang, p = rv(m, 20, 30);
-        if (p > 0) { c.save(); c.strokeStyle = `rgba(${INK},.6)`; c.lineWidth = 1; c.beginPath(); c.arc(F.x, F.y, 52, -Math.PI / 2, -Math.PI / 2 + (aEnd + Math.PI / 2) * p); c.stroke(); c.restore(); }
-        const deg = Math.round((aEnd + Math.PI / 2) * 180 / Math.PI);
-        label(c, `θ ≈ ${deg}°`, F.x + 40, F.y + 6, { size: 16, a: .85 * rv(m, 45, 25) });
-        label(c, '× 0,72', (k1.x + k1.ex) / 2 - 22, (k1.y + k1.ey) / 2, { size: 16, align: 'right', a: .85 * rv(m, 70, 25) });
-        const e = rv(m, 95, 30);
-        if (e > 0) {
-          c.save(); c.strokeStyle = `rgba(${INK},${.6 * e})`; c.lineWidth = 1;
-          c.beginPath(); c.ellipse(F.x, F.y + 48, F.w / 2 + 4, 5, 0, 0, TAU); c.stroke();
-          for (const k of F.kids) { const px = k.x + Math.cos(k.ang) * 30, py = k.y + Math.sin(k.ang) * 30; c.beginPath(); c.ellipse(px, py, k.w / 2 + 3, 4, k.ang + Math.PI / 2, 0, TAU); c.stroke(); }
-          c.restore();
-          label(c, 'd² = d₁² + d₂²', F.x + 34, F.y + 50, { size: 16, a: .85 * e });
-          label(c, 'Léonard de Vinci', F.x + 34, F.y + 74, { size: 13, a: .6 * e });
-        }
-      }
-      c.restore();
-      label(c, 'F → F [+F] [−F]', 40, 528, { size: 20, a: .85 * rv(m, 120, 30) });
-      label(c, 'même angle · × 0,72 · 7 fois', 40, 556, { size: 14, a: .65 * rv(m, 135, 30) });
-      const now = f.T, dt = Math.min(0.05, now - (S.last || now)); S.last = now;
-      if (m > 30) {
-        if (!S.falling) {
-          S.make = d => { const tp = S.tips[Math.floor(Math.random() * S.tips.length)]; return { x: tp.ex, y: tp.ey, vy: 22 + Math.random() * 18, ph: Math.random() * 6, age: 0, fade: 0, delay: d, r: 2.8 + Math.random() * 2, v: Math.floor(Math.random() * 4) }; };
-          S.falling = Array.from({ length: 7 }, (_, i) => S.make(i * 1.4));
-        }
-        for (const L of S.falling) {
-          if (L.delay > 0) { L.delay -= dt; continue; }
-          L.age += dt;
-          if (L.y < 586) { L.y += L.vy * dt; L.x += (Math.sin(L.age * 1.7 + L.ph) * 26 + 8) * dt; } else { L.y = 586; L.fade += dt; }
-          c.save(); c.translate(L.x, L.y); c.rotate(Math.sin(L.age * 2.1 + L.ph) * 0.9); c.scale(1, 0.5); spr(c, 0, 0, L.r, (1 - clamp01(L.fade / 1.6)) * .85, L.v); c.restore();
-          if (L.fade > 1.6) Object.assign(L, S.make(0.5 + Math.random() * 3));
-        }
-      }
-    }
-  },
-
-  mer: { w: 1000, h: 560, seed: 11,
-    paint: () => [
-      { type: 'stroke', pts: [[20,200],[500,202],[980,199]], w: 3, ink: .75, dry: .5, speed: 26 },
-      { type: 'stroke', pts: [[40,200],[110,166],[190,152],[260,178],[320,200]], w: 18, ink: .16, dry: .5, taper: [.3,.3] },
-      { type: 'stroke', pts: [[250,200],[300,186],[350,190],[390,200]], w: 10, ink: .12, dry: .5, taper: [.3,.3] },
-      { type: 'stroke', pts: enso(800, 95, 38, 210, 320, 24, .03, 9), w: 6, ink: .85, dry: .4, taper: [.06,.5] }
-    ],
-    live: (c, f) => {
-      const t = f.t, m = f.m;
-      for (let i = 0; i < 6; i++) {
-        const q = (i + 1) / 6, base = 205 + 235 * Math.pow(q, 1.5), A = 1.5 + i * 3.4, s = 0.3 + 0.7 * q, ts = i === 5 ? 1 : 0.6 + 0.4 * q;
-        const pts = []; for (let x = 0; x <= 1000; x += 8) pts.push([x, base + A * sea(x, t * ts, i, s)]);
-        inkLine(c, pts, 0.8 + i * 0.75, 0.35 + 0.11 * i);
-        if (i === 5) for (let k = 2; k < pts.length - 2; k += 3) if (pts[k][1] < pts[k - 2][1] && pts[k][1] < pts[k + 2][1]) spr(c, pts[k][0], pts[k][1] - 5, 2.2, .35, k);
-      }
-      const d = rv(m, 20, 40);
-      if (d > 0) {
-        const comps = [[0.62, x => x / 42 - t * 1.1 + 5], [0.28, x => x / 19 + t * 0.8 + 10], [0.14, x => x / 9 - t * 1.7 + 15]];
-        const names = ['onde 1 · longue', 'onde 2 · moyenne', 'onde 3 · courte'];
-        comps.forEach(([w, g], j) => {
-          const y0 = 482 + j * 28, pts = [];
-          for (let x = 40; x <= 560; x += 5) pts.push([x, y0 + w * 22 * Math.sin(g(x))]);
-          pen(c, pts, d, .6, 1);
-          label(c, names[j], 590, y0, { size: 14, a: .7 * d });
-        });
-      }
-      label(c, 'vague = onde 1 + onde 2 + onde 3', 40, 40, { size: 16, a: .85 * rv(m, 0, 30) });
-      label(c, 'Fourier : toute forme = somme de sinus', 40, 64, { size: 14, a: .6 * rv(m, 10, 30) });
-      pen(c, [[800,137],[800,196]], rv(m, 50, 30), .5, 1, [4, 4]);
-      label(c, 'F = G · m₁ · m₂ / r²', 815, 150, { size: 15, a: .8 * rv(m, 70, 30) });
-      label(c, 'la Lune tire la marée', 815, 174, { size: 13, a: .6 * rv(m, 80, 30) });
-    }
-  },
-
-  fleur: { w: 1000, h: 600, seed: 13,
-    init: () => ({ angle: 137.508 }),
-    paint: () => {
-      const out = [], cx = 500, cy = 262;
-      for (let k = 0; k < 26; k++) {
-        const a = k * TAU / 26 + 0.05 * Math.sin(k * 3.1), r1 = 162, r2 = 232 + 10 * Math.sin(k * 1.7);
-        out.push({ type: 'stroke', pts: [[cx + Math.cos(a) * r1, cy + Math.sin(a) * r1],[cx + Math.cos(a + 0.04) * (r1 + r2) / 2, cy + Math.sin(a + 0.04) * (r1 + r2) / 2],[cx + Math.cos(a + 0.02) * r2, cy + Math.sin(a + 0.02) * r2]], w: 22, ink: .5, dry: .45, taper: [.35,.6], speed: 18, gap: 0 });
-      }
-      out.push({ type: 'stroke', pts: enso(cx, cy, 164, 200, 340, 36, .01, 2), w: 4, ink: .6, dry: .4, speed: 24 });
-      out.push({ type: 'stroke', pts: [[500,500],[504,550],[500,598]], w: 9, ink: .9, dry: .3, taper: [.05,.1] });
-      out.push({ type: 'stroke', pts: [[502,560],[556,536],[606,540]], w: 20, ink: .8, dry: .3, taper: [.45,.55] });
-      return out;
-    },
-    live: (c, f) => {
-      const S = f.S, m = f.m; if (m < 0) return;
-      const N = Math.min(300, Math.floor(m * 3)), ang = S.angle * Math.PI / 180, cx = 500, cy = 262;
-      const P = n => { const a = n * ang, r = 9 * Math.sqrt(n); return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
-      for (let n = 1; n <= N; n++) { const p = P(n); spr(c, p[0], p[1], 1.6 + n * 0.011, .92 - n * .0012, n); }
-      const golden = Math.abs(S.angle - 137.508) < 0.15, sp = rv(m, 110, 60);
-      if (N === 300 && golden && sp > 0) {
-        for (const [fam, dash] of [[21, null], [34, [4, 4]]]) {
-          for (const k0 of [299, 292, 285]) { const pts = []; for (let k = k0; k >= 1; k -= fam) pts.push(P(k)); pen(c, pts, sp, .55, 1.1, dash); }
-          const e = P(299 - (fam === 21 ? 0 : 7)), a = Math.atan2(e[1] - cy, e[0] - cx);
-          label(c, String(fam), e[0] + Math.cos(a) * 26, e[1] + Math.sin(a) * 26, { size: 17, align: 'center', a: .85 * sp });
-        }
-      }
-      const tx = rv(m, 60, 40);
-      label(c, '137,5° = 360° × (1 − 1/φ)', 40, 40, { size: 18, a: .85 * tx });
-      label(c, 'φ = 1,618…', 40, 68, { size: 15, a: .65 * tx });
-      label(c, '1, 1, 2, 3, 5, 8, 13, 21, 34, 55…', 40, 556, { size: 15, a: .7 * sp });
-      label(c, '21 spirales dans un sens, 34 dans l’autre', 40, 582, { size: 13, a: .6 * sp });
-      label(c, `${fr(S.angle, 2)}°`, 960, 48, { font: 'display', size: 30, align: 'right', a: .9 * tx });
-      label(c, golden ? 'angle d’or : aucune place perdue' : 'des trous apparaissent', 960, 82, { size: 14, align: 'right', a: .7 * tx });
-      const t = f.t;
-      for (let k = 0; k < 9; k++) {
-        const u = (t * 0.05 + k / 9) % 1, a = k * 2.4;
-        spr(c, cx + Math.cos(a) * (180 + u * 140) + Math.sin(t + k) * 8, cy + Math.sin(a) * (180 + u * 140) - u * 40, 1.6, .5 * Math.sin(Math.PI * u), k);
-      }
-    }
-  },
-
-  hasard: { w: 1000, h: 560, seed: 17,
-    init: () => {
-      const map = p => [770 + p[0] * 10, 540 - p[1] * 8.8];
-      const L = x0 => { const o = []; let x = x0, y = 1, z = 1; for (let i = 0; i < 5200; i++) { const dx = 10 * (y - x), dy = x * (28 - z) - y, dz = x * y - 8 / 3 * z; x += dx * .005; y += dy * .005; z += dz * .005; if (i % 2 === 0) o.push(map([x, z])); } return o; };
-      const a = L(1), b = L(1.001);
-      let split = a.length - 1;
-      for (let i = 0; i < a.length; i++) if (Math.hypot(a[i][0] - b[i][0], a[i][1] - b[i][1]) > 30) { split = i; break; }
-      return { a, b, split };
-    },
-    paint: () => [
-      { type: 'stroke', pts: [[40,200],[120,198],[200,202],[206,280],[214,545]], w: 8, ink: .85, dry: .5, taper: [.05,.4] },
-      { type: 'stroke', pts: [[60,215],[110,260],[150,320],[170,420],[180,540]], w: 26, ink: .1, dry: .6, taper: [.2,.3], halo: .4 },
-      { type: 'stroke', pts: [[206,547],[350,549],[500,546]], w: 3, ink: .5, dry: .6 },
-      { type: 'stroke', pts: [[530,70],[531,300],[533,520]], w: 2, ink: .22, dry: .8 }
-    ],
-    live: (c, f) => {
-      const S = f.S, t = f.t, m = f.m;
-      if (m < 0) return;
-      const g = 144.6, vx = 118, T = 2.2, P = u => [206 + vx * u, 190 + 0.5 * g * u * u];
-      const traj = []; for (let u = 0; u <= T + 0.001; u += 0.05) traj.push(P(u));
-      pen(c, traj, rv(m, 0, 40), .45, 1, [4, 5]);
-      const land = P(T), xa = rv(m, 30, 20);
-      if (xa > 0) { pen(c, [[land[0] - 8, land[1] - 8], [land[0] + 8, land[1] + 8]], 1, .8 * xa, 1.6); pen(c, [[land[0] + 8, land[1] - 8], [land[0] - 8, land[1] + 8]], 1, .8 * xa, 1.6); }
-      label(c, 'impact calculé', land[0], land[1] - 26, { size: 13, align: 'center', a: .65 * xa });
-      label(c, 'prévisible', 40, 60, { font: 'display', size: 30, a: .9 * rv(m, 0, 30) });
-      label(c, 'y = ½ g t²', 300, 170, { size: 18, a: .85 * rv(m, 20, 30) });
-      if (m > 40) {
-        const u = Math.min(t % 3.4, T);
-        for (let k = 0.2; k < u; k += 0.2) { const p = P(k); spr(c, p[0], p[1], 6, .18, 1); }
-        const p = P(u); spr(c, p[0], p[1] - 2, 8.5, .95, 2);
-      }
-      label(c, 'imprévisible', 560, 60, { font: 'display', size: 30, a: .9 * rv(m, 10, 30) });
-      const L = S.a.length, cyc = t % 11.5, n = Math.floor(Math.min(L, cyc * 330)), fade = cyc > 11 ? 1 - (cyc - 11) / 0.5 : 1;
-      poly(c, S.a, n, .8 * fade, 1.3);
-      poly(c, S.b, n, .45 * fade, 1.2, [5, 4]);
-      if (n > 1 && n < L) { spr(c, S.a[n - 1][0], S.a[n - 1][1], 4, .9 * fade, 0); spr(c, S.b[n - 1][0], S.b[n - 1][1], 4, .5 * fade, 1); }
-      if (n > S.split) {
-        const q = S.a[S.split], e = clamp01((n - S.split) / 120) * fade, right = q[0] > 850;
-        c.save(); c.strokeStyle = `rgba(${INK},${.6 * e})`; c.lineWidth = 1; c.beginPath(); c.arc(q[0], q[1], 16, 0, TAU); c.stroke(); c.restore();
-        label(c, 'ici, elles se séparent', q[0] + (right ? -22 : 22), q[1] - 22, { size: 13, align: right ? 'right' : 'left', a: .75 * e });
-      }
-      pen(c, [[560,522],[596,522]], rv(m, 20, 20), .8, 1.3);
-      label(c, 'départ (1 ; 1 ; 1)', 606, 522, { size: 14, a: .75 * rv(m, 20, 20) });
-      pen(c, [[560,546],[596,546]], rv(m, 25, 20), .45, 1.2, [5, 4]);
-      label(c, 'départ (1,001 ; 1 ; 1)', 606, 546, { size: 14, a: .6 * rv(m, 25, 20) });
-    }
-  },
-
-  cerveau: { w: 1000, h: 520, seed: 19,
-    init: () => ({
-      ab: [[196,258],[270,246],[350,236],[430,228],[476,222]],
-      bc: [[526,223],[610,234],[690,254],[804,278]],
-      out: [[856,284],[920,292],[995,302]],
-      synA: [486, 221], synB: [814, 279]
-    }),
-    paint: S => {
-      const out = [];
-      neuron(out, 180, 260, [150, 205, 255, 105, 300], 21);
-      out.push({ type: 'stroke', pts: S.ab, w: 4, ink: .9, dry: .25, taper: [.05,.2], speed: 14 });
-      neuron(out, 510, 220, [128, 232, 272, 88, 52, 312], 22);
-      out.push({ type: 'stroke', pts: S.bc, w: 4, ink: .9, dry: .25, taper: [.05,.2], speed: 14 });
-      neuron(out, 840, 280, [90, 265, 20, 330, 130, 225], 23);
-      out.push({ type: 'stroke', pts: S.out, w: 4, ink: .85, dry: .4, taper: [.05,.5], speed: 14 });
-      return out;
-    },
-    live: (c, f) => {
-      const S = f.S, t = f.t, m = f.m;
-      if (m < 0) return;
-      const cyc = t % 4.4;
-      const pulse = (pts, u) => { for (let k = 5; k >= 0; k--) { const p = along(pts, u - k * 0.035); spr(c, p[0], p[1], 5.5 - k * 0.6, k === 0 ? .95 : .35 - k * .05, k); } };
-      const burst = (s, u) => { for (let k = 0; k < 7; k++) { const a = -0.6 + k * 0.2, d = 4 + u * 16; spr(c, s[0] + Math.cos(a) * d, s[1] + Math.sin(a) * d * 0.8, 1.8, .85 * (1 - u), k); } };
-      if (cyc < 1.2) pulse(S.ab, cyc / 1.2);
-      else if (cyc < 1.6) burst(S.synA, (cyc - 1.2) / 0.4);
-      else if (cyc < 2.8) pulse(S.bc, (cyc - 1.6) / 1.2);
-      else if (cyc < 3.2) burst(S.synB, (cyc - 2.8) / 0.4);
-      else if (cyc < 4.0) pulse(S.out, (cyc - 3.2) / 0.8);
-      label(c, '≈ 86 milliards de neurones', 40, 468, { size: 16, a: .85 * rv(m, 0, 30) });
-      label(c, '≈ 100 000 milliards de synapses', 40, 494, { size: 16, a: .85 * rv(m, 15, 30) });
-      label(c, 'influx : 1 à 120 m/s', 960, 468, { size: 16, align: 'right', a: .85 * rv(m, 30, 30) });
-      label(c, 'cerveau entier : ≈ 20 W', 960, 494, { size: 16, align: 'right', a: .85 * rv(m, 45, 30) });
-    }
-  },
-
-  adn: { w: 1000, h: 500, seed: 23,
-    paint: () => [{ type: 'stroke', pts: [[40,424],[500,426],[960,422]], w: 4, ink: .4, dry: .7, speed: 26 }],
-    live: (c, f) => {
-      const t = f.t, m = f.m;
-      if (m < 0) return;
-      const xr = 60 + 880 * rv(m, 0, 80), cy = 220, amp = 95, lam = 300, rot = t * 0.8;
-      const ph = x => TAU * (x - 60) / lam + rot;
-      const back = [], front = [];
-      for (const off of [0, Math.PI * 0.8]) for (let x = 60; x < xr; x += 6) {
-        const x2 = Math.min(x + 6, xr), a1 = ph(x) + off, a2 = ph(x2) + off, z = Math.cos((a1 + a2) / 2);
-        (z < 0 ? back : front).push([x, cy + amp * Math.sin(a1), x2, cy + amp * Math.sin(a2), z]);
-      }
-      const drawSegs = segs => { c.save(); c.lineCap = 'round'; for (const [x1, y1, x2, y2, z] of segs) { c.strokeStyle = shade(.4 + .55 * (z + 1) / 2); c.lineWidth = 3 + 6 * (z + 1) / 2; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); } c.restore(); };
-      drawSegs(back);
-      c.save(); c.lineCap = 'round';
-      for (let x = 74; x < xr; x += 22) {
-        const ya = cy + amp * Math.sin(ph(x)), yb = cy + amp * Math.sin(ph(x) + Math.PI * 0.8);
-        if (Math.abs(ya - yb) < 10) continue;
-        const z = (Math.cos(ph(x)) + Math.cos(ph(x) + Math.PI * 0.8)) / 2;
-        c.strokeStyle = shade(.25 + .3 * (z + 1) / 2); c.lineWidth = 2.2;
-        c.beginPath(); c.moveTo(x, ya); c.lineTo(x, yb); c.stroke();
-      }
-      c.restore();
-      drawSegs(front);
-      const sa = rv(m, 60, 30);
-      font(c, 'mono', 24); const cw = c.measureText('ATG ').width, bw = c.measureText('ATG').width;
-      const cur = Math.floor(t * 1.6) % (CODONS.length + 4);
-      CODONS.forEach(([cod], i) => {
-        const x = 60 + i * cw;
-        label(c, cod, x, 400, { size: 24, a: (i <= cur ? .95 : .55) * sa });
-        if (i === cur && m > 90) { c.save(); c.strokeStyle = `rgba(${INK},.7)`; c.lineWidth = 1; c.strokeRect(x - 5, 384, bw + 10, 32); c.restore(); }
-      });
-      if (m > 90) label(c, CODONS.slice(0, Math.min(cur + 1, CODONS.length)).map(x => x[1]).join(' – '), 60, 456, { size: 15, a: .8 });
-      label(c, 'ATG = commence · TAG = stop', 40, 40, { size: 15, a: .75 * rv(m, 70, 30) });
-      label(c, '3,1 milliards de lettres ≈ 750 Mo', 960, 40, { size: 15, align: 'right', a: .75 * rv(m, 80, 30) });
-    }
-  },
-
-  miroir: { w: 1000, h: 560, seed: 29,
-    init: () => {
-      const T = pts => pts.map(p => [130 + p[0], 40 + p[1]]), list = [];
-      for (const key of ['back', 'face', 'shB', 'shF', 'ear', 'eye']) for (const q of smooth(T(PROFILE[key]), key === 'eye' || key === 'ear' ? 7 : 13)) list.push([1000 - q.x, q.y]);
-      return { T, list };
-    },
-    paint: S => {
-      const P = (pts, w, o) => Object.assign({ type: 'stroke', pts: S.T(pts), w, ink: .92, dry: .35, speed: 13 }, o || {});
-      return [P(PROFILE.face, 7, { taper: [.08,.3] }), P(PROFILE.back, 9, { taper: [.08,.4] }), P(PROFILE.ear, 4, { ink: .7 }), P(PROFILE.eye, 4, { taper: [.3,.3] }), P(PROFILE.shB, 7, { ink: .6, dry: .6 }), P(PROFILE.shF, 7, { ink: .6, dry: .6 })];
-    },
-    live: (c, f) => {
-      const S = f.S, t = f.t, m = f.m;
-      if (m < 0) return;
-      const src = '0.71−0.350.920.08−0.440.13−0.670.29', off = Math.floor(t * 6), n = Math.min(S.list.length, Math.floor(m * 3));
-      font(c, 'mono', 17); c.textAlign = 'center'; c.textBaseline = 'middle';
-      for (let i = 0; i < n; i++) {
-        c.fillStyle = `rgba(${INK},${(.55 + .4 * Math.sin(i * 0.7 + t * 2)).toFixed(3)})`;
-        c.fillText(src[(i + off) % src.length], S.list[i][0], S.list[i][1]);
-      }
-      label(c, '≈ ?', 500, 270, { font: 'display', size: 84, align: 'center', a: .9 * rv(m, 20, 40) });
-      label(c, 'encre · neurones · chimie', 260, 540, { size: 14, align: 'center', a: .7 * rv(m, 60, 30) });
-      label(c, 'nombres · poids · silicium', 740, 540, { size: 14, align: 'center', a: .7 * rv(m, 70, 30) });
-    }
-  },
-
-  vie: { w: 1000, h: 560, seed: 31,
-    paint: () => [
-      { type: 'stroke', pts: enso(500, 280, 215, 15, 335, 40, 0.03, 8), w: 32, ink: .92, dry: .6, taper: [.04,.6], speed: 20, spacing: 1 },
-      { type: 'stroke', pts: [[430,432],[500,422],[570,432]], w: 14, ink: .25, dry: .6, taper: [.3,.3] },
-      { type: 'stroke', pts: [[500,426],[502,372],[497,332]], w: 5, ink: .9, taper: [.05,.5], speed: 6 }
-    ],
-    live: (c, f) => {
-      const t = f.t, m = f.m;
-      if (m < 0) return;
-      const g = rv(m, 0, 50), sw = 0.07 * Math.sin(t * 1.3);
-      const leaf = (x, y, ang, len, wid) => {
-        c.save(); c.translate(x, y); c.rotate(ang);
-        c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(len * 0.45, -wid, len, 0); c.quadraticCurveTo(len * 0.45, wid, 0, 0);
-        c.fillStyle = shade(.85); c.fill();
-        c.strokeStyle = `rgba(${PAPER.join(',')},.6)`; c.lineWidth = 1; c.beginPath(); c.moveTo(3, 0); c.lineTo(len * 0.85, 0); c.stroke();
-        c.restore();
-      };
-      leaf(498, 336, Math.PI + 0.38 + sw, 64 * g, 15 * g);
-      leaf(498, 332, -0.5 + sw * 1.2, 72 * g, 17 * g);
-      const a = rv(m, 40, 40), b = rv(m, 55, 40);
-      arrowPen(c, 900, 258, 745, 266, a, .6);
-      arrowPen(c, 745, 298, 900, 306, b, .6);
-      label(c, 'énergie', 910, 256, { size: 16, a: .85 * a });
-      label(c, 'chaleur', 910, 306, { size: 16, a: .85 * b });
-      label(c, 'ordre maintenu', 500, 190, { size: 16, align: 'center', a: .8 * rv(m, 80, 40) });
-      label(c, 'système ouvert', 500, 216, { size: 13, align: 'center', a: .55 * rv(m, 90, 40) });
-      if (m > 90) for (let k = 0; k < 5; k++) {
-        const u = (t * 0.35 + k / 5) % 1;
-        const pin = along([[900,258],[745,266],[640,272]], u), pout = along([[640,292],[745,298],[900,306]], u);
-        spr(c, pin[0], pin[1], 2.4, .8 * Math.sin(Math.PI * u), k);
-        spr(c, pout[0], pout[1], 2, .45 * Math.sin(Math.PI * u), k + 1);
-      }
-    }
-  },
-
-  pinceau: { w: 1000, h: 600, seed: 37,
-    paint: () => {
-      const x0 = 930, y0 = 160, x1 = 680, y1 = 470;
-      const L = Math.hypot(x1 - x0, y1 - y0), dx = (x1 - x0) / L, dy = (y1 - y0) / L, nx = -dy, ny = dx;
-      const node = t => { const px = x0 + dx * L * t, py = y0 + dy * L * t; return { type: 'stroke', pts: [[px - nx * 14, py - ny * 14],[px + nx * 14, py + ny * 14]], w: 4, ink: .7, taper: [.2,.2] }; };
-      return [
-        ...thinker(330, 400, 0.45),
-        { type: 'pause', frames: 14 },
-        { type: 'stroke', pts: [[x0, y0],[x1, y1]], w: 24, ink: .26, dry: .15, taper: [.02,.02], halo: .5, speed: 16 },
-        { type: 'stroke', pts: [[x0 + nx * 11, y0 + ny * 11],[x1 + nx * 11, y1 + ny * 11]], w: 2.5, ink: .6, dry: .6, taper: [.05,.05], speed: 18 },
-        node(0.3), node(0.62),
-        { type: 'stroke', pts: [[686,463],[676,475],[666,487]], w: 27, ink: .75, dry: .2, taper: [.02,.02] },
-        { type: 'stroke', pts: [[668,485],[636,515],[602,543],[562,572]], w: 30, ink: 1, dry: .1, taper: [.02,.97], speed: 8 },
-        { type: 'stroke', pts: [[250,582],[420,584],[570,580]], w: 4, ink: .7, dry: .5, taper: [.1,.1], speed: 6 }
-      ];
-    },
-    live: (c, f) => {
-      const t = f.t, m = f.m;
-      if (m < 0) return;
-      label(c, 'Qui tient le pinceau ?', 60, 80, { font: 'display', size: 40, a: .9 * rv(m, 0, 40) });
-      label(c, 'évolution : ≈ 4 milliards d’années d’essais et d’erreurs', 60, 126, { size: 15, a: .7 * rv(m, 30, 30) });
-      label(c, 'une descente de gradient, sans ingénieur ?', 60, 150, { size: 15, a: .7 * rv(m, 45, 30) });
-      for (let k = 0; k < 3; k++) { const u = (t * 0.28 + k / 3) % 1; spr(c, 410 + u * 70, 410 - u * 120, 2 + u * 5, .75 * Math.sin(Math.PI * u), k); }
-      const u = (t * 0.45) % 1;
-      c.save(); c.fillStyle = `rgba(${INK},${(.12 * (1 - u)).toFixed(3)})`; c.beginPath(); c.ellipse(562, 580, 6 + u * 26, 2 + u * 6, 0, 0, TAU); c.fill(); c.restore();
-    }
+    if (a <= 0.01 || x < -40 || x > W + 40 || y < -40 || y > H + 40) continue;
+    spr(x, y, s, a, i);
   }
-};
-
-/* ——— moteur ——— */
-class World {
-  constructor(el, def) {
-    this.el = el; this.def = def; this.cv = {}; this.ctx = {};
-    for (const n of (def.layers || ['a'])) {
-      const cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true');
-      el.appendChild(cv); this.cv[n] = cv; this.ctx[n] = cv.getContext('2d');
-    }
-    if (def.sway && this.cv.b) this.cv.b.style.transformOrigin = `${def.sway[0] / def.w * 100}% ${def.sway[1] / def.h * 100}%`;
-    this.live = document.createElement('canvas'); this.live.setAttribute('aria-hidden', 'true');
-    el.appendChild(this.live); this.lctx = this.live.getContext('2d');
-    this.S = def.init ? def.init() : {};
-    this.items = (def.paint ? def.paint(this.S) : []).map((it, i) => prep(it, (def.seed || 7) * 97 + i));
-    this.cur = 0; this.wait = 0; this.painting = false; this.started = false; this.m = -1; this.visible = false; this.t0 = 0;
-    this.size();
-  }
-  size() {
-    const cssW = this.el.clientWidth || this.def.w, dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const W = Math.round(cssW * dpr), H = Math.round(cssW * this.def.h / this.def.w * dpr);
-    this.ts = Math.min(1.8, Math.max(1, 0.62 * this.def.w / cssW));
-    if (W === this.W && H === this.H) return;
-    this.W = W; this.H = H; this.k = W / this.def.w;
-    for (const n in this.cv) { this.cv[n].width = W; this.cv[n].height = H; }
-    this.live.width = W; this.live.height = H;
-    this.redraw();
-    this.drawLive(performance.now() / 1000);
-  }
-  clearPaint() {
-    for (const n in this.ctx) { const c = this.ctx[n]; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, this.W, this.H); c.setTransform(this.k, 0, 0, this.k, 0, 0); }
-  }
-  redraw() {
-    this.clearPaint();
-    for (const it of this.items) if (it.prog > 0) drawItem(this.ctx[it.layer || 'a'], it, 0, Math.ceil(it.prog));
-  }
-  start() {
-    for (const it of this.items) it.prog = 0;
-    this.cur = 0; this.wait = 0; this.m = -1; this.started = true; this.t0 = performance.now() / 1000;
-    if (reduced) {
-      for (const it of this.items) it.prog = it.total;
-      this.cur = this.items.length; this.m = 100000; this.painting = false;
-      this.redraw(); this.drawLive(this.t0 + 6); return;
-    }
-    this.clearPaint(); this.painting = true;
-  }
-  step() {
-    if (this.painting) {
-      if (this.wait > 0) this.wait--;
-      else if (this.cur < this.items.length) {
-        const it = this.items[this.cur], from = Math.ceil(it.prog);
-        it.prog = Math.min(it.total, it.prog + rate(it));
-        const to = Math.ceil(it.prog);
-        if (to > from) drawItem(this.ctx[it.layer || 'a'], it, from, to);
-        if (it.prog >= it.total) { this.cur++; this.wait = it.gap ?? (it.type === 'stroke' ? 3 : 1); }
-      }
-      if (this.cur >= this.items.length) { this.painting = false; this.m = 0; }
-    } else if (this.m >= 0) this.m++;
-  }
-  drawLive(now) {
-    const c = this.lctx;
-    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, this.W, this.H);
-    if (!this.started || !this.def.live) return;
-    c.setTransform(this.k, 0, 0, this.k, 0, 0);
-    TS = this.ts;
-    this.def.live(c, { t: now - this.t0, T: now, m: this.m, S: this.S, w: this });
+}
+function drawCloudLabels(T, V) {
+  const la = rv(T, 12.4, 1.5) * (1 - rv(T, 20.3, 1.2));
+  if (la <= 0) return;
+  const pts = CL.map(c => proj(c[0], c[1], c[2], T, V));
+  const pp = rv(T, 14, 5.5), nseg = pp * (WORDS.length - 1), done = Math.floor(nseg);
+  const path = pts.slice(0, done + 1).map(p => [p[0], p[1]]);
+  if (done < WORDS.length - 1) { const f = nseg - done, a = pts[done], b = pts[done + 1]; path.push([lerp(a[0], b[0], f), lerp(a[1], b[1], f)]); }
+  pen(path, .6 * la, 1.2);
+  WORDS.forEach((w, k) => {
+    const p = pts[k], on = k <= done;
+    txt(w, p[0] + 8, p[1] - 10, Math.round((13 + 7 * p[2]) * (on ? 1.15 : 1)), 'd', la * (on ? .95 : .35 + .3 * p[2]));
+  });
+}
+function drawDrop(T, V) {
+  if (T > 3.4) return;
+  const c = V.moonC;
+  if (T > 0.2 && T < 1.6) { const u = (T - 0.2) / 1.4, y = lerp(-60, c[1], u * u), st = 1 + u * u * 1.8; spr(c[0], y, 5, .95, 0, st); }
+  if (T >= 1.6) {
+    const u = (T - 1.6) / 1.8;
+    spr(c[0], c[1], V.moonR * (0.12 + 0.5 * Math.sqrt(u)), .5 * (1 - u), 1);
+    for (let k = 0; k < 14; k++) { const an = hash(k, 81) * TAU, d = V.moonR * (0.15 + 0.9 * Math.sqrt(u) * (0.5 + hash(k, 82))); spr(c[0] + Math.cos(an) * d, c[1] + Math.sin(an) * d, 1.5 + hash(k, 83) * 3, .8 * (1 - u), k); }
   }
 }
 
-/* ——— papier et briques ——— */
-(function textures() {
+/* ——— son génératif, seulement après un clic ——— */
+let AC = null, master = null, seaG = null, droneLP = null, audioOn = false;
+function initAudio() {
+  const Ctor = window.AudioContext || window.webkitAudioContext; if (!Ctor) return false;
+  AC = new Ctor(); master = AC.createGain(); master.gain.value = 0; master.connect(AC.destination);
+  droneLP = AC.createBiquadFilter(); droneLP.type = 'lowpass'; droneLP.frequency.value = 380; droneLP.connect(master);
+  [[55, 'sine', .12, -4], [82.41, 'sine', .08, 5], [110, 'triangle', .035, 0]].forEach(([f, t, g, d]) => { const o = AC.createOscillator(); o.type = t; o.frequency.value = f; o.detune.value = d; const gn = AC.createGain(); gn.gain.value = g; o.connect(gn); gn.connect(droneLP); o.start(); });
+  const buf = AC.createBuffer(1, AC.sampleRate * 3, AC.sampleRate), d = buf.getChannelData(0); let b = 0;
+  for (let i = 0; i < d.length; i++) { b = 0.985 * b + 0.015 * (Math.random() * 2 - 1); d[i] = b * 4; }
+  const src = AC.createBufferSource(); src.buffer = buf; src.loop = true; const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700;
+  seaG = AC.createGain(); seaG.gain.value = 0; src.connect(lp); lp.connect(seaG); seaG.connect(master); src.start();
+  return true;
+}
+function plink(n) {
+  if (!audioOn || !AC) return;
+  const t = AC.currentTime, f = [392, 440, 523.25, 587.33, 659.25, 783.99, 880, 523.25, 392][n % 9];
+  [[f, .07], [f * 2.01, .025]].forEach(([fq, g]) => { const o = AC.createOscillator(); o.type = 'sine'; o.frequency.value = fq; const gn = AC.createGain(); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(g, t + 0.01); gn.gain.exponentialRampToValueAtTime(0.0001, t + 3); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 3.1); });
+}
+function audioFrame(T) {
+  if (!AC || !audioOn) return;
+  const coast = rv(T, 23, 3) * (1 - rv(T, 45, 3));
+  seaG.gain.setTargetAtTime(coast * (0.35 + 0.25 * Math.sin(T * 0.9)), AC.currentTime, 0.2);
+  droneLP.frequency.setTargetAtTime(320 + 520 * Math.max(0, NGT), AC.currentTime, 0.5);
+}
+
+/* ——— les phrases ——— */
+const capsEl = document.getElementById('caps'), live = new Map();
+function makeCap(c) {
+  const el = document.createElement('p'); el.className = 'cap' + (c.k ? ' ' + c.k : '');
+  let h = c.kick ? `<span class="kick">${c.kick}</span>` : '', n = 0;
+  h += c.text.split(' ').map(w => `<span class="w">${[...w].map(ch => `<span class="ch" style="transition-delay:${(n++) * 22}ms">${ch}</span>`).join('')}</span>`).join(' ');
+  el.innerHTML = h; capsEl.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+  return el;
+}
+function updateCaps(T) {
+  CAPS.forEach((c, i) => {
+    const on = T >= c.t0 && T < c.t1;
+    if (on && !live.has(i)) live.set(i, makeCap(c));
+    else if (!on && live.has(i)) { const el = live.get(i); live.delete(i); el.classList.add('out'); setTimeout(() => el.remove(), 1100); }
+  });
+}
+
+/* ——— les chapitres ——— */
+const chapEl = document.getElementById('chap');
+CH.forEach(([t, name], i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', `Chapitre ${i + 1} : ${name}`);
+  b.innerHTML = `<span class="lbl">${name}</span><span class="bar"><i></i></span>`;
+  b.addEventListener('click', () => seek(reduced ? REST[i] : t + 0.01, true));
+  chapEl.appendChild(b);
+});
+const chapBtns = [...chapEl.children], chapFill = chapBtns.map(b => b.querySelector('i'));
+let lastChap = -1;
+function chapterAt(T) { let ci = 0; CH.forEach(([t], i) => { if (T >= t) ci = i; }); return ci; }
+function updateChap(T) {
+  const ci = chapterAt(T);
+  CH.forEach(([t], i) => {
+    const t1 = i < CH.length - 1 ? CH[i + 1][0] : END;
+    chapFill[i].style.transform = `scaleX(${c01((T - t) / (t1 - t)).toFixed(3)})`;
+  });
+  if (ci !== lastChap) {
+    chapBtns.forEach((b, i) => { b.classList.toggle('on', i === ci); if (i === ci) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    if (lastChap >= 0) plink(ci);
+    lastChap = ci;
+  }
+}
+
+/* ——— la boucle ——— */
+let T = reduced ? 9 : 0, playing = !reduced, last = performance.now(), prevLogS = 0, slow = 0;
+const endEl = document.getElementById('end'), ppBtn = document.getElementById('pp');
+function setPlaying(p) { playing = p; ppBtn.textContent = p ? 'Pause' : 'Lecture'; jump = true; }
+function seek(t, play) { T = Math.max(0, Math.min(END, t)); jump = true; if (play && !reduced) setPlaying(true); }
+ppBtn.addEventListener('click', () => { if (T >= END) seek(0); setPlaying(!playing); });
+if (reduced) ppBtn.textContent = 'Lecture';
+document.getElementById('again').addEventListener('click', () => { seek(0); setPlaying(!reduced); });
+document.getElementById('snd').addEventListener('click', e => {
+  if (!AC && !initAudio()) return;
+  audioOn = !audioOn; e.currentTarget.setAttribute('aria-pressed', String(audioOn));
+  if (AC.state === 'suspended') AC.resume();
+  master.gain.setTargetAtTime(audioOn ? 0.55 : 0, AC.currentTime, 0.6);
+});
+window.addEventListener('wheel', e => { e.preventDefault(); seek(T + e.deltaY * (e.deltaMode ? 0.4 : 0.012)); }, { passive: false });
+let ty = null;
+window.addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
+window.addEventListener('touchmove', e => { if (ty === null) return; const y = e.touches[0].clientY; seek(T + (ty - y) * 0.04); ty = y; }, { passive: true });
+window.addEventListener('touchend', () => { ty = null; }, { passive: true });
+window.addEventListener('keydown', e => {
+  if (e.target && e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+  const ci = chapterAt(T);
+  if (e.key === ' ') { e.preventDefault(); setPlaying(!playing); }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); const n = Math.min(CH.length - 1, ci + 1); seek(reduced ? REST[n] : CH[n][0] + 0.01); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); const n = Math.max(0, ci - 1); seek(reduced ? REST[n] : CH[n][0] + 0.01); }
+});
+
+function resize() {
+  W = innerWidth; H = innerHeight;
+  DPR = Math.min(window.devicePixelRatio || 1, dprCap);
+  cv.width = sc.width = Math.round(W * DPR); cv.height = sc.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  LAND = W / H > 1.15; MM = Math.min(W, H);
+  S0b = Math.min(H, W / 1.5);
+  CX = W / 2 + (LAND ? 0.1 * W : 0); CY = H / 2 + (LAND ? 0 : -0.06 * H);
+  NP = W * H < 520000 ? 1000 : 1600;
+  zMoon = 0.34 * MM / (0.07 * S0b);
+  CF = [CX, CY]; RF = 0.3 * MM;
+  SP = Math.min(0.62 * H / 470, 0.92 * W / 620); PGAP = 0.09 * MM; PCX = CX + (LAND ? 0.02 * W : 0); PCY = LAND ? H * 0.5 : H * 0.4;
+  computeSK(); jump = true;
+}
+addEventListener('resize', resize);
+resize();
+
+(function grain() {
   try {
-    const c = document.createElement('canvas'); c.width = c.height = 320;
-    const x = c.getContext('2d'), r = rng(11);
-    for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(60,58,52,${(r() * 0.06).toFixed(3)})`; x.fillRect(r() * 320, r() * 320, 1, 1); }
-    for (let i = 0; i < 150; i++) {
-      const px = r() * 320, py = r() * 320, a = r() * TAU, l = 6 + r() * 28;
-      x.strokeStyle = `rgba(70,66,58,${(0.02 + r() * 0.05).toFixed(3)})`; x.lineWidth = 0.4 + r() * 0.6;
-      x.beginPath(); x.moveTo(px, py);
-      x.quadraticCurveTo(px + Math.cos(a) * l * 0.5 + (r() - 0.5) * 6, py + Math.sin(a) * l * 0.5 + (r() - 0.5) * 6, px + Math.cos(a) * l, py + Math.sin(a) * l);
-      x.stroke();
-    }
-    document.documentElement.style.setProperty('--paper-tex', `url(${c.toDataURL()})`);
-    const b = document.createElement('canvas'); b.width = 640; b.height = 150;
-    const bx = b.getContext('2d');
-    for (let i = 0; i < 6; i++) {
-      const y = 18 + i * 23, it = prep({ type: 'stroke', pts: [[6, y + (i % 2) * 3], [320, y - 2], [634, y + 2]], w: 36, ink: 1, dry: .12, taper: [.01,.03], spacing: 1.2 }, 300 + i);
-      stamp(bx, it, 0, it.total);
-    }
-    document.documentElement.style.setProperty('--brick-tex', `url(${b.toDataURL()})`);
-    document.documentElement.classList.add('tex');
+    const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d');
+    for (let i = 0; i < 9000; i++) { x.fillStyle = `rgba(40,36,30,${(hash(i, 1) * 0.1).toFixed(3)})`; x.fillRect(hash(i, 2) * 256, hash(i, 3) * 256, 1, 1); }
+    for (let i = 0; i < 160; i++) { const px = hash(i, 4) * 256, py = hash(i, 5) * 256, a = hash(i, 6) * TAU, l = 6 + hash(i, 7) * 26; x.strokeStyle = `rgba(60,55,45,${(0.03 + hash(i, 8) * 0.05).toFixed(3)})`; x.lineWidth = .5; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+    document.getElementById('grain').style.setProperty('--grain', `url(${c.toDataURL()})`);
   } catch (e) {}
 })();
 
-/* ——— mise en route ——— */
-const worlds = [];
-document.querySelectorAll('.world[data-world]').forEach(el => {
-  const def = WORLDS[el.dataset.world];
-  if (!def) return;
-  const w = new World(el, def); el._world = w; worlds.push(w);
-});
-
-const fontsReady = (document.fonts && document.fonts.load)
-  ? Promise.race([
-      Promise.all([
-        document.fonts.load('700 34px "Shippori Mincho B1"', 'Je regarde ≈ ? Qui prévisible'),
-        document.fonts.load('500 26px "Zen Kaku Gothic New"', 'enfance père'),
-        document.fonts.load('400 16px "IBM Plex Mono"', '0.21 − ATG θ ≈ φ')
-      ]),
-      new Promise(r => setTimeout(r, 1500))
-    ]).catch(() => {})
-  : Promise.resolve();
-
-fontsReady.then(() => {
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(entries => {
-      for (const e of entries) {
-        const w = e.target._world;
-        w.visible = e.isIntersecting;
-        if (e.isIntersecting && !w.started && e.intersectionRatio >= 0.3) w.start();
-      }
-    }, { threshold: [0, 0.3] });
-    worlds.forEach(w => io.observe(w.el));
-  } else worlds.forEach(w => { w.visible = true; w.start(); });
-  if (!reduced) {
-    const loop = ms => {
-      const now = ms / 1000;
-      for (const w of worlds) if (w.visible && w.started) { w.step(); w.drawLive(now); }
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-  }
-});
-
-const fleur = document.getElementById('w-fleur'), range = document.getElementById('angle'), out = document.getElementById('angle-out');
-function setAngle(v) {
-  if (!fleur || !fleur._world) return;
-  fleur._world.S.angle = v;
-  if (out) out.textContent = `${fr(v, 2)}°`;
-  if (reduced) fleur._world.drawLive(performance.now() / 1000);
+function render(T) {
+  setNight(rv(T, 76, 3) - rv(T, 107, 4));
+  ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  const v = camera(Math.min(T, 76.9));
+  const V = { v, moonC: MP(v[0], MOON[0], MOON[1]), moonR: 0.07 * v[0].S };
+  if (T < 79) { drawCoast(v[0], T); drawFlower(v[1], T); drawSeed(v[2], T); drawNucleus(v[3], T); drawAtom(v[4], T); }
+  drawDrop(T, V);
+  drawSpace(T);
+  drawParticles(T, V);
+  if (T < 62) drawFlowerOverlay(v[1], T);
+  drawCloudLabels(T, V);
+  const logS = Math.log(v[0].S), speed = Math.abs(logS - prevLogS); prevLogS = logS;
+  let k = reduced || jump ? 1 : Math.max(0.28, 0.62 - speed * 9);
+  if (!reduced && !jump && T > 76.8 && T < 80.5) k = Math.min(k, 0.3);
+  out.globalAlpha = k; out.drawImage(sc, 0, 0); out.globalAlpha = 1;
+  jump = false;
+  updateCaps(T); updateChap(T); audioFrame(T);
+  endEl.classList.toggle('on', T >= 131);
 }
-if (range) range.addEventListener('input', () => setAngle(parseFloat(range.value)));
-const reset = document.getElementById('angle-reset');
-if (reset) reset.addEventListener('click', () => { if (range) range.value = '137.51'; setAngle(137.508); });
-
-let rt;
-window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { worlds.forEach(w => w.size()); onScroll(); }, 120); });
-
-/* ——— les phrases et les briques arrivent avec le scroll ——— */
-const scenes = [...document.querySelectorAll('.scene')].map(s => ({ el: s, items: [...s.querySelectorAll('.reveal')] }));
-const minis = [...document.querySelectorAll('.pile a')], pileN = document.getElementById('pile-n');
-let ticking = false, laid = -1;
-function onScroll() {
-  ticking = false;
-  const vh = window.innerHeight;
-  for (const { el, items } of scenes) {
-    const r = el.getBoundingClientRect(), span = Math.max(1, r.height - vh), p = -r.top / span;
-    const n = items.length;
-    items.forEach((it, i) => {
-      const at = it.dataset.at !== undefined ? parseFloat(it.dataset.at) : 0.1 + i * (0.62 / Math.max(1, n - 1));
-      it.classList.toggle('on', reduced || p >= at);
-    });
-  }
-  const count = document.querySelectorAll('.scene .brique.on').length;
-  if (count !== laid) {
-    laid = count;
-    minis.forEach((a, i) => a.classList.toggle('on', i < count));
-    if (pileN) pileN.textContent = count;
-  }
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (playing && T < END) T = Math.min(END, T + dt);
+  if (playing && T >= END) setPlaying(false);
+  if (playing && dt > 0.034 && DPR > 1) { if (++slow > 90) { dprCap = 1; slow = 0; resize(); } } else slow = Math.max(0, slow - 1);
+  if (playing || jump) render(T);
+  requestAnimationFrame(frame);
 }
-window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
-onScroll();
+window.__seek = t => { T = t; jump = true; render(T); };
+requestAnimationFrame(frame);
 })();
 </script>
 </body>
