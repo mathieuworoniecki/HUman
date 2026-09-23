@@ -1,10 +1,9 @@
 # HUman
 
-Un exercice de pensée : *et si nous étions le plus gros LLM jamais observé ?*
+*Et si nous étions le plus gros LLM jamais observé ?*
 
-L'idée de Mathieu, débattue pas à pas avec Claude, présentée sur une page web où chaque illustration se peint à l'encre de Chine.
+La réflexion de Mathieu, brique par brique, sur une page d'accueil centrée sur les dessins. Chaque scène se peint à l'encre de Chine, reste vivante (vagues, feuilles, signaux nerveux, ADN qui tourne), puis révèle les calculs cachés dans le dessin. Les phrases clés apparaissent au fil du scroll et chaque idée pose une brique sur la pile.
 
 Ouvrir `index.html` dans un navigateur. Aucune dépendance, aucun build.
 
-- Huit pas : l'IA, le monde, tout prévoir, le cerveau, nous des IA ?, la vie, le pinceau, l'ADN
-- Un tableau de ce qui nous sépare vraiment, un bilan, et trois questions pour l'échange suivant
+Les dix briques : l'IA, l'arbre, la mer, la fleur, le hasard, le cerveau, l'ADN, le corps, la vie, le pinceau.

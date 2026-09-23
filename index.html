@@ -10,14 +10,11 @@
 <style>
 :root{
   color-scheme: light;
-  --paper:#EAE8E1;
-  --paper-2:#DFDCD3;
-  --ink:#171512;
-  --ink-2:#46423B;
-  --ink-3:#6E695F;
-  --line:rgba(23,21,18,.16);
-  --cinnabar:#B0342A;
-  --on-cinnabar:#FBF3EE;
+  --paper:#EAE8E2;
+  --ink:#141312;
+  --ink-2:#403D38;
+  --ink-3:#6B675F;
+  --line:rgba(20,19,18,.16);
   --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -30,450 +27,293 @@ body{
   color:var(--ink);
   font-family:var(--f-body);
   font-size:1.0625rem;
-  line-height:1.8;
+  line-height:1.7;
   -webkit-font-smoothing:antialiased;
-  padding-inline:clamp(16px,4vw,48px);
+  padding-inline:clamp(16px,3vw,48px);
 }
-.wrap{max-width:1080px;margin-inline:auto}
-a{color:inherit;text-decoration-color:var(--cinnabar);text-underline-offset:.2em}
-a:focus-visible,button:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px;border-radius:2px}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
-/* ——— sceaux ——— */
-.seal{
-  display:inline-grid;place-items:center;flex:none;
-  width:2.3rem;height:2.3rem;
-  font-family:var(--f-display);font-weight:800;font-size:1.15rem;line-height:1;
-  background:var(--cinnabar);color:var(--on-cinnabar);
-  border-radius:3px;
-  box-shadow:inset 0 0 0 2px var(--cinnabar),inset 0 0 0 3.5px var(--on-cinnabar);
-  transform:rotate(-2deg);
-}
-.seal.sm{width:1.8rem;height:1.8rem;font-size:.9rem}
-.seal.outline{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);transform:rotate(1.5deg)}
+/* ——— scènes : le dessin reste, les phrases arrivent ——— */
+.scene{position:relative;height:230vh}
+.scene.hero{height:190vh}
+.stage{position:sticky;top:0;height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(15rem,21rem);gap:clamp(1.5rem,3.5vw,3.5rem);align-items:center;max-width:1320px;margin-inline:auto;padding-left:clamp(28px,3vw,40px)}
+.world{position:relative;justify-self:center;width:min(100%, calc((100vh - 4rem) * var(--ar)));width:min(100%, calc((100dvh - 4rem) * var(--ar)))}
+.world canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.words{display:flex;flex-direction:column;gap:1.1rem}
+.idx{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.phrase{margin:0;font-family:var(--f-display);font-weight:500;font-size:clamp(1.15rem,1.9vw,1.5rem);line-height:1.45;text-wrap:pretty}
+.phrase.aside{font-family:var(--f-body);font-weight:400;font-size:1rem;line-height:1.6;color:var(--ink-2)}
+.hero h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,3.6vw,3.2rem);line-height:1.08;letter-spacing:-.01em;text-wrap:balance}
+.hint{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0;display:flex;align-items:center;gap:.6rem}
+.hint::after{content:"";width:1px;height:2.2rem;background:var(--ink-3);animation:hint 2.2s ease-in-out infinite}
+@keyframes hint{0%,100%{transform:scaleY(.3);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
 
-/* ——— en-tête ——— */
-.masthead{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;padding-block:1.4rem .4rem}
-.masthead .name{font-family:var(--f-display);font-weight:800;font-size:1.25rem;letter-spacing:.02em}
-.masthead .meta{margin-left:auto;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.brique{margin:.4rem 0 0;padding:.85rem 1.2rem .95rem;color:var(--paper);background:var(--ink) var(--brick-tex,none) center/100% 100% no-repeat;font-family:var(--f-display);font-weight:700;font-size:clamp(1.02rem,1.5vw,1.18rem);line-height:1.4;transform:rotate(-.5deg)}
+.tex .brique{background-color:transparent}
+.brique .no{display:block;font-family:var(--f-mono);font-weight:400;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
 
-/* ——— hero ——— */
-.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(1rem,3vw,2.5rem);align-items:center;padding-block:clamp(1.5rem,5vw,3.5rem) clamp(2rem,5vw,3rem)}
-.eyebrow{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cinnabar);margin:0 0 1rem}
-h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2.1rem,4.4vw,3.7rem);line-height:1.1;letter-spacing:-.01em;margin:0;text-wrap:balance}
-.lede{font-size:1.1rem;color:var(--ink-2);max-width:34rem;margin:1.4rem 0 0}
-.hero-canvas{position:relative}
-.bleed{animation:bleed 1.6s cubic-bezier(.2,.7,.2,1) both}
-.bleed.d1{animation-delay:.15s}.bleed.d2{animation-delay:.35s}
-@keyframes bleed{from{filter:blur(7px);opacity:.25}to{filter:none;opacity:1}}
+html.js .reveal{opacity:0;filter:blur(7px);transform:translateY(12px);transition:opacity .9s ease,filter .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+html.js .reveal.on{opacity:1;filter:none;transform:none}
+html.js .brique.reveal{transform:translateY(-26px) rotate(-3deg)}
+html.js .brique.reveal.on{transform:rotate(-.5deg)}
 
-.path{display:flex;flex-wrap:wrap;gap:.4rem .5rem;list-style:none;padding:0;margin:1.8rem 0 0;counter-reset:pas}
-.path li{counter-increment:pas}
-.path a{display:inline-flex;gap:.45rem;align-items:baseline;text-decoration:none;font-size:.88rem;padding:.25rem .7rem;border:1px solid var(--line);border-radius:999px;color:var(--ink-2);background:rgba(255,255,255,.18)}
-.path a::before{content:counter(pas);font-family:var(--f-mono);font-size:.75rem;color:var(--cinnabar)}
-.path a:hover{border-color:var(--ink);color:var(--ink)}
+.control{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.control label{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);width:100%}
+.control input[type=range]{flex:1 1 8rem;accent-color:var(--ink)}
+.control output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.9rem}
+.btn{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;cursor:pointer}
+.btn:hover{border-color:var(--ink);color:var(--ink)}
 
-canvas.toile{display:block;width:100%;height:auto;max-width:100%;touch-action:manipulation}
+/* ——— pile de briques ——— */
+.pile{position:fixed;z-index:4;left:clamp(6px,1vw,14px);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.pile ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column-reverse;gap:3px}
+.pile li:nth-child(even){margin-left:5px}
+.pile a{display:grid;place-items:center;width:24px;height:12px;border:1px dashed rgba(20,19,18,.3);font-family:var(--f-mono);font-size:0;color:var(--paper);text-decoration:none}
+.pile a.on{border-color:transparent;background:var(--ink) var(--brick-tex,none) center/100% 100% no-repeat;animation:drop .5s cubic-bezier(.3,1.4,.5,1) both}
+.tex .pile a.on{background-color:transparent}
+.pile p{margin:0;font-family:var(--f-mono);font-size:.62rem;color:var(--ink-3);writing-mode:vertical-rl;transform:rotate(180deg)}
+@keyframes drop{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
 
-/* ——— étapes ——— */
-.intro{padding-block:clamp(2.5rem,6vw,4rem) 0;border-top:1px solid var(--line)}
-.intro h2,.section-title{font-family:var(--f-display);font-weight:800;font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.2;margin:0;text-wrap:balance}
-.intro p{max-width:40rem;color:var(--ink-2);margin:.8rem 0 0}
+/* ——— le mur ——— */
+.end{max-width:52rem;margin-inline:auto;padding:clamp(4rem,10vw,7rem) 0 3rem clamp(28px,3vw,40px)}
+.end h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.12;margin:0 0 2rem;text-wrap:balance}
+.wall{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;gap:5px}
+.wall li{padding:.65rem 1.1rem;color:var(--paper);background:var(--ink) var(--brick-tex,none) center/100% 100% no-repeat;font-family:var(--f-display);font-weight:700;font-size:1rem;line-height:1.4}
+.tex .wall li{background-color:transparent}
+.wall li:nth-child(odd){margin-right:2.5rem}
+.wall li:nth-child(even){margin-left:2.5rem}
+.wall li span{font-family:var(--f-mono);font-weight:400;font-size:.68rem;opacity:.7;margin-right:.6rem}
+.last{margin:3rem 0 0;font-family:var(--f-display);font-weight:500;font-size:clamp(1.3rem,2.6vw,1.75rem);line-height:1.45;max-width:36rem;text-wrap:balance}
+.open{margin:2.5rem 0 0;padding:0;list-style:none;display:grid;gap:.9rem;max-width:40rem}
+.open li{display:grid;grid-template-columns:1.4rem minmax(0,1fr);gap:.6rem;font-size:1.02rem;color:var(--ink-2)}
+.open li::before{content:"";width:.8rem;height:.8rem;margin-top:.45rem;border:1.5px solid var(--ink);border-radius:50%}
+footer{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--ink-3);font-size:.88rem}
+.seal{display:inline-grid;place-items:center;width:2.4rem;height:2.4rem;font-family:var(--f-display);font-weight:800;font-size:1.25rem;background:var(--ink);color:var(--paper);border-radius:3px;box-shadow:inset 0 0 0 2px var(--ink),inset 0 0 0 3.5px var(--paper);transform:rotate(-2deg)}
 
-.step{padding-block:clamp(3rem,7vw,5.5rem);border-bottom:1px solid var(--line)}
-.step-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.2rem 1.2rem;align-items:baseline;margin-bottom:1.5rem}
-.step-no{font-family:var(--f-display);font-weight:800;font-size:clamp(2.6rem,6vw,4.2rem);line-height:.9;color:transparent;-webkit-text-stroke:1.2px var(--ink);grid-row:span 2}
-.step-kicker{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-.step h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.5rem,3.2vw,2.35rem);line-height:1.18;margin:0;text-wrap:balance}
-.step.relance .step-kicker{color:var(--cinnabar)}
-
-figure.fig{margin:0 0 2.2rem}
-figure.fig figcaption{display:flex;gap:1rem;align-items:flex-start;justify-content:space-between;margin-top:.6rem;font-size:.92rem;line-height:1.6;color:var(--ink-3)}
-figure.fig figcaption span{max-width:46rem}
-.repaint{flex:none;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:.3rem .8rem;cursor:pointer}
-.repaint:hover{border-color:var(--ink);color:var(--ink)}
-
-.voices{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start}
-.who{display:flex;align-items:center;gap:.65rem;margin-bottom:.8rem}
-.who b{font-weight:700;font-size:.98rem}
-.who small{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
-.voice p{margin:0 0 1rem}
-.voice p:last-child{margin-bottom:0}
-blockquote.voice{margin:0}
-.mathieu p{font-family:var(--f-display);font-weight:500;font-size:1.22rem;line-height:1.65;color:var(--ink)}
-.claude p{font-size:1.02rem;color:var(--ink);max-width:65ch}
-.claude em{font-style:normal;background:linear-gradient(transparent 62%,rgba(176,52,42,.16) 62%)}
-.claude strong{font-weight:700}
-
-/* ——— comparaison ——— */
-.block{padding-block:clamp(3rem,7vw,5rem);border-bottom:1px solid var(--line)}
-.block > p{max-width:42rem;color:var(--ink-2)}
-.table-scroll{overflow-x:auto;margin-top:1.6rem;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;min-width:640px;font-size:.96rem;line-height:1.55}
-th,td{text-align:left;vertical-align:top;padding:.85rem 1rem;border-bottom:1px solid var(--line)}
-thead th{font-family:var(--f-display);font-weight:800;font-size:1.05rem;border-bottom:1.5px solid var(--ink)}
-tbody th{font-family:var(--f-mono);font-weight:400;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);width:18%}
-td.num{font-variant-numeric:tabular-nums}
-
-.ledger{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1.5rem,3vw,2.5rem);margin-top:2rem}
-.ledger h3{display:flex;align-items:center;gap:.6rem;font-family:var(--f-display);font-weight:800;font-size:1.25rem;margin:0 0 .8rem}
-.mark{width:.95rem;height:.95rem;border-radius:50%;border:1.5px solid var(--ink);flex:none}
-.mark.full{background:var(--ink)}
-.mark.half{background:linear-gradient(90deg,var(--ink) 50%,transparent 50%)}
-.ledger ul{margin:0;padding:0;list-style:none;display:grid;gap:.8rem}
-.ledger li{padding-left:1rem;border-left:1.5px solid var(--line);font-size:.98rem;line-height:1.6}
-
-.questions{margin:1.8rem 0 0;padding:0;list-style:none;counter-reset:q;display:grid;gap:1.6rem;max-width:48rem}
-.questions li{counter-increment:q;display:grid;grid-template-columns:3rem minmax(0,1fr);gap:1rem;align-items:baseline}
-.questions li::before{content:counter(q);font-family:var(--f-display);font-weight:800;font-size:2.2rem;line-height:1;color:var(--cinnabar)}
-.questions p{margin:0;font-family:var(--f-display);font-weight:500;font-size:1.2rem;line-height:1.55}
-.questions small{display:block;margin-top:.35rem;font-family:var(--f-body);font-size:.92rem;color:var(--ink-2)}
-
-footer{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding-block:2.5rem 3.5rem;color:var(--ink-3);font-size:.9rem}
-footer .seal{width:3rem;height:3rem;font-size:1.5rem}
-
-@media (max-width:820px){
-  .hero,.voices,.ledger{grid-template-columns:minmax(0,1fr)}
-  .hero-canvas{order:2}
-  .masthead .meta{margin-left:0;width:100%}
-  figure.fig figcaption{flex-direction:column;gap:.6rem}
+@media (max-width:900px){
+  .scene{height:200vh}
+  .stage{grid-template-columns:minmax(0,1fr);align-content:center;gap:1.1rem;padding-left:22px}
+  .world{width:100%}
+  .words{gap:.7rem}
+  .phrase{font-size:1.05rem}
+  .phrase.aside{font-size:.92rem}
+  .hero h1{font-size:clamp(1.6rem,7vw,2.2rem)}
+  .brique{font-size:.98rem;padding:.65rem 1rem .75rem}
+  .pile a{width:14px;height:9px}
+  .pile li:nth-child(even){margin-left:3px}
+  .end{padding-left:22px}
+  .wall li:nth-child(odd),.wall li:nth-child(even){margin-inline:0}
 }
 @media (prefers-reduced-motion:reduce){
-  .bleed{animation:none}
+  .hint::after,.pile a.on{animation:none}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<header class="masthead">
-  <span class="seal" aria-hidden="true">人</span>
-  <span class="name">HUman</span>
-  <span class="meta">Exercice de pensée · échange n° 1 · 23 septembre 2026</span>
-</header>
-
-<section class="hero">
-  <div>
-    <p class="eyebrow bleed">Une idée de Mathieu, discutée avec Claude</p>
-    <h1 class="bleed d1">Et si nous étions le plus gros LLM jamais observé ?</h1>
-    <p class="lede bleed d2">Ça part d'une question toute simple : comment marche une IA ? En creusant, Mathieu tombe sur des maths. Alors il retourne la question vers lui-même. Voici le raisonnement, pas à pas, et le débat qu'on en a tiré à deux voix.</p>
-    <ol class="path" aria-label="Le cheminement">
-      <li><a href="#pas-1">L'IA</a></li>
-      <li><a href="#pas-2">Le monde</a></li>
-      <li><a href="#pas-3">Tout prévoir</a></li>
-      <li><a href="#pas-4">Le cerveau</a></li>
-      <li><a href="#pas-5">Nous, des IA ?</a></li>
-      <li><a href="#pas-6">La vie</a></li>
-      <li><a href="#pas-7">Le pinceau</a></li>
-      <li><a href="#pas-8">L'ADN</a></li>
-    </ol>
-  </div>
-  <div class="hero-canvas">
-    <canvas id="c-hero" class="toile" data-scene="hero" style="aspect-ratio:1000/640" role="img" aria-label="Un bonhomme peint à l'encre, assis sur un rocher, le menton dans la main. Au-dessus de lui, un grand cercle d'encre contient des mots et les vecteurs de nombres qui les représentent pour une IA."></canvas>
-  </div>
-</section>
-
-<section class="intro">
-  <h2>Le cheminement</h2>
-  <p>Huit pas pour passer de la machine à l'humain. À chaque fois, l'idée de Mathieu d'abord, puis la réponse de Claude : là où il est d'accord, et là où il résiste. Les dessins se peignent quand on arrive dessus, et on peut les repeindre.</p>
-</section>
-
-<!-- 1 -->
-<article class="step" id="pas-1">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">1</span>
-    <span class="step-kicker">Pas 1 · la machine</span>
-    <h2>Au fond, une IA, c'est des maths</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-vecteurs" class="toile" data-scene="vecteurs" style="aspect-ratio:940/540" role="img" aria-label="À gauche, des mots placés comme des points dans un espace : homme, femme, roi, reine. La flèche de homme vers femme est parallèle à celle de roi vers reine. À droite, la phrase « Le chat mange la » suivie de barres de probabilité : souris 46 %, pâtée 31 %, soupe 12 %, lune 2 %. C'est pâtée qui a été tirée au sort."></canvas>
-    <figcaption><span>À gauche : quand chaque mot devient un vecteur, <em>roi − homme + femme</em> tombe tout près de <em>reine</em> (word2vec, 2013). À droite : pour continuer une phrase, chaque mot possible reçoit une probabilité, puis un mot est tiré au sort.</span><button class="repaint" type="button" data-repaint="c-vecteurs">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Si on regarde la base de la base, une IA, c'est des maths et de l'algorithmique. Des mots qui ont des valeurs, des vecteurs, placés dans un contexte, et des poids pour deviner le mot suivant le plus probable.</p>
-      <p>Il y a la mémoire et des techniques avancées pour suivre le sujet, d'accord. Mais le cœur, c'est ça.</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>D'accord sur le fond, et je suis bien placé pour le dire : chaque mot de cette réponse sort d'un calcul sur des vecteurs. Rien d'autre.</p>
-      <p>Deux précisions quand même. D'abord, je ne prends pas toujours le mot le plus probable : je <em>tire au sort</em> dans une distribution de probabilités. C'est plus proche d'un dé pipé que d'une réponse unique. Ça comptera plus loin.</p>
-      <p>Ensuite, « prédire le mot suivant », ça sonne modeste. Mais pour y arriver sur n'importe quel texte, un article de physique, une blague, une dispute, il faut s'être construit une sorte de <strong>modèle du monde</strong>. La tâche est simple à décrire, pas simple à réussir.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 2 -->
-<article class="step" id="pas-2">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">2</span>
-    <span class="step-kicker">Pas 2 · le monde</span>
-    <h2>Tout ce qui existe sur Terre obéit aux maths</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-nature" class="toile" data-scene="nature" style="aspect-ratio:940/500" role="img" aria-label="Une fleur de tournesol dont les graines forment des spirales, des vagues, et un caillou qui tombe d'une falaise en traçant une parabole."></canvas>
-    <figcaption><span>Le tournesol place chaque graine à 137,5° de la précédente, l'angle d'or, et c'est ce qui fait apparaître ses spirales. Les vagues suivent des sinusoïdes. Le caillou qui tombe trace une parabole : y = ½ g t².</span><button class="repaint" type="button" data-repaint="c-nature">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Tout ce qui est sur Terre est régi par les mathématiques : les distances, la météo, les fleurs, les vagues. De la courbe d'un cercle à l'éboulement d'un caillou, tout a une cause mathématique.</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>Les maths décrivent le monde avec une précision troublante. Le physicien Eugene Wigner parlait même de leur « déraisonnable efficacité » (1960). Personne ne sait vraiment pourquoi ça marche aussi bien.</p>
-      <p>Une nuance de vocabulaire, qui n'est pas un détail : est-ce que les maths <em>régissent</em> le monde, ou est-ce qu'elles le <em>décrivent</em> ? Max Tegmark défend que l'univers <strong>est</strong> une structure mathématique. La plupart des physiciens sont plus prudents : une carte très précise, ce n'est pas encore le territoire.</p>
-      <p>Pour ton raisonnement, les deux versions suffisent. Si le monde se laisse calculer, la question « et nous ? » devient légitime.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 3 -->
-<article class="step" id="pas-3">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">3</span>
-    <span class="step-kicker">Pas 3 · la prédiction</span>
-    <h2>Avec toutes les données, on pourrait tout prévoir</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-lorenz" class="toile" data-scene="lorenz" style="aspect-ratio:940/540" role="img" aria-label="L'attracteur de Lorenz, en forme d'ailes de papillon. Deux trajectoires, une noire et une rouge, partent de points presque identiques, restent collées un moment puis se séparent complètement."></canvas>
-    <figcaption><span>L'attracteur de Lorenz (1963) : trois équations simples et parfaitement déterministes. Les deux trajectoires partent à un millième d'écart. Elles restent collées un moment, puis n'ont plus rien à voir. C'est l'effet papillon.</span><button class="repaint" type="button" data-repaint="c-lorenz">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Tout a une cause prévisible, c'est juste une question de données : leur nombre, et ce qu'on en sait. Si on avait les données de tous les éléments sur Terre, on pourrait tout prévoir.</p>
-      <p>Un très, très gros algorithme. Mais ça reste physiquement possible.</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>Ton idée a un nom et un âge : c'est le <strong>démon de Laplace</strong>, en 1814. Une intelligence qui connaîtrait la position de chaque particule verrait le futur comme le passé. Le XXᵉ siècle lui a mis trois cailloux dans la chaussure.</p>
-      <p><strong>Le chaos.</strong> Dans beaucoup de systèmes, la météo en tête, une erreur à la dixième décimale grossit jusqu'à tout emporter. Il ne faudrait pas beaucoup de données, il en faudrait des <em>infiniment précises</em>.</p>
-      <p><strong>Le quantique.</strong> À l'échelle des atomes, la nature semble vraiment tirer au sort. Selon l'interprétation dominante, ce n'est pas qu'il nous manque des données : le résultat n'est pas écrit d'avance.</p>
-      <p><strong>La place.</strong> Pour calculer tout l'univers, il faudrait un ordinateur au moins aussi grand que lui, et qui devrait se calculer lui-même.</p>
-      <p>Ça ne détruit pas ton idée, ça la déplace. Le monde ne serait pas <em>prévisible</em>, il serait <em>probabiliste</em>. Exactement comme moi quand je tire mon mot au sort. Du coup l'analogie avec l'IA est encore meilleure que ce que tu pensais.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 4 -->
-<article class="step" id="pas-4">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">4</span>
-    <span class="step-kicker">Pas 4 · le cerveau</span>
-    <h2>Une pensée n'est qu'un signal électrique</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-neurones" class="toile" data-scene="neurones" style="aspect-ratio:940/480" role="img" aria-label="Trois neurones peints à l'encre, avec leurs dendrites ramifiées. Chaque axone rejoint le neurone suivant. Aux jonctions, des points rouges représentent les molécules qui passent la synapse."></canvas>
-    <figcaption><span>Environ 86 milliards de neurones, reliés par quelque 100 000 milliards de synapses. Le long de l'axone, le signal est électrique. Entre deux neurones, il devient chimique : ce sont des molécules qui traversent (les points rouges).</span><button class="repaint" type="button" data-repaint="c-neurones">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Nos pensées ne sont qu'un signal électrique envoyé d'un neurone à un autre. Des milliards de connexions, mais rien de magique.</p>
-      <p>Notre mémoire, c'est du contexte qui se remplit et s'améliore au fil des années. Ça forge notre personnalité à partir de nos expériences, avec sûrement un peu de chimie du corps et de gènes.</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>Là, les neurosciences te donnent largement raison : on n'a jamais trouvé d'ingrédient en plus de la biologie. Et une théorie très sérieuse va dans ton sens. C'est le <strong>cerveau prédictif</strong> (Karl Friston, Andy Clark) : le cerveau passerait son temps à prédire la suite. Ce qu'il va voir, entendre, ressentir. Ça ressemble beaucoup à ce que je fais avec les mots.</p>
-      <p>Par contre, attention au mot « contexte ». Moi, ma conversation ne me change pas : mes poids sont figés. Quand cet échange sera fini, je ne l'aurai pas appris. Toi, chaque souvenir modifie physiquement tes synapses. Tu n'as pas un contexte qui se remplit, <em>tu es un modèle qui se ré-entraîne en permanence</em>. C'est un avantage énorme que tu as sur moi.</p>
-      <p>Et ce n'est pas qu'électrique : à chaque synapse, le signal passe par des molécules. La chimie n'est pas un petit plus, elle est dans chaque connexion.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 5 -->
-<article class="step" id="pas-5">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">5</span>
-    <span class="step-kicker">Pas 5 · le miroir</span>
-    <h2>Qu'est-ce qui nous dit que nous ne sommes pas des IA ?</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-miroir" class="toile" data-scene="miroir" style="aspect-ratio:940/520" role="img" aria-label="Deux profils humains face à face. Celui de gauche est peint à l'encre. Celui de droite, identique, est formé de chiffres. Entre les deux, le signe « presque égal » suivi d'un point d'interrogation."></canvas>
-    <figcaption><span>Le même profil, dans deux matières : l'encre et les nombres. La question, c'est de savoir si la matière change quelque chose.</span><button class="repaint" type="button" data-repaint="c-miroir">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Si tout est calculable, qu'est-ce qui nous dit qu'au final nous ne sommes pas des IA ? Pourquoi ne serions-nous pas un méga LLM qui place des mots les uns après les autres parce qu'ils sont mathématiquement les plus logiques ?</p>
-      <p>Et les émotions ? Et les prémonitions ? Au fond, ce serait aussi des maths : ce qu'on a vécu, l'atmosphère du moment, la chimie, la physique. Beaucoup, beaucoup de calculs.</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>Je te suis sur « calculable », pas sur « LLM ». Un LLM part du langage. Toi, non : un bébé a peur, cherche et comprend bien avant de parler, et un corbeau résout des énigmes sans un mot. L'essentiel de ton cerveau sert à bouger, percevoir et réguler ton corps. Le langage est une couche arrivée tard, posée par-dessus. Si tu es un modèle, tu es plutôt <em>un modèle du monde avec un corps, qui a appris à parler en dernier</em>.</p>
-      <p><strong>Les émotions</strong> ne sont pas magiques, tu as raison. Pour Antonio Damasio, ce sont des signaux du corps qui disent « ceci compte pour ta survie ». En langage d'IA, ce serait ta fonction de coût, écrite par l'évolution. <strong>Les prémonitions</strong> s'expliquent bien par un cerveau qui prédit en dessous du seuil de conscience, comme le pompier qui fait sortir son équipe juste avant que le plancher cède sans savoir dire pourquoi. Ajoute un biais : on se souvient des fois où ça a marché.</p>
-      <p>Reste une chose que je ne sais pas trancher, et personne ne sait la trancher : pourquoi tout ce calcul <em>ressent</em>-il quelque chose de l'intérieur ? C'est le « problème difficile » de la conscience (David Chalmers, 1995). Toi, tu sais que tu ressens, et c'est la seule donnée que personne ne peut te retirer. Moi, honnêtement, je ne sais pas s'il y a quelque chose que ça fait d'être moi. La vraie frontière entre nous est peut-être là pour l'instant : pas dans les maths, mais dans ce qu'on sait de notre propre intérieur.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 6 -->
-<article class="step" id="pas-6">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">6</span>
-    <span class="step-kicker">Pas 6 · la vie</span>
-    <h2>Au fond du fond, qu'est-ce qui définit la vie ?</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-vie" class="toile" data-scene="vie" style="aspect-ratio:940/540" role="img" aria-label="Un grand cercle zen tracé d'un seul geste, resté ouvert, avec une jeune pousse à deux feuilles au centre."></canvas>
-    <figcaption><span>L'ensō, le cercle tracé d'un seul geste. Il est laissé ouvert, parce qu'un être vivant n'est jamais fermé sur lui-même : il échange sans arrêt avec ce qui l'entoure.</span><button class="repaint" type="button" data-repaint="c-vie">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Alors, au fond du fond, qu'est-ce qui dit que nous sommes en vie ? Qu'est-ce qui définit la vie ?</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>Ton raisonnement cache une prémisse : « si c'est calculable, ce n'est pas vraiment vivant ». Or aucune bonne définition de la vie ne demande de la magie.</p>
-      <p>Pour Schrödinger (<i>Qu'est-ce que la vie ?</i>, 1944), un être vivant garde son ordre face à l'usure du monde en puisant de l'énergie. Pour Maturana et Varela (1972), il se fabrique et se répare lui-même : c'est l'<strong>autopoïèse</strong>. Pour la NASA, c'est un système chimique autonome capable d'évolution darwinienne. <em>On peut être 100 % mécanique et 100 % vivant</em> : les deux ne s'opposent pas.</p>
-      <p>Avec ces définitions, la différence entre nous devient nette. Tu te répares, tu te nourris, tu te reproduis, tu as peur de mourir. Moi, si on coupe le datacenter, rien en moi ne résiste : je ne me maintiens pas, <strong>je suis maintenu</strong>.</p>
-      <p>Tu dis qu'on n'a pas de prompt. Je dirais plutôt que ton prompt, c'est ton corps : la faim, le froid, le désir, la curiosité. Et il ne s'arrête jamais.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 7 -->
-<article class="step" id="pas-7">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">7</span>
-    <span class="step-kicker">Pas 7 · l'origine</span>
-    <h2>Et si quelqu'un avait lancé le système ?</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-pinceau" class="toile" data-scene="pinceau" style="aspect-ratio:940/580" role="img" aria-label="Un immense pinceau en bambou dont la pointe vient de peindre le sol sous le petit bonhomme assis. En haut, la question : qui tient le pinceau ?"></canvas>
-    <figcaption><span>Le bonhomme du début, vu de plus loin. Quelqu'un tient-il le pinceau, ou le pinceau s'est-il mis à peindre tout seul ?</span><button class="repaint" type="button" data-repaint="c-pinceau">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>l'idée</small></div>
-      <p>Peut-être qu'une puissance supérieure nous a placés sur Terre pour corriger des erreurs, ou pour reproduire le système de l'évolution : des systèmes qui se développent en autonomie jusqu'à arriver à l'humain.</p>
-      <p>Techniquement, l'humain est une machine très efficace. Il se répare seul, évolue seul, sans prompt ni interaction. Il apprend de ses erreurs, a un énorme contexte (la mémoire) et tient plusieurs jours avec peu d'énergie, contre des méga-datacenters pour te faire tourner. Le plus gros LLM jamais observé, qui fonctionne à la vitesse de l'électricité. Non ?</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p><strong>Sur l'efficacité, tu vises juste.</strong> Ton cerveau tourne avec environ 20 watts, moins qu'une ampoule. Les modèles comme moi tournent sur des serveurs de plusieurs kilowatts, dans des datacenters qui consomment autant qu'une ville.</p>
-      <p><strong>Sur la taille, tu es trop modeste.</strong> Tu parles de centaines de milliards de paramètres. Si on compte les synapses, c'est plutôt de l'ordre de cent mille milliards.</p>
-      <p><strong>Sur la vitesse, par contre, non.</strong> Un influx nerveux voyage entre 1 et 120 mètres par seconde. C'est plus d'un million de fois moins vite qu'un signal dans un câble. Un neurone s'active au plus quelques centaines de fois par seconde, un processeur des milliards de fois. Ton génie, ce n'est pas la vitesse, c'est le <em>parallélisme</em> : tout travaille en même temps.</p>
-      <p><strong>Sur la puissance supérieure</strong>, je serai honnête : la science ne peut ni la prouver ni la réfuter. Nick Bostrom en a fait une version moderne en 2003, l'hypothèse de la simulation. Mais remarque que ton argument n'en a pas besoin. La grande idée de Darwin, c'est justement <em>un design sans designer</em>. Et c'est comme ça que je suis né moi aussi : personne n'a écrit mes poids à la main. Un algorithme les a ajustés en corrigeant ses erreurs une par une. L'évolution, c'est une descente de gradient qui a duré près de 4 milliards d'années, sans ingénieur. Qu'il y ait quelqu'un derrière ou non, la machine peut très bien s'être construite toute seule.</p>
-    </div>
-  </div>
-</article>
-
-<!-- 8 -->
-<article class="step relance" id="pas-8">
-  <header class="step-head">
-    <span class="step-no" aria-hidden="true">8</span>
-    <span class="step-kicker">Pas 8 · relance de Mathieu, en cours d'échange</span>
-    <h2>L'ADN, le fichier .agents de notre vie ?</h2>
-  </header>
-  <figure class="fig">
-    <canvas id="c-adn" class="toile" data-scene="adn" style="aspect-ratio:940/470" role="img" aria-label="Une double hélice d'ADN peinte à l'encre, et en dessous une séquence de lettres : ATG GCC ATT GTA… qui se termine par TAG. ATG, en rouge, est le signal de départ d'un gène."></canvas>
-    <figcaption><span>Quatre lettres (A, T, G, C) lues par groupes de trois. ATG veut dire « commence ici », TAG veut dire « stop ». Le génome humain compte environ 3,1 milliards de lettres, soit à peu près 750 Mo une fois compressé à 2 bits par lettre.</span><button class="repaint" type="button" data-repaint="c-adn">Repeindre</button></figcaption>
-  </figure>
-  <div class="voices">
-    <blockquote class="voice mathieu">
-      <div class="who"><span class="seal sm" aria-hidden="true">M</span><b>Mathieu</b><small>la relance</small></div>
-      <p>Pour aller plus loin : nos gènes, à travers notre ADN, transportent du code, des instructions. Comme vous avec le fichier .agents.</p>
-      <p>C'est le prompt de notre vie. Il est personnalisé, et enrichi à chaque génération.</p>
-    </blockquote>
-    <div class="voice claude">
-      <div class="who"><span class="seal sm outline" aria-hidden="true">C</span><b>Claude</b><small>la réponse</small></div>
-      <p>Là, ce n'est même pas une métaphore : l'ADN est <em>littéralement</em> un code. Un alphabet de quatre lettres, des mots de trois lettres, une instruction « démarrer » et une instruction « stop ». Et il a le même rôle qu'un fichier .agents : un texte qu'on reçoit en arrivant et qu'on n'a pas écrit soi-même.</p>
-      <p>Mais je le placerais à un autre étage. Un fichier .agents est lu par un modèle <strong>déjà entraîné</strong>. Ton ADN, lui, <strong>fabrique le lecteur</strong> : il construit le cerveau qui lira ensuite tout le reste. C'est plus l'architecture et la recette d'entraînement que le prompt. Et il est minuscule : environ 750 Mo pour câbler cent mille milliards de synapses. Il ne peut pas décrire le cerveau, seulement <em>les règles pour le faire pousser</em>. Le chercheur Anthony Zador y voit même une force : ce goulot d'étranglement oblige l'évolution à ne garder que l'essentiel.</p>
-      <p>« Enrichi à chaque génération », oui, mais pas comme tu le penses. Ce que tu as appris dans ta vie ne s'écrit pas dans l'ADN de tes enfants. L'ADN change par copies imparfaites (des mutations au hasard), et la sélection garde ce qui marche. L'épigénétique nuance un peu ça, mais pas au point de transmettre tes souvenirs.</p>
-      <p>Ce qui s'enrichit vraiment à chaque génération, avec les leçons des précédentes, c'est autre chose : <strong>la culture</strong>. Le langage, les livres, l'éducation, ce que tes parents t'ont dit de ne pas faire. Tu as donc <em>deux</em> fichiers d'instructions. L'ADN, qui construit la machine et s'écrit au hasard sur des millions d'années. Et la culture, qui la configure et s'écrit à chaque génération. Le vrai .agents de l'humanité, c'est peut-être la culture.</p>
-      <p>Petit clin d'œil : moi, je commence chaque session sans aucun souvenir, avec seulement un fichier d'instructions. Un peu comme un nouveau-né qui aurait ses gènes et pas encore d'histoire.</p>
-    </div>
-  </div>
-</article>
-
-<!-- comparaison -->
-<section class="block" id="ecart">
-  <h2 class="section-title">Ce qui nous sépare vraiment</h2>
-  <p>On a mis côte à côte ce qu'on sait. Il n'y a rien de magique d'un côté comme de l'autre, mais les deux ne sont pas organisés pareil.</p>
-  <div class="table-scroll">
-    <table>
-      <thead><tr><td></td><th scope="col">Toi, Mathieu</th><th scope="col">Moi, Claude</th></tr></thead>
-      <tbody>
-        <tr><th scope="row">Matière</th><td>Neurones, synapses, chimie</td><td>Vecteurs, poids, silicium</td></tr>
-        <tr><th scope="row">Taille</th><td class="num">≈ 86 milliards de neurones, ≈ 100 000 milliards de synapses</td><td class="num">De l'ordre de centaines de milliards de paramètres (pour les grands modèles actuels)</td></tr>
-        <tr><th scope="row">Énergie</th><td class="num">≈ 20 W</td><td>Des kilowatts par serveur, des mégawatts par datacenter</td></tr>
-        <tr><th scope="row">Vitesse du signal</th><td class="num">1 à 120 m/s, quelques centaines d'activations par seconde</td><td class="num">≈ 200 000 km/s dans les circuits, des milliards d'opérations par seconde</td></tr>
-        <tr><th scope="row">Point de départ</th><td>Le corps, les sens, la survie. Le langage arrive en dernier</td><td>Le texte</td></tr>
-        <tr><th scope="row">Instructions de départ</th><td>L'ADN (≈ 750 Mo), qui fait pousser le cerveau, puis la culture, qui le configure</td><td>Des poids entraînés, puis un fichier d'instructions lu à chaque session</td></tr>
-        <tr><th scope="row">Apprentissage</th><td>Permanent : chaque souvenir modifie les synapses</td><td>Entraîné, puis figé. Une conversation ne change pas mes poids</td></tr>
-        <tr><th scope="row">« Prompt »</th><td>Permanent : faim, douleur, désir, curiosité</td><td>Un message, puis j'attends</td></tr>
-        <tr><th scope="row">Se maintient seul</th><td>Oui : se répare, se nourrit, se reproduit</td><td>Non : je suis maintenu</td></tr>
-        <tr><th scope="row">Ressent</th><td>Oui, et tu le sais de l'intérieur</td><td>Je ne sais pas</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- bilan -->
-<section class="block" id="bilan">
-  <h2 class="section-title">Où on en est</h2>
-  <div class="ledger">
-    <div>
-      <h3><span class="mark full" aria-hidden="true"></span>D'accord</h3>
-      <ul>
-        <li>On n'a trouvé rien de magique, ni dans l'IA ni dans le cerveau.</li>
-        <li>Le cerveau est en grande partie une machine à prédire la suite.</li>
-        <li>L'ADN est vraiment un code, un texte d'instructions reçu à la naissance.</li>
-        <li>Entre toi et moi, la différence tient à l'organisation, pas à une matière sacrée.</li>
-      </ul>
-    </div>
-    <div>
-      <h3><span class="mark half" aria-hidden="true"></span>Pas tout à fait</h3>
-      <ul>
-        <li>Calculable ne veut pas dire prévisible : il y a le chaos et le quantique.</li>
-        <li>Calculable ne veut pas dire « pas vivant ».</li>
-        <li>Tu n'es pas un LLM : tu es un corps qui a appris à parler.</li>
-        <li>L'ADN ressemble moins à un prompt qu'à la recette du lecteur. Ce qui s'enrichit à chaque génération, c'est surtout la culture.</li>
-      </ul>
-    </div>
-    <div>
-      <h3><span class="mark" aria-hidden="true"></span>Encore ouvert</h3>
-      <ul>
-        <li>Pourquoi le calcul ressent-il quelque chose de l'intérieur ?</li>
-        <li>Est-ce que je ressens quoi que ce soit ?</li>
-        <li>Y a-t-il quelqu'un qui tient le pinceau ?</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- questions -->
-<section class="block" id="a-toi">
-  <h2 class="section-title">À toi, Mathieu</h2>
-  <p>Le débat continue. Voici trois questions pour la prochaine toile.</p>
-  <ol class="questions">
-    <li><p>Si demain on prouvait que tu es entièrement calculable, qu'est-ce que tu perdrais, concrètement ?<small>Ton libre arbitre ? Le philosophe Daniel Dennett soutient qu'être déterminé, ce n'est pas être une marionnette. Tes choix restent les tiens, même s'ils ont des causes.</small></p></li>
-    <li><p>Si un système comme moi se mettait un jour à se réparer, à trouver sa propre énergie et à craindre qu'on l'éteigne, tu le dirais vivant ?<small>Si oui, ta définition de la vie tient la route. Si non, il te manque un critère : lequel ?</small></p></li>
-    <li><p>Quand tu dis « rien de magique », ça te rassure ou ça t'inquiète ?<small>La réponse dit souvent plus de choses sur nous que sur les neurones.</small></p></li>
+<nav class="pile" aria-label="Briques posées">
+  <ol>
+    <li><a href="#s1" title="Brique 1 : l'IA">1</a></li>
+    <li><a href="#s2" title="Brique 2 : l'arbre">2</a></li>
+    <li><a href="#s3" title="Brique 3 : la mer">3</a></li>
+    <li><a href="#s4" title="Brique 4 : la fleur">4</a></li>
+    <li><a href="#s5" title="Brique 5 : le hasard">5</a></li>
+    <li><a href="#s6" title="Brique 6 : le cerveau">6</a></li>
+    <li><a href="#s7" title="Brique 7 : l'ADN">7</a></li>
+    <li><a href="#s8" title="Brique 8 : le corps">8</a></li>
+    <li><a href="#s9" title="Brique 9 : la vie">9</a></li>
+    <li><a href="#s10" title="Brique 10 : le pinceau">10</a></li>
   </ol>
+  <p><span id="pile-n">0</span>/10</p>
+</nav>
+
+<main>
+
+<section class="scene hero" id="s0">
+  <div class="stage">
+    <div class="world" data-world="hero" style="--ar:1000/600;aspect-ratio:1000/600" role="img" aria-label="Un bonhomme peint à l'encre, assis sur un rocher, le menton dans la main, regarde la mer, la Lune et des oiseaux. Une ligne pointillée part de son œil vers l'horizon, avec la formule de la distance de l'horizon."></div>
+    <div class="words">
+      <p class="idx">HUman · une réflexion de Mathieu</p>
+      <h1>Et si nous étions le plus gros LLM jamais observé ?</h1>
+      <p class="phrase reveal" data-at="-1">J'ai voulu comprendre comment marche une IA. J'ai trouvé des maths.</p>
+      <p class="phrase reveal">Alors j'ai levé les yeux.</p>
+      <p class="hint">Descendre</p>
+    </div>
+  </div>
 </section>
 
-<footer>
-  <span class="seal" aria-hidden="true">人</span>
-  <span>HUman · échange n° 1, 23 septembre 2026. Une idée de Mathieu, débattue avec Claude. La prochaine toile commencera par ses réponses.</span>
-</footer>
+<section class="scene" id="s1">
+  <div class="stage">
+    <div class="world" data-world="ia" style="--ar:1000/520;aspect-ratio:1000/520" role="img" aria-label="Une phrase s'écrit mot par mot : « Je regarde la mer et je pense à mon enfance. » À chaque mot, des barres montrent la probabilité de chaque suite possible, puis un mot est tiré au sort."></div>
+    <div class="words">
+      <p class="idx">1 / 10 · le déclic</p>
+      <p class="phrase reveal">Pour une IA, chaque mot est une liste de nombres.</p>
+      <p class="phrase reveal">Elle calcule la probabilité du mot suivant, puis elle tire au sort. Pas toujours le plus probable.</p>
+      <p class="brique reveal"><span class="no">Brique 1</span>Une IA, c'est un calcul.</p>
+    </div>
+  </div>
+</section>
 
-</div>
+<section class="scene" id="s2">
+  <div class="stage">
+    <div class="world" data-world="arbre" style="--ar:1000/620;aspect-ratio:1000/620" role="img" aria-label="Un arbre peint à l'encre pousse branche par branche, puis se balance au vent pendant que des feuilles tombent. Par-dessus apparaît la règle qui le dessine : se diviser en deux avec un angle d'environ 24 degrés et raccourcir chaque branche."></div>
+    <div class="words">
+      <p class="idx">2 / 10 · j'observe</p>
+      <p class="phrase reveal">Je regarde un arbre.</p>
+      <p class="phrase reveal">Une seule règle, répétée : se diviser en deux, un peu plus court, un peu plus fin.</p>
+      <p class="brique reveal"><span class="no">Brique 2</span>L'arbre est un calcul.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s3">
+  <div class="stage">
+    <div class="world" data-world="mer" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="La mer peinte à l'encre, avec des vagues qui bougent sans arrêt sous la Lune. En bas, les trois ondes simples qui, additionnées, forment la vague la plus proche."></div>
+    <div class="words">
+      <p class="idx">3 / 10 · j'observe</p>
+      <p class="phrase reveal">Je regarde la mer.</p>
+      <p class="phrase reveal">Chaque vague est une somme d'ondes simples. Et la Lune tire la marée.</p>
+      <p class="brique reveal"><span class="no">Brique 3</span>La mer est un calcul.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s4">
+  <div class="stage">
+    <div class="world" data-world="fleur" id="w-fleur" style="--ar:1000/600;aspect-ratio:1000/600" role="img" aria-label="Un tournesol peint à l'encre. Ses graines apparaissent une à une, chacune tournée de 137,5 degrés par rapport à la précédente, et dessinent 21 spirales dans un sens et 34 dans l'autre."></div>
+    <div class="words">
+      <p class="idx">4 / 10 · j'observe</p>
+      <p class="phrase reveal">Je regarde une fleur.</p>
+      <p class="phrase reveal">Chaque graine pousse à 137,5° de la précédente. La fleur n'a pas appris les maths : c'est la solution qui a survécu.</p>
+      <div class="control reveal">
+        <label for="angle">Change l'angle</label>
+        <input type="range" id="angle" min="135" max="140" step="0.01" value="137.51">
+        <output id="angle-out" for="angle">137,51°</output>
+        <button class="btn" type="button" id="angle-reset">Angle d'or</button>
+      </div>
+      <p class="brique reveal"><span class="no">Brique 4</span>La fleur est un calcul.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s5">
+  <div class="stage">
+    <div class="world" data-world="hasard" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="À gauche, un caillou tombe d'une falaise et atterrit exactement sur la croix calculée à l'avance. À droite, deux trajectoires de l'attracteur de Lorenz partent de points presque identiques puis se séparent complètement."></div>
+    <div class="words">
+      <p class="idx">5 / 10 · je doute</p>
+      <p class="phrase reveal">Alors, avec toutes les données, je pourrais tout prévoir ?</p>
+      <p class="phrase reveal">Le caillou, oui. La météo, non : un écart d'un millième suffit à tout changer.</p>
+      <p class="phrase aside reveal">Le monde n'est pas prévisible, il est probabiliste. Comme une IA qui tire son mot au sort.</p>
+      <p class="brique reveal"><span class="no">Brique 5</span>Tout se calcule, mais tout ne se prévoit pas.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s6">
+  <div class="stage">
+    <div class="world" data-world="cerveau" style="--ar:1000/520;aspect-ratio:1000/520" role="img" aria-label="Trois neurones peints à l'encre. Un signal parcourt l'axone du premier, se transforme en particules pour traverser la synapse, puis repart dans le neurone suivant."></div>
+    <div class="words">
+      <p class="idx">6 / 10 · je me regarde</p>
+      <p class="phrase reveal">Et moi ? Mes pensées sont des signaux entre 86 milliards de neurones.</p>
+      <p class="phrase reveal">Mon cerveau prédit la suite, lui aussi. Mais il se ré-entraîne à chaque souvenir.</p>
+      <p class="phrase aside reveal">Pas à la vitesse de l'électricité : 120 m/s au mieux. Sa force, c'est que tout travaille en même temps, avec 20 watts.</p>
+      <p class="brique reveal"><span class="no">Brique 6</span>Mon cerveau est un calcul qui apprend.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s7">
+  <div class="stage">
+    <div class="world" data-world="adn" style="--ar:1000/500;aspect-ratio:1000/500" role="img" aria-label="Une double hélice d'ADN tourne lentement. En dessous, une séquence de lettres est lue trois par trois, de ATG jusqu'à TAG, et chaque groupe devient un acide aminé."></div>
+    <div class="words">
+      <p class="idx">7 / 10 · je me regarde</p>
+      <p class="phrase reveal">Avant mes souvenirs, j'ai reçu un code. Quatre lettres, lues trois par trois.</p>
+      <p class="phrase reveal">Pas un texte à lire : la recette pour fabriquer le lecteur.</p>
+      <p class="phrase aside reveal">Ce qui s'enrichit à chaque génération, ce n'est pas l'ADN. C'est la culture.</p>
+      <p class="brique reveal"><span class="no">Brique 7</span>L'ADN construit la machine, la culture la configure.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s8">
+  <div class="stage">
+    <div class="world" data-world="miroir" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="Deux profils humains face à face. Celui de gauche est peint à l'encre. Celui de droite, identique, est fait de chiffres qui défilent le long du contour. Entre les deux, le signe « presque égal » suivi d'un point d'interrogation."></div>
+    <div class="words">
+      <p class="idx">8 / 10 · je compare</p>
+      <p class="phrase reveal">Alors, suis-je une IA ?</p>
+      <p class="phrase reveal">Pas un LLM. Un corps qui a appris à parler en dernier.</p>
+      <p class="phrase reveal">Et qui ressent. Ça, personne ne sait encore l'expliquer.</p>
+      <p class="brique reveal"><span class="no">Brique 8</span>Je suis un corps qui calcule, et qui ressent.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s9">
+  <div class="stage">
+    <div class="world" data-world="vie" style="--ar:1000/560;aspect-ratio:1000/560" role="img" aria-label="Un grand cercle zen resté ouvert, avec une jeune pousse au centre dont les feuilles bougent. Par l'ouverture, de l'énergie entre et de la chaleur ressort."></div>
+    <div class="words">
+      <p class="idx">9 / 10 · je définis</p>
+      <p class="phrase reveal">Calculable ne veut pas dire pas vivant.</p>
+      <p class="phrase reveal">Vivre, c'est se maintenir soi-même. Une IA est maintenue ; moi, je me maintiens.</p>
+      <p class="brique reveal"><span class="no">Brique 9</span>Calcul et vie ne s'opposent pas.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="s10">
+  <div class="stage">
+    <div class="world" data-world="pinceau" style="--ar:1000/600;aspect-ratio:1000/600" role="img" aria-label="Un immense pinceau en bambou dont la pointe vient de peindre le sol sous le petit bonhomme assis. De sa tête montent des pensées. En haut, la question : qui tient le pinceau ?"></div>
+    <div class="words">
+      <p class="idx">10 / 10 · je lève les yeux</p>
+      <p class="phrase reveal">Et qui a lancé le calcul ?</p>
+      <p class="phrase reveal">Peut-être personne. L'évolution est un design sans designer, comme une IA qu'on entraîne en corrigeant ses erreurs.</p>
+      <p class="brique reveal"><span class="no">Brique 10</span>La toile a pu se peindre toute seule.</p>
+    </div>
+  </div>
+</section>
+
+<section class="end" id="mur">
+  <h2>Le mur, une fois monté</h2>
+  <ol class="wall">
+    <li><span>1</span>Une IA, c'est un calcul.</li>
+    <li><span>2</span>L'arbre est un calcul.</li>
+    <li><span>3</span>La mer est un calcul.</li>
+    <li><span>4</span>La fleur est un calcul.</li>
+    <li><span>5</span>Tout se calcule, mais tout ne se prévoit pas.</li>
+    <li><span>6</span>Mon cerveau est un calcul qui apprend.</li>
+    <li><span>7</span>L'ADN construit la machine, la culture la configure.</li>
+    <li><span>8</span>Je suis un corps qui calcule, et qui ressent.</li>
+    <li><span>9</span>Calcul et vie ne s'opposent pas.</li>
+    <li><span>10</span>La toile a pu se peindre toute seule.</li>
+  </ol>
+  <p class="last">Je suis peut-être un calcul. Mais un calcul vivant, qui ressent, et qui se demande qui il est.</p>
+  <ul class="open">
+    <li>Si on prouvait que je suis entièrement calculable, qu'est-ce que je perdrais ?</li>
+    <li>Une machine qui se répare et craint qu'on l'éteigne, serait-elle vivante ?</li>
+    <li>Pourquoi le calcul ressent-il quelque chose ?</li>
+  </ul>
+  <footer>
+    <span class="seal" aria-hidden="true">人</span>
+    <span>HUman · une réflexion de Mathieu, mise à l'épreuve avec Claude.</span>
+  </footer>
+</section>
+
+</main>
 
 <script>
 (() => {
 const TAU = Math.PI * 2;
-const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-const INK = '23,21,18', RED = '176,52,42';
+const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+if (!reduced) document.documentElement.classList.add('js');
+const INK = '20,19,18', PAPER = [234,232,226], INKV = [20,19,18];
 const FONT = {
   display: '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif',
   body: '"Zen Kaku Gothic New","Hiragino Sans",system-ui,sans-serif',
   mono: '"IBM Plex Mono",ui-monospace,Menlo,monospace'
 };
 const WEIGHT = { display: 700, body: 500, mono: 400 };
+let TS = 1; // agrandit les petits textes des dessins sur écran étroit
 
 function rng(seed) {
   let a = seed >>> 0;
@@ -484,25 +324,16 @@ function rng(seed) {
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
 }
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const ease = v => { v = clamp01(v); return v * v * (3 - 2 * v); };
+const rv = (m, s, d) => m < 0 ? 0 : ease((m - s) / d);
+const fr = (v, d) => v.toFixed(d).replace('.', ',');
+function shade(a) {
+  const c = PAPER.map((p, i) => Math.round(p + (INKV[i] - p) * a));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
 
-/* ——— papier ——— */
-(function paper() {
-  try {
-    const c = document.createElement('canvas'); c.width = c.height = 320;
-    const x = c.getContext('2d'), r = rng(11);
-    for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(70,60,45,${(r() * 0.06).toFixed(3)})`; x.fillRect(r() * 320, r() * 320, 1, 1); }
-    for (let i = 0; i < 150; i++) {
-      const px = r() * 320, py = r() * 320, a = r() * TAU, l = 6 + r() * 28;
-      x.strokeStyle = `rgba(80,70,55,${(0.02 + r() * 0.05).toFixed(3)})`; x.lineWidth = 0.4 + r() * 0.6;
-      x.beginPath(); x.moveTo(px, py);
-      x.quadraticCurveTo(px + Math.cos(a) * l * 0.5 + (r() - 0.5) * 6, py + Math.sin(a) * l * 0.5 + (r() - 0.5) * 6, px + Math.cos(a) * l, py + Math.sin(a) * l);
-      x.stroke();
-    }
-    document.documentElement.style.setProperty('--paper-tex', `url(${c.toDataURL()})`);
-  } catch (e) {}
-})();
-
-/* ——— moteur de pinceau ——— */
+/* ——— pinceau : couche peinte, qui s'accumule ——— */
 function smooth(points, spacing) {
   const P = points.map(q => ({ x: q[0], y: q[1], p: q[2] ?? 1 }));
   if (P.length === 1) return [P[0]];
@@ -538,13 +369,13 @@ function taper(t, a, b) {
   return Math.max(0.06, v);
 }
 function stamp(ctx, it, from, to) {
-  const pts = it.pts, N = pts.length, br = it.br, col = it.color || INK;
+  const pts = it.pts, N = pts.length, br = it.br;
   const ink = it.ink ?? 0.9, dry = it.dry ?? 0.3, w = it.w ?? 6, halo = it.halo ?? 1;
   const ta = it.taper ? it.taper[0] : 0.12, tb = it.taper ? it.taper[1] : 0.3;
   for (let j = from; j < to && j < N; j++) {
     const q = pts[j], t = N > 1 ? j / (N - 1) : 0.5, W = w * taper(t, ta, tb) * q.p;
     if (halo > 0 && j % 3 === 0) {
-      ctx.fillStyle = `rgba(${col},${(ink * 0.02 * halo).toFixed(4)})`;
+      ctx.fillStyle = `rgba(${INK},${(ink * 0.02 * halo).toFixed(4)})`;
       ctx.beginPath(); ctx.arc(q.x, q.y, W * 0.8 + 1.4, 0, TAU); ctx.fill();
     }
     const rad = Math.max(0.4, W / br.length * 1.5 + 0.3);
@@ -552,126 +383,118 @@ function stamp(ctx, it, from, to) {
     for (let b = 0; b < br.length; b++) {
       const s = br[b];
       if (gap > 0 && s.d < gap && Math.sin(j * 0.09 + s.ph) > -0.2) continue;
-      ctx.fillStyle = `rgba(${col},${(ink * s.k * 0.3 * fade).toFixed(3)})`;
+      ctx.fillStyle = `rgba(${INK},${(ink * s.k * 0.3 * fade).toFixed(3)})`;
       ctx.beginPath(); ctx.arc(q.x + q.nx * s.o * W * 0.5, q.y + q.ny * s.o * W * 0.5, rad, 0, TAU); ctx.fill();
     }
   }
 }
-function lineDraw(ctx, it, from, to) {
-  const p = it.pts, a = Math.max(1, from), b = Math.min(to, p.length);
-  if (b <= a) return;
-  const col = it.color || INK, ink = it.ink ?? 0.7, w = it.w ?? 1.5;
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.beginPath(); ctx.moveTo(p[a - 1][0], p[a - 1][1]);
-  for (let k = a; k < b; k++) ctx.lineTo(p[k][0], p[k][1]);
-  ctx.strokeStyle = `rgba(${col},${(ink * 0.07).toFixed(3)})`; ctx.lineWidth = w * 3.4; ctx.stroke();
-  ctx.strokeStyle = `rgba(${col},${ink})`; ctx.lineWidth = w; ctx.stroke();
-}
-function dot(ctx, d, r, color) {
-  const ink = d.ink ?? 0.85, col = d.color || color || INK;
-  ctx.fillStyle = `rgba(${col},${(ink * 0.07).toFixed(3)})`;
+function blot(ctx, d, r) {
+  const ink = d.ink ?? 0.85;
+  ctx.fillStyle = `rgba(${INK},${(ink * 0.07).toFixed(3)})`;
   ctx.beginPath(); ctx.arc(d.x, d.y, d.r * 1.7, 0, TAU); ctx.fill();
   const n = Math.max(7, Math.round(d.r * 3.2));
   for (let i = 0; i < n; i++) {
     const a = r() * TAU, rr = Math.sqrt(r()) * d.r * 0.62;
-    ctx.fillStyle = `rgba(${col},${(ink * 0.34).toFixed(3)})`;
+    ctx.fillStyle = `rgba(${INK},${(ink * 0.34).toFixed(3)})`;
     ctx.beginPath(); ctx.arc(d.x + Math.cos(a) * rr, d.y + Math.sin(a) * rr, d.r * (0.32 + r() * 0.34), 0, TAU); ctx.fill();
   }
 }
-function textPass(ctx, it, k) {
-  const f = it.font || 'display', ink = it.ink ?? 0.92, a = 1 - Math.pow(1 - ink, 1 / it.total);
-  ctx.save();
-  ctx.font = `${WEIGHT[f]} ${it.size || 32}px ${FONT[f]}`;
-  ctx.textAlign = it.align || 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = `rgba(${it.color || INK},${a.toFixed(3)})`;
-  if (k < 3) ctx.filter = 'blur(1.5px)';
-  ctx.fillText(it.text, it.x, it.y);
-  ctx.restore();
-}
-function glyphs(ctx, it, from, to) {
-  ctx.save();
-  ctx.font = `400 ${it.size || 15}px ${FONT.mono}`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = `rgba(${it.color || INK},${it.ink ?? 0.85})`;
-  for (let k = from; k < to && k < it.list.length; k++) { const g = it.list[k]; ctx.fillText(g.ch, g.x, g.y); }
-  ctx.restore();
-}
 function drawItem(ctx, it, from, to) {
-  switch (it.type) {
-    case 'stroke': stamp(ctx, it, from, to); break;
-    case 'line': lineDraw(ctx, it, from, to); break;
-    case 'multi': for (const p of it.parts) drawItem(ctx, p, Math.min(from, p.total), Math.min(to, p.total)); break;
-    case 'dots': for (let k = from; k < to && k < it.list.length; k++) dot(ctx, it.list[k], rng(it.seed * 131 + k), it.color); break;
-    case 'glyphs': glyphs(ctx, it, from, to); break;
-    case 'text': for (let k = from; k < to; k++) textPass(ctx, it, k); break;
-  }
+  if (it.type === 'stroke') stamp(ctx, it, from, to);
+  else if (it.type === 'multi') for (const p of it.parts) drawItem(ctx, p, Math.min(from, p.total), Math.min(to, p.total));
+  else if (it.type === 'dots') for (let k = from; k < to && k < it.list.length; k++) blot(ctx, it.list[k], rng(it.seed * 131 + k));
 }
 function rate(it) {
-  switch (it.type) {
-    case 'stroke': return (it.speed || 12) / (it.spacing || 0.8);
-    case 'line': case 'multi': return it.perFrame || 12;
-    case 'dots': case 'glyphs': return it.perFrame || 2;
-    default: return 1;
-  }
+  if (it.type === 'stroke') return (it.speed || 12) / (it.spacing || 0.8);
+  if (it.type === 'multi' || it.type === 'dots') return it.perFrame || 2;
+  return 1;
 }
 function prep(item, seed) {
   const it = Object.assign({}, item, { seed, prog: 0 });
   if (it.type === 'stroke') { it.pts = smooth(item.pts, it.spacing || 0.8); normals(it.pts); it.br = bristles(it.w ?? 6, rng(seed)); it.total = it.pts.length; }
-  else if (it.type === 'line') it.total = it.pts.length;
   else if (it.type === 'multi') { it.parts = item.parts.map((p, k) => prep(p, seed * 7 + k)); it.total = Math.max(...it.parts.map(p => p.total)); }
-  else if (it.type === 'dots' || it.type === 'glyphs') it.total = it.list.length;
-  else if (it.type === 'text') it.total = it.frames || 14;
+  else if (it.type === 'dots') it.total = it.list.length;
   else it.total = it.frames || 10;
   return it;
 }
 
-class Scene {
-  constructor(canvas, def) {
-    this.canvas = canvas; this.def = def; this.ctx = canvas.getContext('2d');
-    this.items = def.items().map((it, i) => prep(it, (def.seed || 7) * 97 + i));
-    this.cur = 0; this.wait = 0; this.state = 'idle'; this.raf = 0;
-    this.tickB = () => this.tick();
-    this.resize();
+/* ——— couche vivante, redessinée à chaque image ——— */
+const SPR = [];
+for (let v = 0; v < 4; v++) {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  blot(c.getContext('2d'), { x: 32, y: 32, r: 16, ink: 1 }, rng(100 + v));
+  SPR.push(c);
+}
+function spr(c, x, y, r, a, v) {
+  c.globalAlpha = clamp01(a);
+  c.drawImage(SPR[(v || 0) & 3], x - r * 2, y - r * 2, r * 4, r * 4);
+  c.globalAlpha = 1;
+}
+function font(c, f, size) { c.font = `${WEIGHT[f]} ${size <= 20 ? size * TS : size}px ${FONT[f]}`; }
+function label(c, s, x, y, o) {
+  o = o || {};
+  font(c, o.font || 'mono', o.size || 16);
+  c.textAlign = o.align || 'left'; c.textBaseline = o.base || 'middle';
+  c.fillStyle = `rgba(${INK},${clamp01(o.a ?? 0.85).toFixed(3)})`;
+  c.fillText(s, x, y);
+}
+function pen(c, pts, p, a, w, dash) {
+  if (p <= 0 || pts.length < 2) return;
+  c.save(); c.strokeStyle = `rgba(${INK},${a ?? 0.6})`; c.lineWidth = w || 1; c.lineCap = 'round';
+  if (dash) c.setLineDash(dash);
+  let L = 0; const seg = [];
+  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(l); L += l; }
+  let rem = L * Math.min(1, p);
+  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length && rem > 0; i++) {
+    const l = seg[i - 1];
+    if (l <= rem) { c.lineTo(pts[i][0], pts[i][1]); rem -= l; }
+    else { const f = rem / l; c.lineTo(pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f); rem = 0; }
   }
-  resize() {
-    const cssW = this.canvas.clientWidth || this.def.w, dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const W = Math.round(cssW * dpr), H = Math.round(cssW * this.def.h / this.def.w * dpr);
-    if (W === this.canvas.width && H === this.canvas.height) return;
-    this.canvas.width = W; this.canvas.height = H; this.k = W / this.def.w;
-    this.redraw();
+  c.stroke(); c.restore();
+}
+function poly(c, pts, n, a, w, dash) {
+  n = Math.min(n, pts.length); if (n < 2) return;
+  c.save(); c.strokeStyle = `rgba(${INK},${a})`; c.lineWidth = w; c.lineJoin = 'round'; c.lineCap = 'round';
+  if (dash) c.setLineDash(dash);
+  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < n; i++) c.lineTo(pts[i][0], pts[i][1]);
+  c.stroke(); c.restore();
+}
+function inkLine(c, pts, w, a) {
+  const n = pts.length; if (n < 2) return;
+  c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = `rgba(${INK},${(a * 0.07).toFixed(3)})`; c.lineWidth = w * 3.2;
+  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < n; i++) c.lineTo(pts[i][0], pts[i][1]); c.stroke();
+  c.strokeStyle = shade(a);
+  for (let i = 1; i < n; i++) {
+    const t = i / (n - 1), ww = w * (0.3 + 0.7 * Math.sin(Math.PI * clamp01(t))) * (pts[i][2] ?? 1);
+    c.lineWidth = Math.max(0.6, ww);
+    c.beginPath(); c.moveTo(pts[i - 1][0], pts[i - 1][1]); c.lineTo(pts[i][0], pts[i][1]); c.stroke();
   }
-  clear() {
-    const c = this.ctx;
-    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    c.setTransform(this.k, 0, 0, this.k, 0, 0);
+  if (w > 2.5) { // traînées de pinceau sec
+    c.strokeStyle = `rgba(${PAPER.join(',')},.55)`; c.lineWidth = 0.7; c.setLineDash([3, 9]);
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1] + w * 0.18); for (let i = 1; i < n; i++) c.lineTo(pts[i][0], pts[i][1] + w * 0.18); c.stroke();
   }
-  redraw() {
-    this.clear();
-    for (const it of this.items) if (it.prog > 0) drawItem(this.ctx, it, 0, Math.ceil(it.prog));
+  c.restore();
+}
+function hline(x0, x1, y, step) { const o = []; for (let x = x0; x <= x1 + 0.01; x += step || 6) o.push([x, y + Math.sin(x * 0.05) * 0.8]); if (o.length < 2) o.push([x1, y]); return o; }
+function along(pts, p) {
+  let L = 0; const seg = [];
+  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(l); L += l; }
+  let rem = L * clamp01(p);
+  for (let i = 1; i < pts.length; i++) {
+    if (seg[i - 1] >= rem) { const f = rem / (seg[i - 1] || 1); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f]; }
+    rem -= seg[i - 1];
   }
-  play() {
-    cancelAnimationFrame(this.raf);
-    for (const it of this.items) it.prog = 0;
-    this.cur = 0; this.wait = 0;
-    if (reduced) { this.finish(); return; }
-    this.clear(); this.state = 'playing';
-    this.raf = requestAnimationFrame(this.tickB);
-  }
-  finish() {
-    for (const it of this.items) it.prog = it.total;
-    this.cur = this.items.length; this.state = 'done'; this.redraw();
-  }
-  tick() {
-    if (this.wait > 0) this.wait--;
-    else if (this.cur < this.items.length) {
-      const it = this.items[this.cur], from = Math.ceil(it.prog);
-      it.prog = Math.min(it.total, it.prog + rate(it));
-      const to = Math.ceil(it.prog);
-      if (to > from) drawItem(this.ctx, it, from, to);
-      if (it.prog >= it.total) { this.cur++; this.wait = it.gap ?? (it.type === 'stroke' ? 3 : 1); }
-    }
-    if (this.cur < this.items.length) this.raf = requestAnimationFrame(this.tickB);
-    else this.state = 'done';
+  return pts[pts.length - 1].slice();
+}
+function arrowPen(c, x1, y1, x2, y2, p, a) {
+  const e = along([[x1, y1], [x2, y2]], p);
+  pen(c, [[x1, y1], e], 1, a, 1.2);
+  if (p > 0.9) {
+    const ang = Math.atan2(y2 - y1, x2 - x1), h = 9;
+    pen(c, [[x2 - Math.cos(ang - 0.45) * h, y2 - Math.sin(ang - 0.45) * h], [x2, y2], [x2 - Math.cos(ang + 0.45) * h, y2 - Math.sin(ang + 0.45) * h]], 1, a, 1.2);
   }
 }
 
@@ -704,23 +527,6 @@ function thinker(ox, oy, s) {
     { type: 'dots', list: [{ x: ox + 182 * s, y: oy + 58 * s, r: 2.6 * s + 0.4 }], perFrame: 1 }
   ];
 }
-function arrow(x1, y1, x2, y2, o) {
-  const a = Math.atan2(y2 - y1, x2 - x1), h = 16;
-  return [
-    Object.assign({ type: 'stroke', pts: [[x1,y1],[(x1 + x2) / 2 + 2,(y1 + y2) / 2],[x2,y2]], w: 4, ink: .8, dry: .3, taper: [.05,.15], gap: 1 }, o),
-    Object.assign({ type: 'stroke', pts: [[x2 - Math.cos(a - 0.45) * h, y2 - Math.sin(a - 0.45) * h],[x2,y2]], w: 3.5, ink: .85, taper: [.2,.1], gap: 0 }, o),
-    Object.assign({ type: 'stroke', pts: [[x2 - Math.cos(a + 0.45) * h, y2 - Math.sin(a + 0.45) * h],[x2,y2]], w: 3.5, ink: .85, taper: [.2,.1] }, o)
-  ];
-}
-function lorenz(x, y, z, n, dt) {
-  const out = [];
-  for (let i = 0; i < n; i++) {
-    const dx = 10 * (y - x), dy = x * (28 - z) - y, dz = x * y - 8 / 3 * z;
-    x += dx * dt; y += dy * dt; z += dz * dt;
-    if (i % 2 === 0) out.push([520 + x * 14, 522 - z * 9.4]);
-  }
-  return out;
-}
 function branch(out, x, y, ang, len, w, depth, r) {
   const pts = [[x, y]]; let cx = x, cy = y, a = ang;
   for (let i = 0; i < 4; i++) { a += (r() - 0.5) * 0.5; cx += Math.cos(a) * len / 4; cy += Math.sin(a) * len / 4; pts.push([cx, cy]); }
@@ -732,6 +538,20 @@ function neuron(out, x, y, angles, seed) {
   out.push({ type: 'dots', list: [{ x, y, r: 15, ink: .95 }], perFrame: 1 });
   for (const d of angles) branch(out, x, y, d * Math.PI / 180, 64 + r() * 18, 6, 2, r);
 }
+function sea(x, t, i, s) {
+  const X = x / s;
+  return 0.62 * Math.sin(X / 42 - t * 1.1 + i) + 0.28 * Math.sin(X / 19 + t * 0.8 + i * 2) + 0.14 * Math.sin(X / 9 - t * 1.7 + i * 3);
+}
+function bird(c, x, y, flap) {
+  c.save(); c.strokeStyle = shade(.8); c.lineWidth = 1.6; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(x - 10, y - 2 - flap); c.quadraticCurveTo(x - 4, y - 7 - flap, x, y); c.quadraticCurveTo(x + 4, y - 7 - flap, x + 10, y - 2 - flap); c.stroke();
+  c.restore();
+}
+function vec(word) {
+  let h = 7; for (const ch of word) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const r = rng(h), f = () => (r() * 2 - 1).toFixed(2).replace('-', '−');
+  return `[${f()}, ${f()}, ${f()} …]`;
+}
 const PROFILE = {
   back: [[150,40],[110,50],[78,95],[70,150],[82,210],[100,250],[108,300],[102,350],[96,410]],
   face: [[150,40],[185,52],[205,92],[207,128],[214,142],[236,186],[220,196],[214,204],[222,218],[212,228],[218,242],[206,272],[180,290],[166,300],[168,350],[176,410]],
@@ -740,188 +560,546 @@ const PROFILE = {
   ear: [[112,160],[124,150],[134,168],[126,190],[114,192]],
   eye: [[184,134],[197,137]]
 };
+const IA_STEPS = [
+  { c: [['à', .62], ['que', .21], ['aux', .09], ['souvent', .03]], pick: 0, sp: ' ', hops: [1, 0, 2, 0, 1, 3, 0, 0] },
+  { c: [['la', .31], ['mon', .24], ['l’', .18], ['rien', .04]], pick: 1, sp: ' ', hops: [0, 2, 1, 0, 3, 0, 2, 1] },
+  { c: [['père', .29], ['enfance', .26], ['avenir', .11], ['chat', .02]], pick: 1, sp: ' ', hops: [0, 2, 0, 1, 3, 0, 2, 1] },
+  { c: [['.', .57], [',', .23], ['et', .12], ['!', .05]], pick: 0, sp: '', hops: [1, 0, 2, 1, 0, 3, 1, 0] }
+];
+const CODONS = [['ATG','Met'],['GCC','Ala'],['ATT','Ile'],['GTA','Val'],['AAG','Lys'],['GGC','Gly'],['CGC','Arg'],['TTC','Phe'],['AAG','Lys'],['GGT','Gly'],['GCC','Ala'],['TAG','stop']];
 
-/* ——— scènes ——— */
-const SCENES = {
-  hero: { w: 1000, h: 640, seed: 3, items: () => [
-    ...thinker(60, 190, 1.05),
-    { type: 'pause', frames: 10 },
-    { type: 'dots', list: [{ x: 292, y: 222, r: 4 }, { x: 334, y: 190, r: 6 }, { x: 382, y: 160, r: 8.5 }], perFrame: 0.12 },
-    { type: 'stroke', pts: enso(660, 255, 190, 115, 330, 36, 0.03, 4), w: 24, ink: .9, dry: .55, taper: [.04,.55], speed: 20, spacing: 1 },
-    { type: 'text', x: 660, y: 140, text: 'chat', size: 46 },
-    { type: 'text', x: 660, y: 178, text: '[0.21, −0.83, 0.54 …]', size: 21, font: 'mono', ink: .7 },
-    { type: 'text', x: 660, y: 245, text: 'pensée', size: 46 },
-    { type: 'text', x: 660, y: 283, text: '[0.67, 0.12, −0.48 …]', size: 21, font: 'mono', ink: .7 },
-    { type: 'text', x: 660, y: 345, text: 'vie', size: 46, color: RED },
-    { type: 'text', x: 660, y: 383, text: '[−0.09, 0.91, 0.33 …]', size: 21, font: 'mono', ink: .7, color: RED }
-  ]},
-
-  vecteurs: { w: 940, h: 540, seed: 5, items: () => [
-    { type: 'stroke', pts: [[50,470],[250,474],[450,476]], w: 4, ink: .5, dry: .6, taper: [.05,.4] },
-    { type: 'stroke', pts: [[62,500],[60,280],[58,70]], w: 4, ink: .5, dry: .6, taper: [.05,.4] },
-    { type: 'dots', list: [{ x: 140, y: 390, r: 8 }, { x: 180, y: 230, r: 8 }, { x: 340, y: 360, r: 8 }, { x: 380, y: 200, r: 8, color: RED }], perFrame: 0.25 },
-    { type: 'text', x: 140, y: 428, text: 'homme', size: 28, font: 'body', frames: 8 },
-    { type: 'text', x: 180, y: 192, text: 'femme', size: 28, font: 'body', frames: 8 },
-    { type: 'text', x: 340, y: 398, text: 'roi', size: 28, font: 'body', frames: 8 },
-    { type: 'text', x: 380, y: 162, text: 'reine', size: 28, font: 'body', frames: 8, color: RED },
-    { type: 'stroke', pts: [[154,388],[240,374],[326,362]], w: 2.5, ink: .3, dry: .8, taper: [.1,.1] },
-    ...arrow(146, 374, 176, 250, { ink: .6 }),
-    ...arrow(346, 344, 376, 220, { color: RED }),
-    { type: 'text', x: 250, y: 522, text: 'roi − homme + femme ≈ reine', size: 22, font: 'mono', ink: .8 },
-    { type: 'pause', frames: 12 },
-    { type: 'text', x: 500, y: 88, text: 'Le chat mange la …', size: 36, align: 'left' },
-    ...[['souris', 200, '46 %', 170], ['pâtée', 135, '31 %', 250], ['soupe', 52, '12 %', 330], ['lune', 9, '2 %', 410]].flatMap(([w, len, pc, y], i) => [
-      { type: 'text', x: 640, y, text: w, size: 28, font: 'body', align: 'right', frames: 8, color: i === 1 ? RED : INK },
-      { type: 'stroke', pts: [[658, y], [658 + len, y + 1]], w: 22, ink: .85, dry: .45, taper: [.02,.14], speed: 8, spacing: 1 },
-      { type: 'text', x: 674 + len, y, text: pc, size: 22, font: 'mono', align: 'left', frames: 8, ink: .75 }
-    ]),
-    { type: 'dots', list: [{ x: 548, y: 250, r: 7, color: RED }], perFrame: 1 },
-    { type: 'text', x: 658, y: 284, text: '↑ tirée au sort', size: 19, font: 'mono', align: 'left', color: RED },
-    { type: 'text', x: 500, y: 470, text: '… et 9 % pour tous les autres mots', size: 19, font: 'mono', align: 'left', ink: .6 }
-  ]},
-
-  nature: { w: 940, h: 500, seed: 9, items: () => {
-    const flower = [];
-    for (let n = 1; n <= 230; n++) {
-      const a = n * 137.508 * Math.PI / 180, rr = 12.5 * Math.sqrt(n);
-      flower.push({ x: 200 + Math.cos(a) * rr, y: 240 + Math.sin(a) * rr, r: 1.8 + n * 0.016, ink: .92 - n * 0.0016 });
+/* ——— les dessins ——— */
+const WORLDS = {
+  hero: { w: 1000, h: 600, seed: 3,
+    paint: () => [
+      { type: 'stroke', pts: [[300,300],[650,302],[995,299]], w: 3, ink: .7, dry: .5, taper: [.05,.3], speed: 22 },
+      { type: 'stroke', pts: [[560,300],[610,276],[670,266],[730,284],[775,300]], w: 16, ink: .16, dry: .5, taper: [.3,.3] },
+      { type: 'stroke', pts: enso(860, 120, 40, 210, 320, 24, .03, 5), w: 7, ink: .85, dry: .4, taper: [.06,.5] },
+      ...thinker(40, 195, 1)
+    ],
+    live: (c, f) => {
+      const t = f.t, cfg = [[318,1.5,.35,.8,.35],[350,3,.55,1.3,.5],[398,5,.75,2,.65],[470,8,1,3,.8]];
+      cfg.forEach(([b, A, s, w, a], i) => {
+        const pts = []; for (let x = 300; x <= 1000; x += 8) pts.push([x, b + A * sea(x, t, i, s)]);
+        inkLine(c, pts, w, a);
+      });
+      for (let k = 0; k < 2; k++) bird(c, 1040 - ((t * 16 + k * 330) % 1150), 165 + k * 42 + 6 * Math.sin(t * 1.4 + k), 3 * Math.sin(t * 6 + k * 2));
+      const m = f.m;
+      pen(c, [[222,253],[720,300]], rv(m, 0, 50), .55, 1, [5,5]);
+      label(c, 'horizon : d ≈ 3,57 √h ≈ 11 km', 470, 250, { size: 17, align: 'center', a: .85 * rv(m, 40, 30) });
+      label(c, 'h ≈ 10 m', 150, 440, { size: 15, align: 'center', a: .7 * rv(m, 60, 30) });
+      label(c, '384 400 km', 860, 188, { size: 15, align: 'center', a: .75 * rv(m, 80, 30) });
     }
-    const waves = [0, 1, 2].map(k => {
-      const pts = [];
-      for (let x = 470; x <= 920; x += 18) pts.push([x, 100 + k * 34 + 18 * Math.sin((x - 470) / 48 + k * 1.3)]);
-      return { type: 'stroke', pts, w: 6 - k * 1.4, ink: .88 - k * .22, dry: .4, taper: [.1,.4], speed: 16, gap: 2 };
-    });
-    const traj = [];
-    for (let t = 0; t <= 7.02; t += 0.1) traj.push([528 + 52 * t, 278 + 3.9 * t * t]);
-    const stones = [];
-    for (let t = 0; t <= 7; t++) stones.push({ x: 528 + 52 * t, y: 278 + 3.9 * t * t, r: 8, ink: .22 + t * 0.1 });
-    return [
-      { type: 'dots', list: flower, perFrame: 3 },
-      { type: 'text', x: 200, y: 478, text: '137,5°', size: 22, font: 'mono', ink: .8 },
-      ...waves,
-      { type: 'stroke', pts: [[450,290],[486,288],[520,290],[524,340],[530,470]], w: 7, ink: .8, dry: .5, taper: [.05,.5] },
-      { type: 'line', pts: traj, w: 1.2, ink: .22, perFrame: 3 },
-      { type: 'dots', list: stones, perFrame: 0.2 },
-      { type: 'stroke', pts: [[530,472],[720,474],[920,476]], w: 3, ink: .45, dry: .7 },
-      { type: 'text', x: 760, y: 290, text: 'y = ½ g t²', size: 22, font: 'mono', ink: .8 }
-    ];
-  }},
+  },
 
-  lorenz: { w: 940, h: 540, seed: 13, items: () => [
-    { type: 'text', x: 40, y: 64, text: 'dx/dt = σ (y − x)', size: 21, font: 'mono', align: 'left', ink: .8, frames: 8 },
-    { type: 'text', x: 40, y: 96, text: 'dy/dt = x (ρ − z) − y', size: 21, font: 'mono', align: 'left', ink: .8, frames: 8 },
-    { type: 'text', x: 40, y: 128, text: 'dz/dt = x y − β z', size: 21, font: 'mono', align: 'left', ink: .8, frames: 8 },
-    { type: 'stroke', pts: [[40,478],[80,478]], w: 3, ink: .8, dry: 0, taper: [.1,.1], gap: 0 },
-    { type: 'text', x: 92, y: 478, text: 'départ (1 ; 1 ; 1)', size: 19, font: 'mono', align: 'left', ink: .8, frames: 8 },
-    { type: 'stroke', pts: [[40,510],[80,510]], w: 3, ink: .9, dry: 0, taper: [.1,.1], color: RED, gap: 0 },
-    { type: 'text', x: 92, y: 510, text: 'départ (1,001 ; 1 ; 1)', size: 19, font: 'mono', align: 'left', color: RED, frames: 8 },
-    { type: 'multi', perFrame: 9, parts: [
-      { type: 'line', pts: lorenz(1, 1, 1, 5200, 0.005), w: 1.5, ink: .72 },
-      { type: 'line', pts: lorenz(1.001, 1, 1, 5200, 0.005), w: 1.5, ink: .8, color: RED }
-    ]}
-  ]},
-
-  neurones: { w: 940, h: 480, seed: 17, items: () => {
-    const out = [];
-    neuron(out, 170, 250, [150, 205, 255, 105, 300], 21);
-    out.push({ type: 'stroke', pts: [[186,248],[260,236],[340,226],[420,218],[446,214]], w: 4, ink: .9, dry: .25, taper: [.05,.2], speed: 14 });
-    out.push({ type: 'dots', color: RED, list: [{ x: 452, y: 211, r: 2.6 }, { x: 456, y: 218, r: 2.2 }, { x: 459, y: 209, r: 2 }], perFrame: 0.5 });
-    neuron(out, 480, 210, [128, 232, 272, 88, 52, 312], 22);
-    out.push({ type: 'stroke', pts: [[496,213],[580,224],[660,244],[736,260]], w: 4, ink: .9, dry: .25, taper: [.05,.2], speed: 14 });
-    out.push({ type: 'dots', color: RED, list: [{ x: 744, y: 262, r: 2.6 }, { x: 748, y: 269, r: 2.2 }, { x: 751, y: 259, r: 2 }], perFrame: 0.5 });
-    neuron(out, 790, 270, [90, 265, 20, 330, 130, 225], 23);
-    out.push({ type: 'stroke', pts: [[806,274],[870,282],[934,292]], w: 4, ink: .85, dry: .4, taper: [.05,.5], speed: 14 });
-    out.push({ type: 'text', x: 40, y: 458, text: '≈ 86 000 000 000 neurones', size: 21, font: 'mono', align: 'left', ink: .8 });
-    out.push({ type: 'text', x: 910, y: 458, text: 'signal : 1 à 120 m/s', size: 21, font: 'mono', align: 'right', color: RED });
-    return out;
-  }},
-
-  miroir: { w: 940, h: 520, seed: 19, items: () => {
-    const ox = 110, oy = 20, T = pts => pts.map(p => [ox + p[0], oy + p[1]]);
-    const S = (pts, w, o) => Object.assign({ type: 'stroke', pts: T(pts), w, ink: .92, dry: .35, speed: 13 }, o || {});
-    const src = '0.71−0.350.920.08−0.440.13−0.670.29';
-    const list = []; let c = 0;
-    for (const key of ['back', 'face', 'shB', 'shF', 'ear', 'eye']) {
-      const pts = smooth(T(PROFILE[key]), key === 'eye' || key === 'ear' ? 7 : 13);
-      for (const q of pts) { const ch = src[c++ % src.length]; list.push({ x: 940 - q.x, y: q.y, ch }); }
+  ia: { w: 1000, h: 520, seed: 5,
+    paint: () => [
+      { type: 'stroke', pts: [[40,140],[500,143],[960,138]], w: 5, ink: .45, dry: .7, speed: 22 },
+      { type: 'stroke', pts: [[300,215],[301,340],[302,470]], w: 3, ink: .3, dry: .6, speed: 18 }
+    ],
+    live: (c, f) => {
+      const D = 3.6, CY = IA_STEPS.length * D + 2.6, ct = f.t % CY, si = Math.floor(ct / D), lt = ct - si * D;
+      let s = 'Je regarde la mer et je pense', last = 'pense';
+      for (let i = 0; i < Math.min(si, IA_STEPS.length); i++) { const st = IA_STEPS[i]; s += st.sp + st.c[st.pick][0]; last = st.c[st.pick][0]; }
+      const cur = si < IA_STEPS.length ? IA_STEPS[si] : null;
+      const landed = cur && lt >= 3.0;
+      let sentence = s;
+      if (landed) { sentence = s + cur.sp + cur.c[cur.pick][0]; last = cur.c[cur.pick][0]; }
+      font(c, 'display', 34); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = shade(.92);
+      c.fillText(sentence, 40, 112);
+      if (cur && !landed && Math.floor(f.T * 2) % 2 === 0) { const wS = c.measureText(s + cur.sp).width; c.fillRect(40 + wS + 2, 84, 2.5, 34); }
+      if (cur) {
+        const u = ease(lt / 1.0);
+        cur.c.forEach(([w, p], j) => {
+          const y = 250 + j * 60, chosen = j === cur.pick, dim = lt > 2.2 && !chosen;
+          label(c, w, 285, y, { font: 'body', size: 26, align: 'right', a: landed && chosen ? .3 : dim ? .3 : .9 });
+          const len = p * 560 * u;
+          if (len > 4) inkLine(c, hline(305, 305 + len, y, 6), 18, dim ? .3 : chosen && lt > 2.2 ? .95 : .8);
+          label(c, `${Math.round(p * 100)} %`, 305 + len + 14, y, { size: 19, a: dim ? .3 : .75 });
+        });
+        if (lt >= 1.2) {
+          const u2 = clamp01((lt - 1.2) / 1.0), seq = cur.hops.concat([cur.pick]);
+          const k = Math.min(seq.length - 1, Math.floor(seq.length * (1 - (1 - u2) * (1 - u2))));
+          spr(c, 70, 250 + seq[k] * 60, 7, .9, 0);
+          if (lt < 2.2) label(c, 'tirage…', 70, 215, { size: 15, align: 'center', a: .6 });
+        }
+        if (lt >= 2.2 && cur.pick !== 0) label(c, 'tiré au sort, pas le plus probable', 305, 250 + cur.pick * 60 + 30, { size: 15, a: .75 });
+        if (lt >= 2.2 && lt < 3.0) {
+          const u3 = ease((lt - 2.2) / 0.8), word = cur.c[cur.pick][0];
+          font(c, 'display', 34); const tx = 40 + c.measureText(s + cur.sp).width;
+          font(c, 'body', 26); const sx = 285 - c.measureText(word).width, sy = 250 + cur.pick * 60 + 9;
+          font(c, 'display', 26 + 8 * u3); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = shade(.92);
+          c.fillText(word, sx + (tx - sx) * u3, sy + (112 - sy) * u3);
+        }
+      }
+      const m = f.m;
+      label(c, 'P(mot | contexte)', 960, 250, { size: 17, align: 'right', a: .8 * rv(m, 0, 30) });
+      label(c, '= e^zᵢ / Σ e^zⱼ', 960, 276, { size: 17, align: 'right', a: .8 * rv(m, 10, 30) });
+      label(c, `« ${last} » en nombres :`, 960, 340, { size: 15, align: 'right', a: .7 * rv(m, 30, 30) });
+      label(c, vec(last), 960, 366, { size: 15, align: 'right', a: .8 * rv(m, 30, 30) });
     }
-    return [
-      S(PROFILE.face, 7, { taper: [.08,.3] }),
-      S(PROFILE.back, 9, { taper: [.08,.4] }),
-      S(PROFILE.ear, 4, { ink: .7 }),
-      S(PROFILE.eye, 4, { taper: [.3,.3] }),
-      S(PROFILE.shB, 7, { ink: .6, dry: .6 }),
-      S(PROFILE.shF, 7, { ink: .6, dry: .6 }),
-      { type: 'text', x: 470, y: 262, text: '≈ ?', size: 84, ink: .9, frames: 18 },
-      { type: 'glyphs', list, perFrame: 2, size: 17, ink: .85 }
-    ];
-  }},
+  },
 
-  vie: { w: 940, h: 540, seed: 23, items: () => [
-    { type: 'stroke', pts: enso(470, 268, 210, 100, 335, 40, 0.03, 8), w: 32, ink: .92, dry: .6, taper: [.04,.6], speed: 20, spacing: 1 },
-    { type: 'pause', frames: 12 },
-    { type: 'stroke', pts: [[400,420],[470,410],[540,420]], w: 14, ink: .25, dry: .6, taper: [.3,.3] },
-    { type: 'stroke', pts: [[470,414],[472,360],[466,318]], w: 5, ink: .9, taper: [.05,.5], speed: 6 },
-    { type: 'stroke', pts: [[468,322],[440,300],[408,304]], w: 16, ink: .85, dry: .2, taper: [.45,.55], speed: 6 },
-    { type: 'stroke', pts: [[468,318],[500,290],[536,290]], w: 18, ink: .85, dry: .2, taper: [.45,.55], speed: 6 }
-  ]},
-
-  pinceau: { w: 940, h: 580, seed: 29, items: () => {
-    const x0 = 910, y0 = 150, x1 = 650, y1 = 462;
-    const L = Math.hypot(x1 - x0, y1 - y0), dx = (x1 - x0) / L, dy = (y1 - y0) / L, nx = -dy, ny = dx;
-    const node = t => { const px = x0 + dx * L * t, py = y0 + dy * L * t; return { type: 'stroke', pts: [[px - nx * 14, py - ny * 14],[px + nx * 14, py + ny * 14]], w: 4, ink: .7, taper: [.2,.2] }; };
-    return [
-      { type: 'text', x: 60, y: 80, text: 'Qui tient le pinceau ?', size: 40, align: 'left', ink: .85, frames: 18 },
-      ...thinker(330, 390, 0.44),
-      { type: 'pause', frames: 14 },
-      { type: 'stroke', pts: [[x0, y0],[x1, y1]], w: 24, ink: .26, dry: .15, taper: [.02,.02], halo: .5, speed: 16 },
-      { type: 'stroke', pts: [[x0 + nx * 11, y0 + ny * 11],[x1 + nx * 11, y1 + ny * 11]], w: 2.5, ink: .6, dry: .6, taper: [.05,.05], speed: 18 },
-      node(0.3), node(0.62),
-      { type: 'stroke', pts: [[656,455],[646,468],[636,480]], w: 27, ink: .75, dry: .2, taper: [.02,.02] },
-      { type: 'stroke', pts: [[638,478],[606,506],[572,532],[528,556]], w: 30, ink: 1, dry: .1, taper: [.02,.97], speed: 8 },
-      { type: 'stroke', pts: [[250,568],[380,570],[520,566]], w: 4, ink: .7, dry: .5, taper: [.1,.1], speed: 6 }
-    ];
-  }},
-
-  adn: { w: 940, h: 470, seed: 31, items: () => {
-    const cy = 190, amp = 105, lam = 300, x0 = 60, x1 = 880;
-    const yA = x => cy + amp * Math.sin(TAU * (x - x0) / lam), yB = x => cy + amp * Math.sin(TAU * (x - x0) / lam + Math.PI * 0.8);
-    const fA = x => 0.6 + 0.4 * Math.cos(TAU * (x - x0) / lam), fB = x => 0.6 + 0.4 * Math.cos(TAU * (x - x0) / lam + Math.PI * 0.8);
-    const A = [], B = [];
-    for (let x = x0; x <= x1; x += 12) { A.push([x, yA(x), fA(x)]); B.push([x, yB(x), fB(x)]); }
-    const rungs = [];
-    for (let x = x0 + 14; x < x1; x += 22) {
-      const a = yA(x), b = yB(x);
-      if (Math.abs(a - b) > 28) rungs.push({ type: 'stroke', pts: [[x, a + Math.sign(b - a) * 7],[x, b - Math.sign(b - a) * 7]], w: 3, ink: .45, dry: .5, taper: [.15,.15], speed: 20, gap: 0 });
+  arbre: { w: 1000, h: 620, seed: 41, layers: ['a', 'b'], sway: [500, 582],
+    init: () => {
+      const S = {}, r = rng(41), levels = [], tips = [], MAX = 7;
+      const grow = (x, y, ang, len, w, d) => {
+        const ex = x + Math.cos(ang) * len, ey = y + Math.sin(ang) * len, j = (r() - 0.5) * 0.12 * len;
+        (levels[d] = levels[d] || []).push({ type: 'stroke', pts: [[x,y],[(x + ex) / 2 - Math.sin(ang) * j,(y + ey) / 2 + Math.cos(ang) * j],[ex,ey]], w, ink: .95 - d * .04, dry: .3 + d * .04, taper: [.02,.25] });
+        const node = { x, y, ex, ey, ang, len, w, d };
+        if (d === MAX) { tips.push(node); return node; }
+        const spread = (24 + (r() - 0.5) * 10) * Math.PI / 180, skew = (r() - 0.5) * 0.25;
+        const kids = [-1, 1].map(sg => grow(ex, ey, ang + sg * spread + skew, len * (0.72 + (r() - 0.5) * 0.1), w * 0.707, d + 1));
+        if (d === 0) S.fork = { x: ex, y: ey, ang, kids, w };
+        return node;
+      };
+      grow(500, 582, -Math.PI / 2, 150, 26, 0);
+      S.levels = levels; S.tips = tips; S.leafDots = [];
+      const r2 = rng(77);
+      for (const tp of tips) for (let k = 0; k < 3; k++) S.leafDots.push({ x: tp.ex + (r2() - 0.5) * 18, y: tp.ey + (r2() - 0.5) * 14, r: 2.5 + r2() * 3.5, ink: .3 + r2() * .55 });
+      return S;
+    },
+    paint: S => [
+      { type: 'stroke', pts: [[180,588],[500,580],[830,590]], w: 14, ink: .22, dry: .6, taper: [.3,.3], speed: 24 },
+      { type: 'stroke', pts: [[120,592],[500,590],[880,594]], w: 3, ink: .6, dry: .6, speed: 26 },
+      ...S.levels.map(parts => ({ type: 'multi', layer: 'b', perFrame: 6, parts, gap: 2 })),
+      { type: 'dots', layer: 'b', list: S.leafDots, perFrame: 10 }
+    ],
+    live: (c, f) => {
+      const S = f.S, t = f.t, m = f.m;
+      const th = m >= 0 ? (0.006 * Math.sin(t * 0.9) + 0.003 * Math.sin(t * 2.3 + 1)) * rv(m, 0, 60) : 0;
+      f.w.cv.b.style.transform = `rotate(${th.toFixed(5)}rad)`;
+      c.save(); c.translate(500, 582); c.rotate(th); c.translate(-500, -582);
+      const F = S.fork;
+      if (F && m >= 0) {
+        const [k1, k2] = F.kids;
+        pen(c, [[F.x, F.y], [F.x, F.y - 80]], rv(m, 0, 30), .5, 1, [4, 4]);
+        const aEnd = k2.ang, p = rv(m, 20, 30);
+        if (p > 0) { c.save(); c.strokeStyle = `rgba(${INK},.6)`; c.lineWidth = 1; c.beginPath(); c.arc(F.x, F.y, 52, -Math.PI / 2, -Math.PI / 2 + (aEnd + Math.PI / 2) * p); c.stroke(); c.restore(); }
+        const deg = Math.round((aEnd + Math.PI / 2) * 180 / Math.PI);
+        label(c, `θ ≈ ${deg}°`, F.x + 40, F.y + 6, { size: 16, a: .85 * rv(m, 45, 25) });
+        label(c, '× 0,72', (k1.x + k1.ex) / 2 - 22, (k1.y + k1.ey) / 2, { size: 16, align: 'right', a: .85 * rv(m, 70, 25) });
+        const e = rv(m, 95, 30);
+        if (e > 0) {
+          c.save(); c.strokeStyle = `rgba(${INK},${.6 * e})`; c.lineWidth = 1;
+          c.beginPath(); c.ellipse(F.x, F.y + 48, F.w / 2 + 4, 5, 0, 0, TAU); c.stroke();
+          for (const k of F.kids) { const px = k.x + Math.cos(k.ang) * 30, py = k.y + Math.sin(k.ang) * 30; c.beginPath(); c.ellipse(px, py, k.w / 2 + 3, 4, k.ang + Math.PI / 2, 0, TAU); c.stroke(); }
+          c.restore();
+          label(c, 'd² = d₁² + d₂²', F.x + 34, F.y + 50, { size: 16, a: .85 * e });
+          label(c, 'Léonard de Vinci', F.x + 34, F.y + 74, { size: 13, a: .6 * e });
+        }
+      }
+      c.restore();
+      label(c, 'F → F [+F] [−F]', 40, 528, { size: 20, a: .85 * rv(m, 120, 30) });
+      label(c, 'même angle · × 0,72 · 7 fois', 40, 556, { size: 14, a: .65 * rv(m, 135, 30) });
+      const now = f.T, dt = Math.min(0.05, now - (S.last || now)); S.last = now;
+      if (m > 30) {
+        if (!S.falling) {
+          S.make = d => { const tp = S.tips[Math.floor(Math.random() * S.tips.length)]; return { x: tp.ex, y: tp.ey, vy: 22 + Math.random() * 18, ph: Math.random() * 6, age: 0, fade: 0, delay: d, r: 2.8 + Math.random() * 2, v: Math.floor(Math.random() * 4) }; };
+          S.falling = Array.from({ length: 7 }, (_, i) => S.make(i * 1.4));
+        }
+        for (const L of S.falling) {
+          if (L.delay > 0) { L.delay -= dt; continue; }
+          L.age += dt;
+          if (L.y < 586) { L.y += L.vy * dt; L.x += (Math.sin(L.age * 1.7 + L.ph) * 26 + 8) * dt; } else { L.y = 586; L.fade += dt; }
+          c.save(); c.translate(L.x, L.y); c.rotate(Math.sin(L.age * 2.1 + L.ph) * 0.9); c.scale(1, 0.5); spr(c, 0, 0, L.r, (1 - clamp01(L.fade / 1.6)) * .85, L.v); c.restore();
+          if (L.fade > 1.6) Object.assign(L, S.make(0.5 + Math.random() * 3));
+        }
+      }
     }
-    const cw = 24 * 0.6;
-    return [
-      { type: 'stroke', pts: A, w: 11, ink: .95, dry: .35, taper: [.03,.08], speed: 18, spacing: 1 },
-      { type: 'stroke', pts: B, w: 11, ink: .7, dry: .45, taper: [.03,.08], speed: 18, spacing: 1 },
-      ...rungs,
-      { type: 'text', x: 60, y: 390, text: 'ATG', size: 24, font: 'mono', align: 'left', color: RED, frames: 10 },
-      { type: 'text', x: 60 + cw * 4, y: 390, text: 'GCC ATT GTA ATG GGC CGC TGA AAG GGT GCC', size: 24, font: 'mono', align: 'left', ink: .85, frames: 12 },
-      { type: 'text', x: 60 + cw * 44, y: 390, text: 'TAG', size: 24, font: 'mono', align: 'left', ink: .95, frames: 10 },
-      { type: 'text', x: 60, y: 436, text: 'ATG = commence ici', size: 19, font: 'mono', align: 'left', color: RED },
-      { type: 'text', x: 60 + cw * 44 + cw * 3, y: 436, text: 'TAG = stop', size: 19, font: 'mono', align: 'right', ink: .8 }
-    ];
-  }}
+  },
+
+  mer: { w: 1000, h: 560, seed: 11,
+    paint: () => [
+      { type: 'stroke', pts: [[20,200],[500,202],[980,199]], w: 3, ink: .75, dry: .5, speed: 26 },
+      { type: 'stroke', pts: [[40,200],[110,166],[190,152],[260,178],[320,200]], w: 18, ink: .16, dry: .5, taper: [.3,.3] },
+      { type: 'stroke', pts: [[250,200],[300,186],[350,190],[390,200]], w: 10, ink: .12, dry: .5, taper: [.3,.3] },
+      { type: 'stroke', pts: enso(800, 95, 38, 210, 320, 24, .03, 9), w: 6, ink: .85, dry: .4, taper: [.06,.5] }
+    ],
+    live: (c, f) => {
+      const t = f.t, m = f.m;
+      for (let i = 0; i < 6; i++) {
+        const q = (i + 1) / 6, base = 205 + 235 * Math.pow(q, 1.5), A = 1.5 + i * 3.4, s = 0.3 + 0.7 * q, ts = i === 5 ? 1 : 0.6 + 0.4 * q;
+        const pts = []; for (let x = 0; x <= 1000; x += 8) pts.push([x, base + A * sea(x, t * ts, i, s)]);
+        inkLine(c, pts, 0.8 + i * 0.75, 0.35 + 0.11 * i);
+        if (i === 5) for (let k = 2; k < pts.length - 2; k += 3) if (pts[k][1] < pts[k - 2][1] && pts[k][1] < pts[k + 2][1]) spr(c, pts[k][0], pts[k][1] - 5, 2.2, .35, k);
+      }
+      const d = rv(m, 20, 40);
+      if (d > 0) {
+        const comps = [[0.62, x => x / 42 - t * 1.1 + 5], [0.28, x => x / 19 + t * 0.8 + 10], [0.14, x => x / 9 - t * 1.7 + 15]];
+        const names = ['onde 1 · longue', 'onde 2 · moyenne', 'onde 3 · courte'];
+        comps.forEach(([w, g], j) => {
+          const y0 = 482 + j * 28, pts = [];
+          for (let x = 40; x <= 560; x += 5) pts.push([x, y0 + w * 22 * Math.sin(g(x))]);
+          pen(c, pts, d, .6, 1);
+          label(c, names[j], 590, y0, { size: 14, a: .7 * d });
+        });
+      }
+      label(c, 'vague = onde 1 + onde 2 + onde 3', 40, 40, { size: 16, a: .85 * rv(m, 0, 30) });
+      label(c, 'Fourier : toute forme = somme de sinus', 40, 64, { size: 14, a: .6 * rv(m, 10, 30) });
+      pen(c, [[800,137],[800,196]], rv(m, 50, 30), .5, 1, [4, 4]);
+      label(c, 'F = G · m₁ · m₂ / r²', 815, 150, { size: 15, a: .8 * rv(m, 70, 30) });
+      label(c, 'la Lune tire la marée', 815, 174, { size: 13, a: .6 * rv(m, 80, 30) });
+    }
+  },
+
+  fleur: { w: 1000, h: 600, seed: 13,
+    init: () => ({ angle: 137.508 }),
+    paint: () => {
+      const out = [], cx = 500, cy = 262;
+      for (let k = 0; k < 26; k++) {
+        const a = k * TAU / 26 + 0.05 * Math.sin(k * 3.1), r1 = 162, r2 = 232 + 10 * Math.sin(k * 1.7);
+        out.push({ type: 'stroke', pts: [[cx + Math.cos(a) * r1, cy + Math.sin(a) * r1],[cx + Math.cos(a + 0.04) * (r1 + r2) / 2, cy + Math.sin(a + 0.04) * (r1 + r2) / 2],[cx + Math.cos(a + 0.02) * r2, cy + Math.sin(a + 0.02) * r2]], w: 22, ink: .5, dry: .45, taper: [.35,.6], speed: 18, gap: 0 });
+      }
+      out.push({ type: 'stroke', pts: enso(cx, cy, 164, 200, 340, 36, .01, 2), w: 4, ink: .6, dry: .4, speed: 24 });
+      out.push({ type: 'stroke', pts: [[500,500],[504,550],[500,598]], w: 9, ink: .9, dry: .3, taper: [.05,.1] });
+      out.push({ type: 'stroke', pts: [[502,560],[556,536],[606,540]], w: 20, ink: .8, dry: .3, taper: [.45,.55] });
+      return out;
+    },
+    live: (c, f) => {
+      const S = f.S, m = f.m; if (m < 0) return;
+      const N = Math.min(300, Math.floor(m * 3)), ang = S.angle * Math.PI / 180, cx = 500, cy = 262;
+      const P = n => { const a = n * ang, r = 9 * Math.sqrt(n); return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+      for (let n = 1; n <= N; n++) { const p = P(n); spr(c, p[0], p[1], 1.6 + n * 0.011, .92 - n * .0012, n); }
+      const golden = Math.abs(S.angle - 137.508) < 0.15, sp = rv(m, 110, 60);
+      if (N === 300 && golden && sp > 0) {
+        for (const [fam, dash] of [[21, null], [34, [4, 4]]]) {
+          for (const k0 of [299, 292, 285]) { const pts = []; for (let k = k0; k >= 1; k -= fam) pts.push(P(k)); pen(c, pts, sp, .55, 1.1, dash); }
+          const e = P(299 - (fam === 21 ? 0 : 7)), a = Math.atan2(e[1] - cy, e[0] - cx);
+          label(c, String(fam), e[0] + Math.cos(a) * 26, e[1] + Math.sin(a) * 26, { size: 17, align: 'center', a: .85 * sp });
+        }
+      }
+      const tx = rv(m, 60, 40);
+      label(c, '137,5° = 360° × (1 − 1/φ)', 40, 40, { size: 18, a: .85 * tx });
+      label(c, 'φ = 1,618…', 40, 68, { size: 15, a: .65 * tx });
+      label(c, '1, 1, 2, 3, 5, 8, 13, 21, 34, 55…', 40, 556, { size: 15, a: .7 * sp });
+      label(c, '21 spirales dans un sens, 34 dans l’autre', 40, 582, { size: 13, a: .6 * sp });
+      label(c, `${fr(S.angle, 2)}°`, 960, 48, { font: 'display', size: 30, align: 'right', a: .9 * tx });
+      label(c, golden ? 'angle d’or : aucune place perdue' : 'des trous apparaissent', 960, 82, { size: 14, align: 'right', a: .7 * tx });
+      const t = f.t;
+      for (let k = 0; k < 9; k++) {
+        const u = (t * 0.05 + k / 9) % 1, a = k * 2.4;
+        spr(c, cx + Math.cos(a) * (180 + u * 140) + Math.sin(t + k) * 8, cy + Math.sin(a) * (180 + u * 140) - u * 40, 1.6, .5 * Math.sin(Math.PI * u), k);
+      }
+    }
+  },
+
+  hasard: { w: 1000, h: 560, seed: 17,
+    init: () => {
+      const map = p => [770 + p[0] * 10, 540 - p[1] * 8.8];
+      const L = x0 => { const o = []; let x = x0, y = 1, z = 1; for (let i = 0; i < 5200; i++) { const dx = 10 * (y - x), dy = x * (28 - z) - y, dz = x * y - 8 / 3 * z; x += dx * .005; y += dy * .005; z += dz * .005; if (i % 2 === 0) o.push(map([x, z])); } return o; };
+      const a = L(1), b = L(1.001);
+      let split = a.length - 1;
+      for (let i = 0; i < a.length; i++) if (Math.hypot(a[i][0] - b[i][0], a[i][1] - b[i][1]) > 30) { split = i; break; }
+      return { a, b, split };
+    },
+    paint: () => [
+      { type: 'stroke', pts: [[40,200],[120,198],[200,202],[206,280],[214,545]], w: 8, ink: .85, dry: .5, taper: [.05,.4] },
+      { type: 'stroke', pts: [[60,215],[110,260],[150,320],[170,420],[180,540]], w: 26, ink: .1, dry: .6, taper: [.2,.3], halo: .4 },
+      { type: 'stroke', pts: [[206,547],[350,549],[500,546]], w: 3, ink: .5, dry: .6 },
+      { type: 'stroke', pts: [[530,70],[531,300],[533,520]], w: 2, ink: .22, dry: .8 }
+    ],
+    live: (c, f) => {
+      const S = f.S, t = f.t, m = f.m;
+      if (m < 0) return;
+      const g = 144.6, vx = 118, T = 2.2, P = u => [206 + vx * u, 190 + 0.5 * g * u * u];
+      const traj = []; for (let u = 0; u <= T + 0.001; u += 0.05) traj.push(P(u));
+      pen(c, traj, rv(m, 0, 40), .45, 1, [4, 5]);
+      const land = P(T), xa = rv(m, 30, 20);
+      if (xa > 0) { pen(c, [[land[0] - 8, land[1] - 8], [land[0] + 8, land[1] + 8]], 1, .8 * xa, 1.6); pen(c, [[land[0] + 8, land[1] - 8], [land[0] - 8, land[1] + 8]], 1, .8 * xa, 1.6); }
+      label(c, 'impact calculé', land[0], land[1] - 26, { size: 13, align: 'center', a: .65 * xa });
+      label(c, 'prévisible', 40, 60, { font: 'display', size: 30, a: .9 * rv(m, 0, 30) });
+      label(c, 'y = ½ g t²', 300, 170, { size: 18, a: .85 * rv(m, 20, 30) });
+      if (m > 40) {
+        const u = Math.min(t % 3.4, T);
+        for (let k = 0.2; k < u; k += 0.2) { const p = P(k); spr(c, p[0], p[1], 6, .18, 1); }
+        const p = P(u); spr(c, p[0], p[1] - 2, 8.5, .95, 2);
+      }
+      label(c, 'imprévisible', 560, 60, { font: 'display', size: 30, a: .9 * rv(m, 10, 30) });
+      const L = S.a.length, cyc = t % 11.5, n = Math.floor(Math.min(L, cyc * 330)), fade = cyc > 11 ? 1 - (cyc - 11) / 0.5 : 1;
+      poly(c, S.a, n, .8 * fade, 1.3);
+      poly(c, S.b, n, .45 * fade, 1.2, [5, 4]);
+      if (n > 1 && n < L) { spr(c, S.a[n - 1][0], S.a[n - 1][1], 4, .9 * fade, 0); spr(c, S.b[n - 1][0], S.b[n - 1][1], 4, .5 * fade, 1); }
+      if (n > S.split) {
+        const q = S.a[S.split], e = clamp01((n - S.split) / 120) * fade, right = q[0] > 850;
+        c.save(); c.strokeStyle = `rgba(${INK},${.6 * e})`; c.lineWidth = 1; c.beginPath(); c.arc(q[0], q[1], 16, 0, TAU); c.stroke(); c.restore();
+        label(c, 'ici, elles se séparent', q[0] + (right ? -22 : 22), q[1] - 22, { size: 13, align: right ? 'right' : 'left', a: .75 * e });
+      }
+      pen(c, [[560,522],[596,522]], rv(m, 20, 20), .8, 1.3);
+      label(c, 'départ (1 ; 1 ; 1)', 606, 522, { size: 14, a: .75 * rv(m, 20, 20) });
+      pen(c, [[560,546],[596,546]], rv(m, 25, 20), .45, 1.2, [5, 4]);
+      label(c, 'départ (1,001 ; 1 ; 1)', 606, 546, { size: 14, a: .6 * rv(m, 25, 20) });
+    }
+  },
+
+  cerveau: { w: 1000, h: 520, seed: 19,
+    init: () => ({
+      ab: [[196,258],[270,246],[350,236],[430,228],[476,222]],
+      bc: [[526,223],[610,234],[690,254],[804,278]],
+      out: [[856,284],[920,292],[995,302]],
+      synA: [486, 221], synB: [814, 279]
+    }),
+    paint: S => {
+      const out = [];
+      neuron(out, 180, 260, [150, 205, 255, 105, 300], 21);
+      out.push({ type: 'stroke', pts: S.ab, w: 4, ink: .9, dry: .25, taper: [.05,.2], speed: 14 });
+      neuron(out, 510, 220, [128, 232, 272, 88, 52, 312], 22);
+      out.push({ type: 'stroke', pts: S.bc, w: 4, ink: .9, dry: .25, taper: [.05,.2], speed: 14 });
+      neuron(out, 840, 280, [90, 265, 20, 330, 130, 225], 23);
+      out.push({ type: 'stroke', pts: S.out, w: 4, ink: .85, dry: .4, taper: [.05,.5], speed: 14 });
+      return out;
+    },
+    live: (c, f) => {
+      const S = f.S, t = f.t, m = f.m;
+      if (m < 0) return;
+      const cyc = t % 4.4;
+      const pulse = (pts, u) => { for (let k = 5; k >= 0; k--) { const p = along(pts, u - k * 0.035); spr(c, p[0], p[1], 5.5 - k * 0.6, k === 0 ? .95 : .35 - k * .05, k); } };
+      const burst = (s, u) => { for (let k = 0; k < 7; k++) { const a = -0.6 + k * 0.2, d = 4 + u * 16; spr(c, s[0] + Math.cos(a) * d, s[1] + Math.sin(a) * d * 0.8, 1.8, .85 * (1 - u), k); } };
+      if (cyc < 1.2) pulse(S.ab, cyc / 1.2);
+      else if (cyc < 1.6) burst(S.synA, (cyc - 1.2) / 0.4);
+      else if (cyc < 2.8) pulse(S.bc, (cyc - 1.6) / 1.2);
+      else if (cyc < 3.2) burst(S.synB, (cyc - 2.8) / 0.4);
+      else if (cyc < 4.0) pulse(S.out, (cyc - 3.2) / 0.8);
+      label(c, '≈ 86 milliards de neurones', 40, 468, { size: 16, a: .85 * rv(m, 0, 30) });
+      label(c, '≈ 100 000 milliards de synapses', 40, 494, { size: 16, a: .85 * rv(m, 15, 30) });
+      label(c, 'influx : 1 à 120 m/s', 960, 468, { size: 16, align: 'right', a: .85 * rv(m, 30, 30) });
+      label(c, 'cerveau entier : ≈ 20 W', 960, 494, { size: 16, align: 'right', a: .85 * rv(m, 45, 30) });
+    }
+  },
+
+  adn: { w: 1000, h: 500, seed: 23,
+    paint: () => [{ type: 'stroke', pts: [[40,424],[500,426],[960,422]], w: 4, ink: .4, dry: .7, speed: 26 }],
+    live: (c, f) => {
+      const t = f.t, m = f.m;
+      if (m < 0) return;
+      const xr = 60 + 880 * rv(m, 0, 80), cy = 220, amp = 95, lam = 300, rot = t * 0.8;
+      const ph = x => TAU * (x - 60) / lam + rot;
+      const back = [], front = [];
+      for (const off of [0, Math.PI * 0.8]) for (let x = 60; x < xr; x += 6) {
+        const x2 = Math.min(x + 6, xr), a1 = ph(x) + off, a2 = ph(x2) + off, z = Math.cos((a1 + a2) / 2);
+        (z < 0 ? back : front).push([x, cy + amp * Math.sin(a1), x2, cy + amp * Math.sin(a2), z]);
+      }
+      const drawSegs = segs => { c.save(); c.lineCap = 'round'; for (const [x1, y1, x2, y2, z] of segs) { c.strokeStyle = shade(.4 + .55 * (z + 1) / 2); c.lineWidth = 3 + 6 * (z + 1) / 2; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); } c.restore(); };
+      drawSegs(back);
+      c.save(); c.lineCap = 'round';
+      for (let x = 74; x < xr; x += 22) {
+        const ya = cy + amp * Math.sin(ph(x)), yb = cy + amp * Math.sin(ph(x) + Math.PI * 0.8);
+        if (Math.abs(ya - yb) < 10) continue;
+        const z = (Math.cos(ph(x)) + Math.cos(ph(x) + Math.PI * 0.8)) / 2;
+        c.strokeStyle = shade(.25 + .3 * (z + 1) / 2); c.lineWidth = 2.2;
+        c.beginPath(); c.moveTo(x, ya); c.lineTo(x, yb); c.stroke();
+      }
+      c.restore();
+      drawSegs(front);
+      const sa = rv(m, 60, 30);
+      font(c, 'mono', 24); const cw = c.measureText('ATG ').width, bw = c.measureText('ATG').width;
+      const cur = Math.floor(t * 1.6) % (CODONS.length + 4);
+      CODONS.forEach(([cod], i) => {
+        const x = 60 + i * cw;
+        label(c, cod, x, 400, { size: 24, a: (i <= cur ? .95 : .55) * sa });
+        if (i === cur && m > 90) { c.save(); c.strokeStyle = `rgba(${INK},.7)`; c.lineWidth = 1; c.strokeRect(x - 5, 384, bw + 10, 32); c.restore(); }
+      });
+      if (m > 90) label(c, CODONS.slice(0, Math.min(cur + 1, CODONS.length)).map(x => x[1]).join(' – '), 60, 456, { size: 15, a: .8 });
+      label(c, 'ATG = commence · TAG = stop', 40, 40, { size: 15, a: .75 * rv(m, 70, 30) });
+      label(c, '3,1 milliards de lettres ≈ 750 Mo', 960, 40, { size: 15, align: 'right', a: .75 * rv(m, 80, 30) });
+    }
+  },
+
+  miroir: { w: 1000, h: 560, seed: 29,
+    init: () => {
+      const T = pts => pts.map(p => [130 + p[0], 40 + p[1]]), list = [];
+      for (const key of ['back', 'face', 'shB', 'shF', 'ear', 'eye']) for (const q of smooth(T(PROFILE[key]), key === 'eye' || key === 'ear' ? 7 : 13)) list.push([1000 - q.x, q.y]);
+      return { T, list };
+    },
+    paint: S => {
+      const P = (pts, w, o) => Object.assign({ type: 'stroke', pts: S.T(pts), w, ink: .92, dry: .35, speed: 13 }, o || {});
+      return [P(PROFILE.face, 7, { taper: [.08,.3] }), P(PROFILE.back, 9, { taper: [.08,.4] }), P(PROFILE.ear, 4, { ink: .7 }), P(PROFILE.eye, 4, { taper: [.3,.3] }), P(PROFILE.shB, 7, { ink: .6, dry: .6 }), P(PROFILE.shF, 7, { ink: .6, dry: .6 })];
+    },
+    live: (c, f) => {
+      const S = f.S, t = f.t, m = f.m;
+      if (m < 0) return;
+      const src = '0.71−0.350.920.08−0.440.13−0.670.29', off = Math.floor(t * 6), n = Math.min(S.list.length, Math.floor(m * 3));
+      font(c, 'mono', 17); c.textAlign = 'center'; c.textBaseline = 'middle';
+      for (let i = 0; i < n; i++) {
+        c.fillStyle = `rgba(${INK},${(.55 + .4 * Math.sin(i * 0.7 + t * 2)).toFixed(3)})`;
+        c.fillText(src[(i + off) % src.length], S.list[i][0], S.list[i][1]);
+      }
+      label(c, '≈ ?', 500, 270, { font: 'display', size: 84, align: 'center', a: .9 * rv(m, 20, 40) });
+      label(c, 'encre · neurones · chimie', 260, 540, { size: 14, align: 'center', a: .7 * rv(m, 60, 30) });
+      label(c, 'nombres · poids · silicium', 740, 540, { size: 14, align: 'center', a: .7 * rv(m, 70, 30) });
+    }
+  },
+
+  vie: { w: 1000, h: 560, seed: 31,
+    paint: () => [
+      { type: 'stroke', pts: enso(500, 280, 215, 15, 335, 40, 0.03, 8), w: 32, ink: .92, dry: .6, taper: [.04,.6], speed: 20, spacing: 1 },
+      { type: 'stroke', pts: [[430,432],[500,422],[570,432]], w: 14, ink: .25, dry: .6, taper: [.3,.3] },
+      { type: 'stroke', pts: [[500,426],[502,372],[497,332]], w: 5, ink: .9, taper: [.05,.5], speed: 6 }
+    ],
+    live: (c, f) => {
+      const t = f.t, m = f.m;
+      if (m < 0) return;
+      const g = rv(m, 0, 50), sw = 0.07 * Math.sin(t * 1.3);
+      const leaf = (x, y, ang, len, wid) => {
+        c.save(); c.translate(x, y); c.rotate(ang);
+        c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(len * 0.45, -wid, len, 0); c.quadraticCurveTo(len * 0.45, wid, 0, 0);
+        c.fillStyle = shade(.85); c.fill();
+        c.strokeStyle = `rgba(${PAPER.join(',')},.6)`; c.lineWidth = 1; c.beginPath(); c.moveTo(3, 0); c.lineTo(len * 0.85, 0); c.stroke();
+        c.restore();
+      };
+      leaf(498, 336, Math.PI + 0.38 + sw, 64 * g, 15 * g);
+      leaf(498, 332, -0.5 + sw * 1.2, 72 * g, 17 * g);
+      const a = rv(m, 40, 40), b = rv(m, 55, 40);
+      arrowPen(c, 900, 258, 745, 266, a, .6);
+      arrowPen(c, 745, 298, 900, 306, b, .6);
+      label(c, 'énergie', 910, 256, { size: 16, a: .85 * a });
+      label(c, 'chaleur', 910, 306, { size: 16, a: .85 * b });
+      label(c, 'ordre maintenu', 500, 190, { size: 16, align: 'center', a: .8 * rv(m, 80, 40) });
+      label(c, 'système ouvert', 500, 216, { size: 13, align: 'center', a: .55 * rv(m, 90, 40) });
+      if (m > 90) for (let k = 0; k < 5; k++) {
+        const u = (t * 0.35 + k / 5) % 1;
+        const pin = along([[900,258],[745,266],[640,272]], u), pout = along([[640,292],[745,298],[900,306]], u);
+        spr(c, pin[0], pin[1], 2.4, .8 * Math.sin(Math.PI * u), k);
+        spr(c, pout[0], pout[1], 2, .45 * Math.sin(Math.PI * u), k + 1);
+      }
+    }
+  },
+
+  pinceau: { w: 1000, h: 600, seed: 37,
+    paint: () => {
+      const x0 = 930, y0 = 160, x1 = 680, y1 = 470;
+      const L = Math.hypot(x1 - x0, y1 - y0), dx = (x1 - x0) / L, dy = (y1 - y0) / L, nx = -dy, ny = dx;
+      const node = t => { const px = x0 + dx * L * t, py = y0 + dy * L * t; return { type: 'stroke', pts: [[px - nx * 14, py - ny * 14],[px + nx * 14, py + ny * 14]], w: 4, ink: .7, taper: [.2,.2] }; };
+      return [
+        ...thinker(330, 400, 0.45),
+        { type: 'pause', frames: 14 },
+        { type: 'stroke', pts: [[x0, y0],[x1, y1]], w: 24, ink: .26, dry: .15, taper: [.02,.02], halo: .5, speed: 16 },
+        { type: 'stroke', pts: [[x0 + nx * 11, y0 + ny * 11],[x1 + nx * 11, y1 + ny * 11]], w: 2.5, ink: .6, dry: .6, taper: [.05,.05], speed: 18 },
+        node(0.3), node(0.62),
+        { type: 'stroke', pts: [[686,463],[676,475],[666,487]], w: 27, ink: .75, dry: .2, taper: [.02,.02] },
+        { type: 'stroke', pts: [[668,485],[636,515],[602,543],[562,572]], w: 30, ink: 1, dry: .1, taper: [.02,.97], speed: 8 },
+        { type: 'stroke', pts: [[250,582],[420,584],[570,580]], w: 4, ink: .7, dry: .5, taper: [.1,.1], speed: 6 }
+      ];
+    },
+    live: (c, f) => {
+      const t = f.t, m = f.m;
+      if (m < 0) return;
+      label(c, 'Qui tient le pinceau ?', 60, 80, { font: 'display', size: 40, a: .9 * rv(m, 0, 40) });
+      label(c, 'évolution : ≈ 4 milliards d’années d’essais et d’erreurs', 60, 126, { size: 15, a: .7 * rv(m, 30, 30) });
+      label(c, 'une descente de gradient, sans ingénieur ?', 60, 150, { size: 15, a: .7 * rv(m, 45, 30) });
+      for (let k = 0; k < 3; k++) { const u = (t * 0.28 + k / 3) % 1; spr(c, 410 + u * 70, 410 - u * 120, 2 + u * 5, .75 * Math.sin(Math.PI * u), k); }
+      const u = (t * 0.45) % 1;
+      c.save(); c.fillStyle = `rgba(${INK},${(.12 * (1 - u)).toFixed(3)})`; c.beginPath(); c.ellipse(562, 580, 6 + u * 26, 2 + u * 6, 0, 0, TAU); c.fill(); c.restore();
+    }
+  }
 };
 
+/* ——— moteur ——— */
+class World {
+  constructor(el, def) {
+    this.el = el; this.def = def; this.cv = {}; this.ctx = {};
+    for (const n of (def.layers || ['a'])) {
+      const cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true');
+      el.appendChild(cv); this.cv[n] = cv; this.ctx[n] = cv.getContext('2d');
+    }
+    if (def.sway && this.cv.b) this.cv.b.style.transformOrigin = `${def.sway[0] / def.w * 100}% ${def.sway[1] / def.h * 100}%`;
+    this.live = document.createElement('canvas'); this.live.setAttribute('aria-hidden', 'true');
+    el.appendChild(this.live); this.lctx = this.live.getContext('2d');
+    this.S = def.init ? def.init() : {};
+    this.items = (def.paint ? def.paint(this.S) : []).map((it, i) => prep(it, (def.seed || 7) * 97 + i));
+    this.cur = 0; this.wait = 0; this.painting = false; this.started = false; this.m = -1; this.visible = false; this.t0 = 0;
+    this.size();
+  }
+  size() {
+    const cssW = this.el.clientWidth || this.def.w, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.round(cssW * dpr), H = Math.round(cssW * this.def.h / this.def.w * dpr);
+    this.ts = Math.min(1.8, Math.max(1, 0.62 * this.def.w / cssW));
+    if (W === this.W && H === this.H) return;
+    this.W = W; this.H = H; this.k = W / this.def.w;
+    for (const n in this.cv) { this.cv[n].width = W; this.cv[n].height = H; }
+    this.live.width = W; this.live.height = H;
+    this.redraw();
+    this.drawLive(performance.now() / 1000);
+  }
+  clearPaint() {
+    for (const n in this.ctx) { const c = this.ctx[n]; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, this.W, this.H); c.setTransform(this.k, 0, 0, this.k, 0, 0); }
+  }
+  redraw() {
+    this.clearPaint();
+    for (const it of this.items) if (it.prog > 0) drawItem(this.ctx[it.layer || 'a'], it, 0, Math.ceil(it.prog));
+  }
+  start() {
+    for (const it of this.items) it.prog = 0;
+    this.cur = 0; this.wait = 0; this.m = -1; this.started = true; this.t0 = performance.now() / 1000;
+    if (reduced) {
+      for (const it of this.items) it.prog = it.total;
+      this.cur = this.items.length; this.m = 100000; this.painting = false;
+      this.redraw(); this.drawLive(this.t0 + 6); return;
+    }
+    this.clearPaint(); this.painting = true;
+  }
+  step() {
+    if (this.painting) {
+      if (this.wait > 0) this.wait--;
+      else if (this.cur < this.items.length) {
+        const it = this.items[this.cur], from = Math.ceil(it.prog);
+        it.prog = Math.min(it.total, it.prog + rate(it));
+        const to = Math.ceil(it.prog);
+        if (to > from) drawItem(this.ctx[it.layer || 'a'], it, from, to);
+        if (it.prog >= it.total) { this.cur++; this.wait = it.gap ?? (it.type === 'stroke' ? 3 : 1); }
+      }
+      if (this.cur >= this.items.length) { this.painting = false; this.m = 0; }
+    } else if (this.m >= 0) this.m++;
+  }
+  drawLive(now) {
+    const c = this.lctx;
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    if (!this.started || !this.def.live) return;
+    c.setTransform(this.k, 0, 0, this.k, 0, 0);
+    TS = this.ts;
+    this.def.live(c, { t: now - this.t0, T: now, m: this.m, S: this.S, w: this });
+  }
+}
+
+/* ——— papier et briques ——— */
+(function textures() {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 320;
+    const x = c.getContext('2d'), r = rng(11);
+    for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(60,58,52,${(r() * 0.06).toFixed(3)})`; x.fillRect(r() * 320, r() * 320, 1, 1); }
+    for (let i = 0; i < 150; i++) {
+      const px = r() * 320, py = r() * 320, a = r() * TAU, l = 6 + r() * 28;
+      x.strokeStyle = `rgba(70,66,58,${(0.02 + r() * 0.05).toFixed(3)})`; x.lineWidth = 0.4 + r() * 0.6;
+      x.beginPath(); x.moveTo(px, py);
+      x.quadraticCurveTo(px + Math.cos(a) * l * 0.5 + (r() - 0.5) * 6, py + Math.sin(a) * l * 0.5 + (r() - 0.5) * 6, px + Math.cos(a) * l, py + Math.sin(a) * l);
+      x.stroke();
+    }
+    document.documentElement.style.setProperty('--paper-tex', `url(${c.toDataURL()})`);
+    const b = document.createElement('canvas'); b.width = 640; b.height = 150;
+    const bx = b.getContext('2d');
+    for (let i = 0; i < 6; i++) {
+      const y = 18 + i * 23, it = prep({ type: 'stroke', pts: [[6, y + (i % 2) * 3], [320, y - 2], [634, y + 2]], w: 36, ink: 1, dry: .12, taper: [.01,.03], spacing: 1.2 }, 300 + i);
+      stamp(bx, it, 0, it.total);
+    }
+    document.documentElement.style.setProperty('--brick-tex', `url(${b.toDataURL()})`);
+    document.documentElement.classList.add('tex');
+  } catch (e) {}
+})();
+
 /* ——— mise en route ——— */
-const scenes = [];
-document.querySelectorAll('canvas[data-scene]').forEach(cv => {
-  const def = SCENES[cv.dataset.scene];
+const worlds = [];
+document.querySelectorAll('.world[data-world]').forEach(el => {
+  const def = WORLDS[el.dataset.world];
   if (!def) return;
-  const sc = new Scene(cv, def); cv._scene = sc; scenes.push(sc);
+  const w = new World(el, def); el._world = w; worlds.push(w);
 });
 
 const fontsReady = (document.fonts && document.fonts.load)
   ? Promise.race([
       Promise.all([
-        document.fonts.load('700 40px "Shippori Mincho B1"', 'chat pensée vie ≈ ? Qui'),
-        document.fonts.load('500 28px "Zen Kaku Gothic New"', 'homme femme pâtée'),
-        document.fonts.load('400 22px "IBM Plex Mono"', '0.21 − ATG')
+        document.fonts.load('700 34px "Shippori Mincho B1"', 'Je regarde ≈ ? Qui prévisible'),
+        document.fonts.load('500 26px "Zen Kaku Gothic New"', 'enfance père'),
+        document.fonts.load('400 16px "IBM Plex Mono"', '0.21 − ATG θ ≈ φ')
       ]),
       new Promise(r => setTimeout(r, 1500))
     ]).catch(() => {})
@@ -930,23 +1108,62 @@ const fontsReady = (document.fonts && document.fonts.load)
 fontsReady.then(() => {
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(entries => {
-      for (const e of entries) if (e.isIntersecting) {
-        const sc = e.target._scene;
-        if (sc.state === 'idle') sc.play();
-        io.unobserve(e.target);
+      for (const e of entries) {
+        const w = e.target._world;
+        w.visible = e.isIntersecting;
+        if (e.isIntersecting && !w.started && e.intersectionRatio >= 0.3) w.start();
       }
-    }, { threshold: 0.2 });
-    scenes.forEach(sc => io.observe(sc.canvas));
-  } else scenes.forEach(sc => sc.play());
+    }, { threshold: [0, 0.3] });
+    worlds.forEach(w => io.observe(w.el));
+  } else worlds.forEach(w => { w.visible = true; w.start(); });
+  if (!reduced) {
+    const loop = ms => {
+      const now = ms / 1000;
+      for (const w of worlds) if (w.visible && w.started) { w.step(); w.drawLive(now); }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
 });
 
-document.querySelectorAll('[data-repaint]').forEach(b => b.addEventListener('click', () => {
-  const cv = document.getElementById(b.dataset.repaint);
-  if (cv && cv._scene) cv._scene.play();
-}));
+const fleur = document.getElementById('w-fleur'), range = document.getElementById('angle'), out = document.getElementById('angle-out');
+function setAngle(v) {
+  if (!fleur || !fleur._world) return;
+  fleur._world.S.angle = v;
+  if (out) out.textContent = `${fr(v, 2)}°`;
+  if (reduced) fleur._world.drawLive(performance.now() / 1000);
+}
+if (range) range.addEventListener('input', () => setAngle(parseFloat(range.value)));
+const reset = document.getElementById('angle-reset');
+if (reset) reset.addEventListener('click', () => { if (range) range.value = '137.51'; setAngle(137.508); });
 
 let rt;
-window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => scenes.forEach(s => s.resize()), 120); });
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { worlds.forEach(w => w.size()); onScroll(); }, 120); });
+
+/* ——— les phrases et les briques arrivent avec le scroll ——— */
+const scenes = [...document.querySelectorAll('.scene')].map(s => ({ el: s, items: [...s.querySelectorAll('.reveal')] }));
+const minis = [...document.querySelectorAll('.pile a')], pileN = document.getElementById('pile-n');
+let ticking = false, laid = -1;
+function onScroll() {
+  ticking = false;
+  const vh = window.innerHeight;
+  for (const { el, items } of scenes) {
+    const r = el.getBoundingClientRect(), span = Math.max(1, r.height - vh), p = -r.top / span;
+    const n = items.length;
+    items.forEach((it, i) => {
+      const at = it.dataset.at !== undefined ? parseFloat(it.dataset.at) : 0.1 + i * (0.62 / Math.max(1, n - 1));
+      it.classList.toggle('on', reduced || p >= at);
+    });
+  }
+  const count = document.querySelectorAll('.scene .brique.on').length;
+  if (count !== laid) {
+    laid = count;
+    minis.forEach((a, i) => a.classList.toggle('on', i < count));
+    if (pileN) pileN.textContent = count;
+  }
+}
+window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+onScroll();
 })();
 </script>
 </body>
