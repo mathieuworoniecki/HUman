@@ -517,5 +517,7 @@
   "you": "Você",
   "post_on": "Publicar no {0}",
   "preview_l": "Prévia",
-  "toast_img": "Imagem salva: publique no Instagram"
+  "toast_img": "Imagem salva: publique no Instagram",
+  "paused_click": "Em pausa · clique para continuar",
+  "paused_tap": "Em pausa · toque para continuar"
 }

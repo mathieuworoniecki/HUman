@@ -517,5 +517,7 @@
   "you": "Toi",
   "post_on": "Publier sur {0}",
   "preview_l": "Aperçu",
-  "toast_img": "Image enregistrée : publie-la sur Instagram"
+  "toast_img": "Image enregistrée : publie-la sur Instagram",
+  "paused_click": "En pause · cliquez pour reprendre",
+  "paused_tap": "En pause · touchez pour reprendre"
 }
