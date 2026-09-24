@@ -70,6 +70,7 @@ html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.sbtn,.
 
 #outro{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity 1.6s ease 1.8s}
 #outro.on{opacity:1}
+#outro:not(.on){transition:opacity .35s ease}
 #outro.on .orb{pointer-events:auto}
 #outro.on #sharebox.on{pointer-events:auto}
 .orb{all:unset;position:absolute;left:0;top:0;z-index:2;display:flex;align-items:center;gap:.5rem;padding:.5rem .8rem .5rem .55rem;border-radius:999px;cursor:pointer;font:500 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:var(--fg);border:1px solid rgba(var(--c),.55);background:color-mix(in srgb,var(--bg) 55%,transparent);box-shadow:0 0 1.2rem rgba(var(--c),.18);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);will-change:transform;transition:opacity .8s ease,background .3s,letter-spacing .3s,padding .9s ease,font-size .9s ease,gap .9s ease,border-radius .9s ease}

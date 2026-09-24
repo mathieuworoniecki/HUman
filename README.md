@@ -4,6 +4,8 @@
 
 **[areweai.dev](https://areweai.dev)**
 
+[![HUman](media/og-en.png)](https://areweai.dev)
+
 ---
 
 Who is actually thinking when I think?
@@ -27,6 +29,14 @@ Where I've landed, for now: I may well be a calculation, a probabilistic one, a 
 **If everything is calculation, why does it feel like something to be me?**
 
 ---
+
+<table>
+<tr><td width="50%"><img src="media/screens/01-words.jpg" alt="A sentence is a path"><br><sub>A sentence is a path</sub></td><td width="50%"><img src="media/screens/02-world.jpg" alt="Everywhere I looked, calculations"><br><sub>Everywhere I looked, calculations</sub></td></tr>
+<tr><td width="50%"><img src="media/screens/03-flower.jpg" alt="The solution that survived"><br><sub>The solution that survived</sub></td><td width="50%"><img src="media/screens/04-dna.jpg" alt="In every seed, a code"><br><sub>In every seed, a code</sub></td></tr>
+<tr><td width="50%"><img src="media/screens/05-atom.jpg" alt="Nature rolls the dice"><br><sub>Nature rolls the dice</sub></td><td width="50%"><img src="media/screens/06-universe.jpg" alt="Calculable, not predictable"><br><sub>Calculable, not predictable</sub></td></tr>
+<tr><td width="50%"><img src="media/screens/07-brain.jpg" alt="Predicting what comes next"><br><sub>Predicting what comes next</sub></td><td width="50%"><img src="media/screens/08-mirror.jpg" alt="Am I an AI?"><br><sub>Am I an AI?</sub></td></tr>
+<tr><td width="50%"><img src="media/screens/09-circuit.jpg" alt="The same current"><br><sub>The same current</sub></td><td width="50%"><img src="media/screens/10-questions.jpg" alt="And you?"><br><sub>And you?</sub></td></tr>
+</table>
 
 HUman is that reflection, told in Chinese ink and particles: from a single word inside an AI, out to a flower, down to the atom, across the universe, into the brain, and back to the one question that stays open. It plays by itself in the browser, in ten languages, and ends by asking you what you think.
 
