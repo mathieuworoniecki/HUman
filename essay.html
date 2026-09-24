@@ -232,7 +232,11 @@ blockquote::after{margin:1.1rem auto 0}
   const mk = (col, a) => { const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'), r = x.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, `rgba(${col},${a})`); r.addColorStop(.2, `rgba(${col},${a * .45})`); r.addColorStop(1, `rgba(${col},0)`); x.fillStyle = r; x.fillRect(0, 0, 32, 32); return c; };
   const HN = STAR.map(c => mk(c.join(','), 1)), HD = INK.map(c => mk(c.join(','), .5));
   const MARK = new Path2D('M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z');
-  let P = [], W = 0, H = 0, dpr = 1, hov = 0, hovT = 0, mx = -1e4, my = -1e4, t0 = performance.now(), sig = '';
+  let P = [], W = 0, H = 0, dpr = 1, hov = 0, hovT = 0, mx = -1e4, my = -1e4, t0 = performance.now(), sig = '', RC = null;
+  const CN = STAR.map(c => `rgb(${c.join(',')})`), CD = INK.map(c => `rgb(${c.join(',')})`);
+  const measure = () => { RC = el.getBoundingClientRect(); };
+  addEventListener('resize', measure, { passive: true }); addEventListener('scroll', measure, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(el);
   // la forme : le contour de la pilule, puis le logo, échantillonnés en points
   function build() {
     const r = el.getBoundingClientRect(); W = r.width; H = r.height; dpr = Math.min(2.5, devicePixelRatio || 1);
@@ -268,8 +272,8 @@ blockquote::after{margin:1.1rem auto 0}
   el.addEventListener('pointerdown', e => { const r = el.getBoundingClientRect(); P.forEach(p => { const dx = p.x - (e.clientX - r.left), dy = p.y - (e.clientY - r.top), d = Math.hypot(dx, dy) + 1; p.vx += dx / d * 5; p.vy += dy / d * 5; }); });
   function frame(now) {
     requestAnimationFrame(frame);
-    if (document.hidden || !el.getClientRects().length) return;
-    const r = el.getBoundingClientRect(), k = `${r.width | 0}x${r.height | 0}`;
+    if (document.hidden || (RC && !RC.width)) return;
+    if (!RC) measure(); const r = RC, k = `${r.width | 0}x${r.height | 0}`;
     if (k !== sig) { sig = k; build(); }
     const t = (now - t0) / 1000, nt = night(), ph = still ? 0 : (t / 6) % 1;
     hov += (hovT - hov) * 0.1;
@@ -295,7 +299,7 @@ blockquote::after{margin:1.1rem auto 0}
       g.globalAlpha = Math.min(1, (nt ? 0.5 : 0.55) * lit * 0.6);
       g.drawImage((nt ? HN : HD)[p.c], p.x - hs / 2, p.y - hs / 2, hs, hs);
       g.globalAlpha = Math.min(1, (0.6 + 0.4 * tw) * (0.75 + 0.25 * lit));
-      g.fillStyle = `rgb(${(nt ? STAR : INK)[p.c].join(',')})`; g.beginPath(); g.arc(p.x, p.y, Math.max(0.42, sz * 0.5), 0, 6.2832); g.fill();
+      g.fillStyle = (nt ? CN : CD)[p.c]; g.beginPath(); g.arc(p.x, p.y, Math.max(0.42, sz * 0.5), 0, 6.2832); g.fill();
     }
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   }

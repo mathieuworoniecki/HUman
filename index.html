@@ -2243,15 +2243,17 @@ const ease01 = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
     const t = bt, cx = W / 2, cy = LAND ? H * 0.5 : H * 0.47;
     const hw = LAND ? Math.min(W / 2 - 110, 0.31 * W + 95) : W / 2 - 70, hh = LAND ? Math.min(H / 2 - 100, Math.max(0.33 * H, 210)) : Math.min(H / 2 - 110, 0.3 * H), rr = Math.min(hw, hh) * 0.55;
     const r = qRect(), gth = ease01((story(T) - SHARE_T) / 1.8);
-    GATH = gth; sbox.classList.toggle('on', gth > 0.35);
     const fin = ease01((gth - 0.62) / 0.33);
+    // d'abord toutes les lectures de mise en page, ensuite toutes les écritures : une seule mise en page par image
+    const M = orbs.map((b, i) => [b.offsetWidth, b.offsetHeight, gth > 0 ? sbtns[i].getBoundingClientRect() : null]);
+    GATH = gth; sbox.classList.toggle('on', gth > 0.35);
     sbtns.forEach(b => { b.style.opacity = fin.toFixed(3); b.style.pointerEvents = fin > 0.9 ? '' : 'none'; });
     orbs.forEach((b, i) => {
-      const bw = b.offsetWidth, bh = b.offsetHeight, u = ((ang / TAU + i / orbs.length + 0.12) % 1 + 1) % 1, P = rrPt(u, hw, hh, rr);
+      const [bw, bh, sr] = M[i], u = ((ang / TAU + i / orbs.length + 0.12) % 1 + 1) % 1, P = rrPt(u, hw, hh, rr);
       let x = cx + P[0] + Math.sin(t * 0.6 + i * 1.9) * 6, y = cy + P[1] + Math.cos(t * 0.8 + i * 2.3) * 5;
       const hid = !LAND && r && gth <= 0 && y > r[1] - 22 && y < r[1] + r[3] + 22;
       let d = 0.94 + 0.08 * (0.5 + 0.5 * Math.sin(u * TAU * 2 + i)), op = hid ? 0.18 : 1;
-      if (gth > 0) { const sr = sbtns[i].getBoundingClientRect(), sx = sr.left + sr.width / 2, sy = sr.top + sr.height / 2; x += (sx - x) * gth; y += (sy - y) * gth; d += (1 - d) * gth; op *= 1 - fin; }
+      if (sr) { const sx = sr.left + sr.width / 2, sy = sr.top + sr.height / 2; x += (sx - x) * gth; y += (sy - y) * gth; d += (1 - d) * gth; op *= 1 - fin; }
       b.style.opacity = op.toFixed(3); b.style.pointerEvents = hid || op < 0.3 ? 'none' : '';
       b.style.transform = `translate(${(x - bw / 2).toFixed(1)}px,${(y - bh / 2).toFixed(1)}px) scale(${d.toFixed(3)})`;
       SHB[i] = [x - bw / 2 + 14, y, b.style.getPropertyValue('--c')];
@@ -2370,7 +2372,8 @@ window.addEventListener('keydown', e => {
 
 function resize() {
   W = innerWidth; H = innerHeight;
-  DPR = Math.min(window.devicePixelRatio || 1, dprCap);
+  // la netteté suit l'écran, mais le dessin reste sous ~4,5 millions de pixels (grands écrans)
+  DPR = Math.max(1, Math.min(window.devicePixelRatio || 1, dprCap, Math.sqrt(4.5e6 / (innerWidth * innerHeight))));
   cv.width = sc.width = Math.round(W * DPR); cv.height = sc.height = Math.round(H * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   bl.width = Math.max(1, Math.ceil(cv.width / 6)); bl.height = Math.max(1, Math.ceil(cv.height / 6));
@@ -2381,9 +2384,14 @@ function resize() {
   zMoon = 0.34 * MM / (0.07 * S0b);
   CF = [CX, CY]; RF = 0.3 * MM;
   SP = LAND ? Math.min(0.6 * H / 470, 0.92 * W / 620) : Math.min(0.5 * H / 470, 0.98 * W / 560); PGAP = 0.09 * MM; PCX = CX + (LAND ? 0.02 * W : 0); PCY = LAND ? H * 0.55 : H * 0.56;
-  computeSK(); buildTitle(); buildCaps(); jump = true;
+  jump = true;
+  // reconstruire le titre et les phrases coûte cher : on attend la fin du redimensionnement
+  clearTimeout(resize.heavy); resize.heavy = setTimeout(() => { computeSK(); buildTitle(); buildCaps(); jump = true; }, resize.first ? 0 : 180);
+  resize.first = false;
 }
-addEventListener('resize', resize);
+resize.first = true;
+let rzPend = false;
+addEventListener('resize', () => { if (rzPend) return; rzPend = true; requestAnimationFrame(() => { rzPend = false; resize(); }); });
 buildGlyphs();
 resize();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { buildGlyphs(); buildTitle(); buildCaps(); jump = true; });
@@ -2484,10 +2492,11 @@ requestAnimationFrame(frame);
   brand.addEventListener('pointerenter', () => { hovT = 1; }); brand.addEventListener('pointerleave', () => { hovT = 0; });
   const size = () => { const b = cv.getBoundingClientRect(); dpr = Math.min(2.5, window.devicePixelRatio || 1); W = b.width; cv.width = Math.round(b.width * dpr); cv.height = Math.round(b.height * dpr); R = W * 0.42; };
   const ease = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
-  const Q = new Array(N);
+  const Q = Array.from({ length: N }, (_, i) => ({ x: 0, y: 0, z: 0, i })), QS = Q.slice();
+  if (window.ResizeObserver) new ResizeObserver(() => size()).observe(cv); else addEventListener('resize', size);
   function frame(now) {
     if (VNOW === null) requestAnimationFrame(frame); else if (now !== VNOW) return;
-    if (!W || cv.width !== Math.round(cv.getBoundingClientRect().width * dpr)) size();
+    if (!W) size();
     const t = (reduced ? 0.25 : 1) * now / 1000, night = typeof NGT === 'number' ? NGT > .5 : true;
     hov += (hovT - hov) * 0.08;
     // toutes les 9 s, la matière se souvient qu'elle est humaine
@@ -2504,7 +2513,7 @@ requestAnimationFrame(frame);
       let px = X * pp * 1.6, py = Y * pp * 1.6;
       const f = form * (0.85 + 0.15 * lh(i, 11)), g = p.g;
       px += (g[0] - px) * f; py += (g[1] - py) * f;
-      Q[i] = { x: W / 2 + px * R, y: W / 2 + py * R, z: Z * (1 - f), i };
+      const q = Q[i]; q.x = W / 2 + px * R; q.y = W / 2 + py * R; q.z = Z * (1 - f);
     }
     lx.setTransform(dpr, 0, 0, dpr, 0, 0); lx.clearRect(0, 0, W, W);
     // les orbites de l'atome, à peine tracées
@@ -2520,15 +2529,16 @@ requestAnimationFrame(frame);
       lx.lineWidth = 0.6; lx.strokeStyle = night ? `rgba(157,180,255,${(0.22 * (1 - form)).toFixed(3)})` : `rgba(38,78,214,${(0.2 * (1 - form)).toFixed(3)})`; lx.stroke();
     }
     // les liaisons : des neurones qui se touchent, un signal qui passe
-    lx.lineWidth = 0.5;
+    lx.lineWidth = 0.5; lx.strokeStyle = night ? 'rgb(200,212,255)' : 'rgb(20,19,18)';
     for (let a = 3; a < N; a++) for (let b = a + 1; b < N; b++) {
       const A = Q[a], B = Q[b], d = Math.hypot(A.x - B.x, A.y - B.y), lim = W * (0.16 + 0.06 * form);
       if (d > lim) continue;
       const al = (1 - d / lim) * (0.18 + 0.3 * form) * (0.6 + 0.4 * Math.sin(t * 3 + a * 0.7 + b));
-      lx.strokeStyle = night ? `rgba(200,212,255,${al.toFixed(3)})` : `rgba(20,19,18,${(al * .8).toFixed(3)})`;
+      lx.globalAlpha = night ? al : al * .8;
       lx.beginPath(); lx.moveTo(A.x, A.y); lx.lineTo(B.x, B.y); lx.stroke();
     }
-    const order2 = Q.slice().sort((a, b) => a.z - b.z);
+    lx.globalAlpha = 1;
+    const order2 = QS.sort((a, b) => a.z - b.z);
     lx.globalCompositeOperation = night ? 'lighter' : 'source-over';
     for (const q of order2) {
       const p = P[q.i], d = (q.z + 1) / 2, tw = 0.7 + 0.3 * Math.sin(t * (2 + p.tw * 3) + p.tw * 20), s = p.s * (0.7 + 0.6 * d) * (p.kind === 0 ? 1.3 : 1) * (1 + 0.25 * form);
@@ -2555,7 +2565,11 @@ requestAnimationFrame(frame);
   const mk = (col, a) => { const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'), r = x.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, `rgba(${col},${a})`); r.addColorStop(.2, `rgba(${col},${a * .45})`); r.addColorStop(1, `rgba(${col},0)`); x.fillStyle = r; x.fillRect(0, 0, 32, 32); return c; };
   const HN = STAR.map(c => mk(c.join(','), 1)), HD = INK.map(c => mk(c.join(','), .5));
   const MARK = new Path2D('M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z');
-  let P = [], W = 0, H = 0, dpr = 1, hov = 0, hovT = 0, mx = -1e4, my = -1e4, t0 = performance.now(), sig = '';
+  let P = [], W = 0, H = 0, dpr = 1, hov = 0, hovT = 0, mx = -1e4, my = -1e4, t0 = performance.now(), sig = '', RC = null;
+  const CN = STAR.map(c => `rgb(${c.join(',')})`), CD = INK.map(c => `rgb(${c.join(',')})`);
+  const measure = () => { RC = el.getBoundingClientRect(); };
+  addEventListener('resize', measure, { passive: true }); addEventListener('scroll', measure, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(el);
   // la forme : le contour de la pilule, puis le logo, échantillonnés en points
   function build() {
     const r = el.getBoundingClientRect(); W = r.width; H = r.height; dpr = Math.min(2.5, devicePixelRatio || 1);
@@ -2591,8 +2605,8 @@ requestAnimationFrame(frame);
   el.addEventListener('pointerdown', e => { const r = el.getBoundingClientRect(); P.forEach(p => { const dx = p.x - (e.clientX - r.left), dy = p.y - (e.clientY - r.top), d = Math.hypot(dx, dy) + 1; p.vx += dx / d * 5; p.vy += dy / d * 5; }); });
   function frame(now) {
     requestAnimationFrame(frame);
-    if (document.hidden || !el.getClientRects().length) return;
-    const r = el.getBoundingClientRect(), k = `${r.width | 0}x${r.height | 0}`;
+    if (document.hidden || (RC && !RC.width)) return;
+    if (!RC) measure(); const r = RC, k = `${r.width | 0}x${r.height | 0}`;
     if (k !== sig) { sig = k; build(); }
     const t = (now - t0) / 1000, nt = night(), ph = still ? 0 : (t / 6) % 1;
     hov += (hovT - hov) * 0.1;
@@ -2618,7 +2632,7 @@ requestAnimationFrame(frame);
       g.globalAlpha = Math.min(1, (nt ? 0.5 : 0.55) * lit * 0.6);
       g.drawImage((nt ? HN : HD)[p.c], p.x - hs / 2, p.y - hs / 2, hs, hs);
       g.globalAlpha = Math.min(1, (0.6 + 0.4 * tw) * (0.75 + 0.25 * lit));
-      g.fillStyle = `rgb(${(nt ? STAR : INK)[p.c].join(',')})`; g.beginPath(); g.arc(p.x, p.y, Math.max(0.42, sz * 0.5), 0, 6.2832); g.fill();
+      g.fillStyle = (nt ? CN : CD)[p.c]; g.beginPath(); g.arc(p.x, p.y, Math.max(0.42, sz * 0.5), 0, 6.2832); g.fill();
     }
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   }
