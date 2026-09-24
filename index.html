@@ -125,8 +125,19 @@ const fr = s => s.replace(/ ([?:!;])/g, ' $1');
 /* ——— le temps ——— */
 const END = 156;
 const HOLD_AT = 9.3, HOLD = 3.2;
-const story = t => t < HOLD_AT ? t : t < HOLD_AT + HOLD ? HOLD_AT : t - HOLD;
-const realOf = s => s < HOLD_AT ? s : s + HOLD;
+// le temps du film se dilate par endroits : le titre reste affiché, l'atome prend son temps
+const WARP = [[HOLD_AT, HOLD_AT, HOLD], [72.8, 76.6, 9.4]];
+const EXTRA = WARP.reduce((q, w) => q + w[2] - (w[1] - w[0]), 0);
+function story(t) {
+  let off = 0;
+  for (const [a, b, d] of WARP) { const ra = a + off; if (t < ra) return t - off; if (t < ra + d) return a + (t - ra) * (b - a) / d; off += d - (b - a); }
+  return t - off;
+}
+function realOf(s) {
+  let off = 0;
+  for (const [a, b, d] of WARP) { if (s < a || (s === a && b === a)) return s + off; if (s < b) return a + off + (s - a) * d / (b - a); off += d - (b - a); }
+  return s + off;
+}
 let TR = 0;
 const QUESTIONS = ['comment marche une IA ?', 'et moi, comment je marche ?', "qu'est-ce qui me rend vivant ?"];
 let loopN = 0;
@@ -156,7 +167,9 @@ const CAPS = [
   { t0: 130.4, t1: 133.2, text: "Et si on remontait tout, d'un seul coup ?" },
   { t0: 133.6, t1: 137.8, text: 'La complexité de la vie, en accéléré.' },
   { t0: 138.4, t1: 141.6, text: 'Et tout se ramène à ça : un atome.' },
-  { t0: 142, t1: 146, text: "De l'électricité qui circule. Dans un neurone. Dans les paramètres d'une IA." },
+  { t0: 141.9, t1: 142.95, text: "De l'électricité qui circule." },
+  { t0: 143.1, t1: 144.55, text: 'Dans un neurone.' },
+  { t0: 144.7, t1: 146.2, text: "Dans les paramètres d'une IA." },
   { t0: 146.4, t1: 1e9, k: 'final', text: "Si tout est calcul, pourquoi est-ce que ça fait quelque chose d'être moi ?" }
 ];
 CAPS.forEach(c => { c.text = fr(c.text); });
@@ -409,7 +422,7 @@ function buildViews(S0, k, fk) {
 function camera(T) {
   if (T < 44) {
     const pan = eio((T - 24.6) / 5.6);
-    return buildViews(S0b * lerp(1.25, 1, pan), 0, [0, lerp(-0.62, 0, pan)]);
+    return buildViews(S0b * lerp(1.25, 1, pan), 0, [0, lerp(-0.62, C0[1], pan)]);
   }
   const u = uOf(T);
   let k = Math.min(3, Math.floor(u)), phi = u - k;
@@ -742,12 +755,12 @@ function drawNucleus(v, T) {
 
 /* ——— niveau 4 : l'atome. La forme se calcule, chaque point se tire au sort ——— */
 // orbitale 3d(z²) de l'hydrogène : |ψ|² ∝ r⁴·e^(−2r/3)·(3cos²θ − 1)², en rayons de Bohr
-const ORB_S = 0.052, ORB = [], ORBR = [];
+const ORB_S = 0.052, ORB = [], ORB3 = [], ORBR = [];
 const orb3 = (x, y, z) => { const r2 = x * x + y * y + z * z, r = Math.sqrt(r2); if (r < .01) return 0; const an = 3 * z * z / r2 - 1; return r2 * r2 * Math.exp(-2 * r / 3) * an * an; };
 const orbP = (x, y, z) => [x * ORB_S, (-z * .96 + y * .28) * ORB_S];
 for (let k = 0; ORB.length < NPMAX && k < 900000; k++) {
   const x = (hash(k, 701) - .5) * 40, y = (hash(k, 702) - .5) * 40, z = (hash(k, 703) - .5) * 40;
-  if (hash(k, 704) * 96 < orb3(x, y, z)) { ORB.push(orbP(x, y, z)); ORBR.push(Math.hypot(x, y, z)); }
+  if (hash(k, 704) * 96 < orb3(x, y, z)) { ORB.push(orbP(x, y, z)); ORB3.push([x, y, z]); ORBR.push(Math.hypot(x, y, z)); }
 }
 const HB = 12, HR = 1.9;
 const HTH = []; { let s = 0; for (let b = 0; b < HB; b++) { let v = 0; for (let q = 0; q < 10; q++) { const r = (b + (q + .5) / 10) * HR; v += Math.pow(r, 6) * Math.exp(-2 * r / 3); } HTH.push(v); s += v; } HTH.forEach((v, b) => { HTH[b] = v / s; }); }
@@ -1086,35 +1099,124 @@ function drawFinale(T) {
     if (age > 0 && age < 0.5 && T < M0) { glow(true); spr(cx, cy, 30 + 140 * age, .55 * (1 - age / 0.5), b); glow(false); }
   });
   if (T < MEND - 0.2) return;
-  const v = camera(74)[4], c = MP(v, 0, 0), S = v.S, fa = rv(T, MEND - 0.2, .8);
-  glow(true); spr(c[0], c[1], 0.2 * S * (1 + 0.08 * Math.sin(T * 3)), .22 * fa, 0); glow(false);
-  for (let k = 0; k < 14; k++) { const p = MP(v, (hash(k, 31) - .5) * 0.09, (hash(k, 32) - .5) * 0.09); spr(p[0], p[1], 0.018 * S, .95 * fa, k); }
-  const ls = Math.floor(T * 3), age = T * 3 - ls;
-  glow(true);
-  for (let e = 0; e < 3; e++) {
-    const sd = ls * 7 + e; if (hash(sd, 1) < 0.35) continue;
-    const an = hash(sd, 2) * TAU, len = (0.55 + 0.4 * hash(sd, 3)) * S, P = [c];
-    for (let s = 1; s <= 9; s++) { const d = len * s / 9, j = (hash(sd, s + 10) - .5) * 0.14 * len; P.push([c[0] + Math.cos(an) * d - Math.sin(an) * j, c[1] + Math.sin(an) * d + Math.cos(an) * j]); }
-    pen(P, .9 * fa * (1 - age), 1.6); pen(P, .22 * fa * (1 - age), 7);
-  }
-  glow(false);
-  if (T > 146.9) ribbon(ensoPts(c[0], c[1], 0.41 * MM, 200, 320, 50, 0.02, 7), 0.024 * MM, { alpha: .9, prog: rv(T, 147, 3), taper: [.04,.55], dry: .6, seed: 7 });
-  const items = [['ATOME', 'des charges qui bougent :', "l'électricité"], ['NEURONE', '86 milliards, reliés par', 'des signaux électriques'], ['IA', 'des centaines de milliards', 'de paramètres : des nombres']];
-  const cw = LAND ? Math.min(260, W * 0.21) : W * 0.88, chh = LAND ? 92 : 52, gap = 22;
+  drawCircuit(T, rv(T, MEND - .2, .8));
+}
+
+/* ——— le courant : atome → neurone → IA → atome, un seul circuit ——— */
+function finLayout(T) {
+  const R = LAND ? 0.31 * MM : 0.36 * W, cx = CX, cy = LAND ? H * 0.57 : H * 0.58, sh = eio((T - 141.4) / 1.3);
+  return { R, cx, cy, ac: [lerp(CX, cx, sh), lerp(LAND ? H * 0.52 : H * 0.5, cy - R, sh)], as: lerp(LAND ? 0.36 * MM : 0.42 * W, 0.15 * MM, sh), sh };
+}
+const cirPt = (L, s) => { const th = -Math.PI / 2 + s * TAU; return [L.cx + Math.cos(th) * L.R, L.cy + Math.sin(th) * L.R]; };
+const cirFr = s => { const th = -Math.PI / 2 + s * TAU; return { t: [-Math.sin(th), Math.cos(th)], n: [Math.cos(th), Math.sin(th)] }; };
+const FC = 146.9, FV = 0.3;
+function finFront(T) { return T < 142.2 ? 0 : T < 143.3 ? eio((T - 142.2) / 1.1) / 3 : T < 144.3 ? 1 / 3 : T < 145.2 ? 1 / 3 + eio((T - 144.3) / .9) / 3 : T < 145.9 ? 2 / 3 : T < FC ? 2 / 3 + eio((T - 145.9) / 1) / 3 : 1; }
+// l'onde qui fait le tour une fois le cercle fermé : 3 paquets, un tour en 3,3 s
+const band = (s, T) => T < FC ? 0 : rv(T, FC, 1) * Math.pow(Math.max(0, Math.sin(TAU * (3 * s - 0.9 * (T - FC)))), 6);
+const finRel = i => 142.2 + PA[i] * 4.4;
+function finS(i, T) {
+  const fr = (T - finRel(i)) * FV;
+  if (T < FC) return Math.max(0, Math.min(fr, finFront(T) - PB[i] * PB[i] * 0.12));
+  const c = Math.max(0, Math.min((FC - finRel(i)) * FV, 1 - PB[i] * PB[i] * 0.12));
+  return (c + (T - FC) * FV) % 1;
+}
+function finLabel(p, n, head, line, a, right) {
   const sv = DISP; DISP = false;
-  items.forEach((it, k) => {
-    const a = rv(T, 141.8 + k * 0.6, .6); if (a <= 0) return;
-    let x0, y0;
-    if (LAND) { const tot = 3 * cw + 2 * gap; x0 = CX - tot / 2 + k * (cw + gap); y0 = H - chh - 70; }
-    else { x0 = (W - cw) / 2; y0 = H - 92 - (3 - k) * (chh + 8); }
-    ctx.globalAlpha = .86 * a; ctx.fillStyle = BG; ctx.fillRect(x0, y0, cw, chh);
-    ctx.globalAlpha = .35 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, cw - 1, chh - 1); ctx.globalAlpha = 1;
-    cardIcon(k, x0 + 30, y0 + chh / 2, a);
-    if (LAND) { txt(it[0], x0 + 60, y0 + 22, 11, 'm', .7 * a); txt(it[1], x0 + 60, y0 + 46, 14, 'd', .95 * a); txt(it[2], x0 + 60, y0 + 66, 14, 'd', .95 * a); }
-    else { txt(it[0], x0 + 60, y0 + 16, 10, 'm', .7 * a); txt(`${it[1]} ${it[2]}`, x0 + 60, y0 + 35, 12, 'd', .95 * a); }
-    if (LAND && k > 0) txt('→', x0 - gap / 2, y0 + chh / 2, 18, 'd', .8 * a, 'center');
-  });
+  const al = right === 'c' ? 'center' : right === undefined ? (n[0] >= -0.2 ? 'left' : 'right') : right ? 'left' : 'right';
+  txt(head, p[0], p[1], 12, 'm', .7 * a, al, true);
+  txt(line, p[0], p[1] + 22, LAND ? 18 : 15, 'd', .95 * a, al, true);
   DISP = sv;
+}
+function drawCircuit(T, fa) {
+  const L = finLayout(T), F = finFront(T), S = L.as, c = L.ac, U = (LAND ? 0.14 : 0.12) * MM;
+  // l'atome : un noyau qui bat, trois orbites qui tournent, des électrons à comète
+  glow(true); spr(c[0], c[1], 0.55 * S * (1 + 0.1 * Math.sin(T * 4)), .2 * fa * (1 + band(0, T)), 0); glow(false);
+  const nr = Math.max(1.6, 0.03 * S);
+  ctx.lineWidth = Math.max(.8, nr * .3); ctx.strokeStyle = FG; ctx.fillStyle = FG;
+  for (let k = 0; k < 9; k++) { const an = k * 2.4 + T * 0.8, d = k ? nr * (k < 4 ? 1.1 : 1.9) * (1 + 0.08 * Math.sin(T * 9 + k)) : 0; ctx.globalAlpha = .95 * fa; ctx.beginPath(); ctx.arc(c[0] + Math.cos(an) * d, c[1] + Math.sin(an) * d, nr, 0, TAU); if (k % 2) ctx.stroke(); else ctx.fill(); }
+  ctx.globalAlpha = 1;
+  for (let k = 0; k < 3; k++) {
+    const rot = k * Math.PI / 3 + T * 0.25, rx = 0.82 * S, ry = 0.26 * S, cr = Math.cos(rot), sr = Math.sin(rot);
+    const E = u => { const x = Math.cos(u) * rx, y = Math.sin(u) * ry; return [c[0] + x * cr - y * sr, c[1] + x * sr + y * cr]; };
+    const O = []; for (let u = 0; u <= TAU + .01; u += TAU / 70) O.push(E(u));
+    pen(O, .38 * fa, Math.max(.8, 0.006 * S));
+    const ph = T * (2.4 + k * 0.5) + k * 2.1;
+    glow(true);
+    for (let q = 12; q >= 0; q--) { const p = E(ph - q * 0.07); spr(p[0], p[1], Math.max(1.2, (q ? 0.028 : 0.05) * S * (1 - q / 14)), fa * (q ? .5 * (1 - q / 13) : 1), q); }
+    glow(false);
+  }
+  // les éclairs, tant que l'atome est seul
+  const la = fa * (1 - rv(T, 141.4, .8));
+  if (la > 0.01) {
+    const ls = Math.floor(T * 3), age = T * 3 - ls; glow(true);
+    for (let e = 0; e < 3; e++) {
+      const sd = ls * 7 + e; if (hash(sd, 1) < 0.35) continue;
+      const an = hash(sd, 2) * TAU, len = (0.55 + 0.4 * hash(sd, 3)) * S * 1.3, P = [c];
+      for (let s = 1; s <= 9; s++) { const d = len * s / 9, j = (hash(sd, s + 10) - .5) * 0.14 * len; P.push([c[0] + Math.cos(an) * d - Math.sin(an) * j, c[1] + Math.sin(an) * d + Math.cos(an) * j]); }
+      pen(P, .9 * la * (1 - age), 1.6); pen(P, .22 * la * (1 - age), 7);
+    }
+    glow(false);
+  }
+  if (L.sh < 0.98) return;
+  // le fil : l'ensō se peint à mesure que le courant avance
+  if (F > 0.02) {
+    const P = []; for (let s = 0.02; s <= Math.min(F, 0.985); s += 0.006) P.push(cirPt(L, s));
+    if (P.length > 2) ribbon(P, 0.02 * MM, { alpha: .9, taper: [.04, T < FC ? .15 : .55], dry: .55, seed: 7 });
+  }
+  const aP = LAND ? [c[0] + 0.19 * MM, c[1] - 10] : [c[0], c[1] + 0.19 * MM];
+  finLabel(aP, [1, 0], 'ATOME', 'des charges qui bougent', rv(T, 142.3, .6), LAND ? true : 'c');
+  // le neurone, sur le fil
+  const na = rv(T, 142.9, .7);
+  if (na > 0) {
+    const sN = 1 / 3, p = cirPt(L, sN), fr = cirFr(sN), t = fr.t, n = fr.n;
+    const charge = T < 144.3 ? c01((T - 143.3) / 1) : 0, fire = T < FC ? Math.exp(-Math.pow((T - 144.35) / .12, 2)) : band(sN, T);
+    for (let k = -1; k <= 1; k++) {
+      const e = [p[0] - t[0] * 0.95 * U + n[0] * k * 0.55 * U, p[1] - t[1] * 0.95 * U + n[1] * k * 0.55 * U], mid = [(p[0] + e[0]) / 2 + n[0] * k * 0.1 * U, (p[1] + e[1]) / 2 + n[1] * k * 0.1 * U];
+      ribbon([p, mid, e], 2.6, { alpha: .85 * na, prog: rv(T, 142.9 + (k + 1) * .12, .7), taper: [.05, .5], dry: 0, seed: k + 60 });
+      for (const sg of [-1, 1]) ribbon([e, [e[0] - t[0] * 0.22 * U + n[0] * sg * 0.14 * U, e[1] - t[1] * 0.22 * U + n[1] * sg * 0.14 * U]], 1.4, { alpha: .6 * na, prog: rv(T, 143.3, .5), dry: 0 });
+      if (T > 143 && T < FC) { const u = ((T - 143) * 1.3 + k * .3) % 1; const q = along([e, mid, p], u); glow(true); spr(q[0], q[1], 3, .8 * na, k + 1); glow(false); }
+    }
+    ctx.globalAlpha = na; ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(p[0], p[1], 0.2 * U, 0, TAU); ctx.fill(); ctx.strokeStyle = FG; ctx.lineWidth = 2.2; ctx.stroke(); ctx.globalAlpha = 1;
+    glow(true); spr(p[0], p[1], 0.2 * U * (0.5 + 0.4 * charge + 0.6 * fire), (.25 + .35 * charge + .45 * fire) * na, 3);
+    if (fire > .05) { ctx.globalAlpha = .6 * fire * na; ctx.strokeStyle = FG; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p[0], p[1], 0.2 * U + (1 - fire) * 0.6 * U, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; }
+    glow(false);
+    // l'oscilloscope : le potentiel du neurone, en direct
+    const ow = 1.6 * U, oh = 0.55 * U, ox = LAND ? p[0] + n[0] * 0.55 * U : p[0] - ow / 2, oy = LAND ? p[1] + n[1] * 0.4 * U + 0.35 * U : p[1] + 1.45 * U, Pv = [];
+    for (let k = 0; k <= 60; k++) {
+      const tt = T - 2 + k / 30, ch = tt < 144.3 ? c01((tt - 143.3) / 1) : 0, sp = tt < FC ? Math.exp(-Math.pow((tt - 144.35) / .06, 2)) : band(sN, tt);
+      const mv = -70 + 15 * ch + 100 * sp; Pv.push([ox + k / 60 * ow, oy + oh - (mv + 80) / 120 * oh]);
+    }
+    pen([[ox, oy + oh - 10 / 120 * oh], [ox + ow, oy + oh - 10 / 120 * oh]], .35 * na, 1, [3, 3]);
+    pen(Pv, .9 * na * rv(T, 143.2, .5), 1.6);
+    const sv = DISP; DISP = false;
+    txt(`${Math.round(-70 + 15 * charge + 100 * fire)} mV`, ox + ow + 6, Pv[60][1], 11, 'm', .85 * na * rv(T, 143.2, .5), 'left', true);
+    DISP = sv;
+    finLabel(LAND ? [ox, oy - 34] : [p[0], p[1] + 0.62 * U], [1, 0], 'NEURONE', 'un signal électrique', na, LAND ? true : 'c');
+  }
+  // l'IA : des couches de nombres, traversées par le même courant
+  const ia = rv(T, 144.8, .7);
+  if (ia > 0) {
+    const sI = 2 / 3, p = cirPt(L, sI), fr = cirFr(sI), t = fr.t, n = fr.n, LY = [3, 4, 4, 2], nodes = [];
+    LY.forEach((cnt, l) => { const row = []; for (let j = 0; j < cnt; j++) { const d = (l - 1.5) * 0.55 * U, o = (j - (cnt - 1) / 2) * 0.42 * U; row.push([p[0] + t[0] * d + n[0] * o, p[1] + t[1] * d + n[1] * o]); } nodes.push(row); });
+    const act = l => T < FC ? Math.exp(-Math.pow((T - (145.25 + l * 0.16)) / 0.1, 2)) : band(sI + (l - 1.5) * 0.012, T);
+    for (let l = 0; l < LY.length - 1; l++) nodes[l].forEach((A, j) => nodes[l + 1].forEach((B, q) => {
+      const w = hash(l * 31 + j * 7 + q, 5) * 2 - 1, g = act(l + .5);
+      pen([A, B], (.18 + .5 * Math.abs(w) * g + .1 * Math.abs(w)) * ia * rv(T, 144.9 + l * .12, .5), 1 + Math.abs(w) * 1.5 * (1 + g), w < 0 ? [3, 3] : null);
+    }));
+    nodes.forEach((row, l) => row.forEach((A, j) => {
+      const g = act(l);
+      ctx.globalAlpha = ia; ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(A[0], A[1], 0.1 * U, 0, TAU); ctx.fill(); ctx.strokeStyle = FG; ctx.lineWidth = 1.4; ctx.stroke(); ctx.globalAlpha = 1;
+      if (g > .03) { ctx.globalAlpha = g * ia; ctx.fillStyle = FG; ctx.beginPath(); ctx.arc(A[0], A[1], 0.06 * U, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; glow(true); spr(A[0], A[1], 0.1 * U, .35 * g * ia, j); glow(false); }
+    }));
+    const sv = DISP; DISP = false;
+    for (let k = 0; k < 4; k++) { const A = nodes[1][k], B = nodes[2][(k + 1) % 4], w = hash(Math.floor(T * 5) * 13 + k, 9) * 2 - 1; txt(fx(w, 2), (A[0] + B[0]) / 2, (A[1] + B[1]) / 2 - 8, 10, 'm', .7 * ia * rv(T, 145.2, .5), 'center', true); }
+    DISP = sv;
+    const lp = LAND ? [p[0] + n[0] * 1.1 * U, p[1] + n[1] * 1.1 * U + 0.3 * U] : [Math.max(p[0], 90), p[1] + 1.05 * U];
+    finLabel(lp, n, 'IA', 'des milliards de poids', ia, LAND ? false : 'c');
+  }
+  // au centre : le même courant
+  const ca = rv(T, FC + .6, 1);
+  if (ca > 0) { const sv = DISP; DISP = false; txt('le même courant', L.cx, L.cy + (LAND ? 0.02 : 0.1) * MM, Math.round(Math.min(26, 0.035 * MM)), 'd', .9 * ca, 'center', true); txt('atome · neurone · IA', L.cx, L.cy + (LAND ? 0.02 : 0.1) * MM + 26, 11, 'm', .6 * ca, 'center', true); DISP = sv; }
 }
 
 /* ——— les particules : le fil rouge ——— */
@@ -1276,12 +1378,12 @@ function shape(name, i, T, V, o) {
       o.s = 1.2 + 1.6 * Math.max(0, 1 - age / 2.5); o.a = Math.exp(-age * 0.9) * (0.55 + 0.45 * hash(i, Math.floor(T * 14))); return;
     }
     case 'atomF': {
-      const vA = V.vA; if (!vA) { o.a = 0; return; }
-      const k = Math.floor(T * 8 + PA[i] * 8), u1 = hash(i, k * 5 + 1), u2 = hash(i, k * 5 + 2), u3 = hash(i, k * 5 + 3), u4 = hash(i, k * 5 + 4);
-      let x, y;
-      if (u1 < 0.7) { const al = (u2 < .5 ? -1 : 1) * (0.2 + 0.62 * Math.pow(u3, 0.6)); x = (u4 - .5) * 2 * 0.34 * Math.sin(Math.PI * c01((Math.abs(al) - 0.2) / 0.62)); y = al; }
-      else { const an = u2 * TAU, rr = 0.36 + (u3 - .5) * 0.12; x = Math.cos(an) * rr; y = Math.sin(an) * rr * 0.22; }
-      const q = MP(vA, x, y); o.x = q[0]; o.y = q[1]; o.s = 1.5; o.a = .95; return;
+      const L = finLayout(T), P3 = ORB3[i % ORB3.length], rot = T * 0.8, cr = Math.cos(rot), sr = Math.sin(rot);
+      const q = orbP(P3[0] * cr - P3[1] * sr, P3[0] * sr + P3[1] * cr, P3[2]), cx = L.ac[0] + q[0] * L.as, cy = L.ac[1] + q[1] * L.as;
+      const k = c01((T - finRel(i)) / 0.35);
+      if (k <= 0) { o.x = cx; o.y = cy; o.s = 1.4; o.a = .85; return; }
+      const sP = finS(i, T), p = cirPt(L, sP), fr = cirFr(sP), off = GX[i] * 0.008 * MM, b = band(sP, T);
+      o.x = lerp(cx, p[0] + fr.n[0] * off, k); o.y = lerp(cy, p[1] + fr.n[1] * off, k); o.s = 1.3 + 1.6 * b; o.a = .65 + .35 * b; return;
     }
     case 'atom': {
       const age = T - atd(i), v4 = V.v[4];
@@ -1597,9 +1699,12 @@ function lensLens(T, V) {
   }
   if (T >= M0 && T < MEND) return ['la vie, en accéléré', ['étoiles → atomes → ADN → fleur → cerveau', '13,8 milliards d’années', 'en 6 secondes']];
   if (T > MEND + 0.5) {
-    const c = MP(camera(74)[4], 0, 0);
-    if (Math.hypot(x - c[0], y - c[1]) > 0.45 * MM) return null;
-    return ["l'électron", ['charge : −1,602 × 10⁻¹⁹ C', 'quand il bouge : du courant', 'neurone ≈ 0,07 V · transistor ≈ 1 V', 'la même électricité, partout']];
+    const L = finLayout(T), E = [[L.ac, "l'électron", ['charge : −1,602 × 10⁻¹⁹ C', 'quand il bouge : du courant', '≈ 10⁻¹⁰ m, presque du vide']]];
+    if (T > 143) E.push([cirPt(L, 1 / 3), 'un neurone', ['repos : −70 mV', 'il décharge à +30 mV, en 1 ms', 'des ions qui passent : du courant']]);
+    if (T > 145) E.push([cirPt(L, 2 / 3), 'une IA', ['y = σ(Σ wᵢ·xᵢ + b)', 'des milliards de poids w', 'dans des transistors : ≈ 1 V']]);
+    let b = null, bd = (0.16 * MM) ** 2; E.forEach(e => { const d = (e[0][0] - x) ** 2 + (e[0][1] - y) ** 2; if (d < bd) { bd = d; b = e; } });
+    if (b) { lensRing(b[0], 0.08 * MM, 1); return [b[1], b[2]]; }
+    if (T > FC && Math.abs(Math.hypot(x - L.cx, y - L.cy) - L.R) < 0.05 * MM) return ['le courant', ['I = dQ / dt', 'des charges qui circulent', 'la même chose, partout']];
   }
   return null;
 }
@@ -1773,9 +1878,12 @@ function audioFrame(T) {
   if (crossed(p, T, 117.2)) { tone(196, 3, .05); tone(294, 3, .03, { delay: .4 }); }
   FW.forEach((F, b) => { if (crossed(p, T, F.t - 0.7)) tone(500 + b * 40, .7, .025, { to: 1500 + b * 60, pan: F.x * 2 - 1 }); if (crossed(p, T, F.t)) { tone(55 + hash(b, 5) * 40, 1.4, .22, { to: 38, pan: F.x * 2 - 1 }); noise(1.4, .16, { f: 3500, q: .6, att: .01 }); } });
   { let t0 = M0; MONT.forEach(([, d], k) => { if (crossed(p, T, t0)) { noise(.35, .12, { f: 800 + k * 300, to: 4000, q: .8 }); tone(PENT[(9 - k) % 10], .4, .04); } t0 += d; }); }
-  if (T > MEND && Math.floor(T * 3) !== Math.floor(p * 3) && hash(Math.floor(T * 3) * 7, 1) >= 0.35) noise(.22, .09, { f: 180, q: 6 });
-  for (let k = 0; k < 3; k++) if (crossed(p, T, 141.8 + k * 0.6)) tone(PENT[3 + k * 2], 1.6, .05);
-  if (crossed(p, T, 147)) { tone(98, 7, .14, { att: .02 }); tone(196.4, 6, .05); tone(294.2, 5, .025); }
+  if (T > MEND && T < 141.8 && Math.floor(T * 3) !== Math.floor(p * 3) && hash(Math.floor(T * 3) * 7, 1) >= 0.35) noise(.22, .09, { f: 180, q: 6 });
+  if (crossed(p, T, 142.2)) tone(PENT[3], 1.6, .05);
+  if (crossed(p, T, 144.35)) { tone(PENT[5], 1.2, .07, { type: 'triangle' }); noise(.06, .12, { f: 2500 }); }
+  for (let l = 0; l < 4; l++) if (crossed(p, T, 145.25 + l * .16)) tone(PENT[6 + l], .3, .04);
+  if (T > FC) { const a = Math.floor(3 * (p - FC) * 0.9 * 3), b = Math.floor(3 * (T - FC) * 0.9 * 3); if (b !== a) tone(PENT[[0, 5, 7][((b % 3) + 3) % 3]] * 2, .25, .018); }
+  if (crossed(p, T, FC)) { tone(98, 7, .14, { att: .02 }); tone(196.4, 6, .05); tone(294.2, 5, .025); }
 }
 
 /* ——— la souris déforme la matière, sans arrêter le film ——— */
@@ -1843,8 +1951,8 @@ function updateChap(T) {
 let T = reduced ? realOf(8.8) : 0, playing = !reduced, last = performance.now(), prevLogS = 0, slow = 0;
 const endEl = document.getElementById('end'), ppBtn = document.getElementById('pp');
 function setPlaying(p) { playing = p; ppBtn.textContent = p ? 'Pause' : 'Lecture'; jump = true; }
-function seek(t, play) { T = Math.max(0, Math.min(END + HOLD, t)); jump = true; if (play && !reduced) setPlaying(true); }
-ppBtn.addEventListener('click', () => { if (T >= END + HOLD) seek(0); setPlaying(!playing); });
+function seek(t, play) { T = Math.max(0, Math.min(END + EXTRA, t)); jump = true; if (play && !reduced) setPlaying(true); }
+ppBtn.addEventListener('click', () => { if (T >= END + EXTRA) seek(0); setPlaying(!playing); });
 if (reduced) ppBtn.textContent = 'Lecture';
 document.getElementById('again').addEventListener('click', () => { seek(0); setPlaying(!reduced); });
 document.getElementById('rst').addEventListener('click', () => { loopN = 0; live.forEach(el => el.remove()); live.clear(); seek(reduced ? realOf(REST[0]) : 0); if (!reduced) setPlaying(true); });
@@ -1873,13 +1981,13 @@ function resize() {
   cv.width = sc.width = Math.round(W * DPR); cv.height = sc.height = Math.round(H * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   bl.width = Math.max(1, Math.ceil(cv.width / 6)); bl.height = Math.max(1, Math.ceil(cv.height / 6));
-  LAND = W / H > 1.15; MM = Math.min(W, H);
+  LAND = W / H > 1.15; MM = Math.min(W, H); C0[1] = LAND ? 0 : -0.16;
   S0b = Math.min(H, W / 1.5);
   CX = W / 2 + (LAND ? 0.1 * W : 0); CY = H / 2 + (LAND ? 0 : -0.06 * H);
   NP = W * H < 520000 ? 1200 : 2400; CPN = W * H < 520000 ? 2600 : 4200;
   zMoon = 0.34 * MM / (0.07 * S0b);
   CF = [CX, CY]; RF = 0.3 * MM;
-  SP = Math.min(0.62 * H / 470, 0.92 * W / 620); PGAP = 0.09 * MM; PCX = CX + (LAND ? 0.02 * W : 0); PCY = LAND ? H * 0.5 : H * 0.4;
+  SP = LAND ? Math.min(0.6 * H / 470, 0.92 * W / 620) : Math.min(0.5 * H / 470, 0.98 * W / 560); PGAP = 0.09 * MM; PCX = CX + (LAND ? 0.02 * W : 0); PCY = LAND ? H * 0.55 : H * 0.56;
   computeSK(); buildTitle(); buildCaps(); jump = true;
 }
 addEventListener('resize', resize);
@@ -1940,8 +2048,8 @@ function render(T) {
 
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (playing && T < END + HOLD) T = Math.min(END + HOLD, T + dt);
-  if (playing && T >= END + HOLD) { loopN++; seek(0); }
+  if (playing && T < END + EXTRA) T = Math.min(END + EXTRA, T + dt);
+  if (playing && T >= END + EXTRA) { loopN++; seek(0); }
   if (playing && dt > 0.034 && DPR > 1) { if (++slow > 90) { dprCap = 1; slow = 0; resize(); } } else slow = Math.max(0, slow - 1);
   if (!playing && (Math.abs(SMX - MX) > .5 || Math.abs(SMY - MY) > .5 || Math.abs(MACT - MIN) > .01)) needs = true;
   if (playing || jump || needs) { TR = T; render(story(T)); needs = false; }
