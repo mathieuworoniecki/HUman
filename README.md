@@ -8,7 +8,7 @@ Ouvrir `index.html` dans un navigateur. Aucune dépendance, aucun build.
 
 Dix langues : français, anglais, chinois, hindi, espagnol, arabe, bengali, portugais, russe et japonais. L'expérience prend automatiquement la langue du navigateur (l'anglais sinon). Le sélecteur en haut permet d'en changer, et `index.html#lang=ja` force une langue.
 
-- Lecture automatique, environ 2 min 40, puis un écran de fin : des questions pour prolonger la réflexion et des lectures pour aller plus loin
+- Lecture automatique, environ 2 min 40, puis un écran de fin : une sphère de points tourne dans le ciel, les questions s'y forment en particules et se transforment l'une en l'autre, et cinq lectures brillent comme des étoiles (la loupe les présente)
 - Un clic sur le film : pause ou lecture
 - La barre des chapitres, en bas, se glisse pour avancer ou reculer
 - Molette ou glisser : avancer et reculer dans le temps
@@ -17,7 +17,7 @@ Dix langues : français, anglais, chinois, hindi, espagnol, arabe, bengali, port
 - La souris déforme la matière sans arrêter le film : les graines s'écartent, l'électron la suit, la mer ondule, les neurones s'allument
 - Sous la souris, une loupe montre le calcul caché de ce qu'on survole : l'angle d'une graine, l'onde d'une vague, le vecteur d'un mot, la probabilité de l'électron, la somme d'un neurone
 - Les phrases s'écrivent en particules en haut à gauche, se fixent à l'encre, puis se transforment en la phrase suivante
-- « Revoir » relance le film, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
+- Les questions de la fin tournent en boucle ; « Revoir » relance le film, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
 
 ## Traductions
 
