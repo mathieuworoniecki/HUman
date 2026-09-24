@@ -4,16 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sommes-nous des IA ?</title>
-<meta name="description" content="Une réflexion de Mathieu, à l'encre de Chine : et si nous étions le plus gros LLM jamais observé ?">
+<meta name="description" content="A reflection by Mathieu, drawn in ink and particles: what if we were the biggest LLM ever observed?">
+<link rel="canonical" href="https://areweai.dev/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="HUman — Et si nous étions le plus gros LLM jamais observé ?">
-<meta property="og:description" content="Une expérience animée, en dix langues : de l'IA à la fleur, de l'atome au cerveau. Et toi, qu'en penses-tu ?">
-<meta property="og:image" content="media/og.png">
+<meta property="og:url" content="https://areweai.dev/">
+<meta property="og:site_name" content="HUman">
+<meta property="og:title" content="HUman — What if we were the biggest LLM ever observed?">
+<meta property="og:description" content="An animated experience in ten languages: from AI to a flower, from the atom to the brain. And you, what do you think?">
+<meta property="og:image" content="https://areweai.dev/media/og-en.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="HUman — Et si nous étions le plus gros LLM jamais observé ?">
-<meta name="twitter:image" content="media/og.png">
+<meta name="twitter:title" content="HUman — What if we were the biggest LLM ever observed?">
+<meta name="twitter:description" content="An animated experience in ten languages. Are we AI?">
+<meta name="twitter:image" content="https://areweai.dev/media/og-en.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><g fill='none' stroke='%239db4ff' stroke-opacity='.55' stroke-width='2'><ellipse cx='32' cy='32' rx='27' ry='10' transform='rotate(-30 32 32)'/><ellipse cx='32' cy='32' rx='27' ry='10' transform='rotate(30 32 32)'/></g><circle cx='32' cy='32' r='7' fill='%23f8f7ff'/><circle cx='52' cy='21' r='5' fill='%239db4ff'/><circle cx='13' cy='42' r='4.5' fill='%23ff7a5c'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2093,8 +2097,8 @@ document.getElementById('of').innerHTML = LX.further.map(([t, a, d]) => `<li>${t
 if (RTL) outEl.dir = 'rtl';
 /* ——— le partage : simple — une question, quatre gestes ——— */
 // l'adresse partagée : celle du site quand il est en ligne, sinon celle de la page publiée
-const ART_URL = 'https://claude.ai/artifact/85V9kRb5gVzUxDq9aKPkCm';
-const shareUrl = () => { const web = /^https?:$/.test(location.protocol) && !/claudeusercontent|claude\.ai|localhost|127\.0\.0\.1/.test(location.host); return web ? location.origin + location.pathname + (LANG !== 'en' ? '#lang=' + LANG : '') : ART_URL; };
+const ART_URL = 'https://areweai.dev/';
+const shareUrl = () => { const web = /^https?:$/.test(location.protocol) && !/claudeusercontent|claude\.ai|localhost|127\.0\.0\.1/.test(location.host); return (web ? location.origin + location.pathname : ART_URL) + (LANG !== 'en' ? '#lang=' + LANG : ''); };
 const SHQ = fr(LX.sr_title.replace(/ /g, ' '));
 const curQuestion = () => SHQ;
 let NOUI = false; const SNAP = {}, SBG = 'stars';

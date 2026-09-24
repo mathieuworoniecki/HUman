@@ -1,5 +1,7 @@
 # HUman
 
+En ligne : https://areweai.dev
+
 *Et si nous étions le plus gros LLM jamais observé ?*
 
 Une expérience plein écran à l'encre de Chine qui déroule la réflexion de Mathieu, sans scroll. Un point de lumière bat, puis éclate en milliers de lettres qui écrivent le titre, puis on traverse l'espace des mots où une phrase se construit, mot par mot, par tirage au sort. Les mots deviennent les étoiles d'une nuit au bord de la mer, où le regard du bonhomme révèle les calculs du paysage, puis on plonge dans une fleur, une graine, une cellule, l'ADN et un atome, où l'électron apparaît tirage après tirage jusqu'à dessiner la forme que le calcul prévoit. Ce nuage explose en étoiles, qui forment une galaxie, puis un réseau cosmique. Ce réseau devient des neurones, puis un visage. Un feu d'artifice remonte toute l'histoire en accéléré jusqu'à un atome vivant : ses électrons partent en courant, allument un neurone, traversent les couches d'une IA et reviennent à l'atome en peignant l'ensō, un seul circuit où passe le même courant.
@@ -19,7 +21,7 @@ Dix langues : français, anglais, chinois, hindi, espagnol, arabe, bengali, port
 - À la fin, on reste : la dernière question demeure dans la sphère qui tourne. « Revoir » relance le film,
 - Partage : quatre boutons (X, Reddit, Instagram, lien) flottent autour des questions sur un circuit qui contourne le texte, reliés à la sphère par un fil de lumière. Après la dernière question, ils glissent vers le centre et se fondent dans un cadre simple : la question du début (dans la langue du visiteur) et les quatre mêmes boutons. X et Reddit ouvrent un post prérempli (question, lien, #AI #LLM) ; Instagram, qui n'a pas de lien de partage, reçoit une carte 4:5 prête à publier (partagée directement depuis un téléphone, sinon enregistrée, avec le lien copié) ; le dernier copie le lien, ou ouvre le menu de partage du téléphone.
 - Le logo est vivant : des étoiles naines (blanches, bleues, rouges) en orbite comme les électrons d'un atome, reliées comme des neurones, qui se rassemblent régulièrement en 人 ; au survol, elles forment 人 aussitôt
-- Aperçu Open Graph : `media/og.png` (et `media/og-en.png`). Une fois le site hébergé, remplacer `media/og.png` par son adresse complète dans les balises `og:image` et `twitter:image`
+- Aperçu Open Graph : `media/og-en.png` (servi depuis https://areweai.dev), et `media/og.png` en français
 
 ## Traductions
 
