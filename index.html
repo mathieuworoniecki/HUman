@@ -69,7 +69,9 @@ body{cursor:none}
   #end{bottom:auto;top:calc(64px + env(safe-area-inset-top,0px))}
   #chap .lbl{opacity:0}
   #chap button.on .lbl{opacity:1;overflow:visible}
-  .hint,.brand small{display:none}
+  .hint,.brand small,.brand b{display:none}
+  .ctrl{gap:.35rem}
+  .btn{padding:.5rem .65rem;letter-spacing:.08em}
 }
 @media (prefers-reduced-motion:reduce){
   .cap,.cap .ch,#end{transition:none}
@@ -86,7 +88,7 @@ body{cursor:none}
 <div class="ctrl">
   <button class="btn" id="snd" type="button" aria-pressed="false">Activer le son</button>
   <button class="btn" id="pp" type="button">Pause</button>
-  <button class="btn" id="rst" type="button">Recommencer</button>
+  <button class="btn" id="rst" type="button">Rejouer</button>
 </div>
 
 <div id="caps" aria-hidden="true"></div>
@@ -127,8 +129,8 @@ let loopN = 0;
 const CH = [[0,'Ouverture'],[10,"L'IA"],[23.2,'Le monde'],[44,'La fleur'],[58.5,'Au fond'],[76.5,"L'univers"],[96.5,'Le cerveau'],[106,'Le miroir'],[120,'La question']];
 const REST = [8.8, 21, 41.5, 55, 69, 88, 104, 117, 132];
 const CAPS = [
-  { t0: 11.4, t1: 15.4, text: "Pour une IA, chaque mot est un point dans l'espace." },
-  { t0: 15.8, t1: 22.8, text: 'Une phrase est un chemin. Le mot suivant : un calcul, puis un tirage au sort.' },
+  { t0: 11.2, t1: 14.0, text: "Pour une IA, chaque mot est un point dans l'espace." },
+  { t0: 14.4, t1: 22.6, text: 'Une phrase est un chemin. Le mot suivant : un calcul, puis un tirage au sort.' },
   { t0: 23.4, t1: 27.8, text: "J'ai voulu comprendre l'IA. J'ai trouvé des maths." },
   { t0: 28.2, t1: 32.6, text: "Alors j'ai levé les yeux." },
   { t0: 33, t1: 37.8, text: 'Et partout où je regardais, des calculs.' },
@@ -279,12 +281,13 @@ function pen(P, a, w, dash, prog) {
   }
   ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
 }
-function txt(s, x, y, px, f, a, align) {
+function txt(s, x, y, px, f, a, align, halo) {
   if (a <= 0.004 || px > 500 || px < 1) return;
   if (DISP && MACT > 0.01) { dsp(x, y); x = DX; y = DY; }
   ctx.globalAlpha = c01(a); ctx.fillStyle = FG;
   ctx.font = `${f === 'd' ? 500 : 400} ${px}px ${f === 'd' ? DISPLAY : MONO}`;
   ctx.textAlign = align || 'left'; ctx.textBaseline = 'middle';
+  if (halo) { ctx.lineJoin = 'round'; ctx.strokeStyle = BG; ctx.lineWidth = Math.max(3, px * 0.3); ctx.strokeText(s, x, y); }
   ctx.fillText(s, x, y); ctx.globalAlpha = 1;
 }
 function fillPoly(P, a) {
@@ -911,33 +914,41 @@ const GROUPS = [
   [[0.1, -0.75, -0.4], ['vie', "l'univers", 'nombre', 'spirale', 'temps', 'code']]
 ];
 const WS = [], WC = [], WIX = {};
-GROUPS.forEach(([g, ws]) => ws.forEach(w => { const k = WS.length; WIX[w] = k; WS.push(w); WC.push([g[0] + (hash(k, 71) - .5) * 0.9, g[1] + (hash(k, 72) - .5) * 0.9, g[2] + (hash(k, 73) - .5) * 0.9]); }));
+GROUPS.forEach(([g, ws]) => ws.forEach(w => { const k = WS.length; WIX[w] = k; WS.push(w); WC.push([g[0] * 1.3 + (hash(k, 71) - .5) * 1.3, g[1] * 1.3 + (hash(k, 72) - .5) * 1.3, g[2] * 1.3 + (hash(k, 73) - .5) * 1.3]); }));
 const NW = WS.length;
 const STEPS = [
   [['regarde', .41], ['pense', .28], ['suis', .19], ['rêve', .07]],
   [['la', .52], ['le', .31], ['les', .12], ['mon', .03]],
-  [['mer', .34], ['lune', .29], ['fleur', .18], ['vie', .06]],
+  [['lune', .34], ['mer', .29], ['fleur', .18], ['vie', .06]],
   [['et', .44], ['qui', .27], ['puis', .18], ['depuis', .06]],
   [['je', .39], ['tout', .22], ['rien', .18], ['donc', .05]],
   [['pense', .36], ['rêve', .24], ['calcule', .21], ['suis', .09]],
   [['à', .48], ['que', .30], ['trop', .08], ['donc', .05]],
-  [['moi', .31], ["l'univers", .23], ['toi', .17], ['rien', .06]]
+  [["l'univers", .31], ['moi', .27], ['toi', .17], ['rien', .06]]
 ];
-const PICK = [0, 0, 0, 0, 0, 0, 0, 1];
+const PICK = [0, 0, 1, 0, 0, 0, 0, 0];
 const SENT = ['je']; STEPS.forEach((st, j) => SENT.push(st[PICK[j]][0]));
-const S0T = 15.6, SD = 0.92;
+// les trois premiers mots lentement, pour comprendre, puis la phrase accélère comme une vraie IA
+const SLOW = 3, SDS = 1.8, SDF = 0.55, S0T = 14.2, LK = 0.62;
+const stepStart = j => S0T + Math.min(j, SLOW) * SDS + Math.max(0, j - SLOW) * SDF;
+const stepDur = j => j < SLOW ? SDS : SDF;
+function stepAt(T) {
+  if (T < S0T) return { j: 0, ph: -1 };
+  for (let j = 0; j < STEPS.length; j++) { const s = stepStart(j), d = stepDur(j); if (T < s + d) return { j, ph: (T - s) / d }; }
+  return { j: STEPS.length, ph: 1 };
+}
+const rollAt = (T, j) => ((Math.floor((T - stepStart(j) - 0.3 * stepDur(j)) * 22) % 4) + 4) % 4;
 function cam3(T) {
   let dist = lerp(8.5, 3.4, eio((T - 9.4) / 5.2)), tx = 0, ty = 0, tz = 0;
-  const w = rv(T, S0T - 1.2, 1.2);
+  const w = rv(T, S0T - 1.4, 1.4);
   if (w > 0) {
-    const u = (T - S0T) / SD, n = STEPS.length;
-    const j = Math.max(0, Math.min(n - 1, Math.floor(u))), ph = u < 0 ? 0 : u >= n ? 1 : u - j;
-    const e = eio((ph - 0.72) / 0.28), A = WC[WIX[SENT[j]]], B = WC[WIX[SENT[j + 1]]];
+    const sp = stepAt(T), n = STEPS.length, j = Math.min(n - 1, sp.j), ph = sp.j >= n ? 1 : Math.max(0, sp.ph);
+    const e = eio((ph - LK) / (1 - LK)), A = WC[WIX[SENT[j]]], B = WC[WIX[SENT[j + 1]]];
     tx = lerp(A[0], B[0], e) * w; ty = lerp(A[1], B[1], e) * w; tz = lerp(A[2], B[2], e) * w;
-    dist = lerp(dist, 2.6, w);
+    dist = lerp(dist, 3.0, w);
   }
   dist = lerp(dist, 9.5, eio((T - 22.8) / 2.2));
-  const yaw = 0.4 + (T - 9) * 0.07, pitch = 0.24 - 0.08 * w;
+  const yaw = 0.4 + (T - 9) * 0.05, pitch = 0.24 - 0.08 * w;
   return { f: 0.9 * MM, dist, tx, ty, tz, cy: Math.cos(yaw), sy: Math.sin(yaw), cp: Math.cos(pitch), sp: Math.sin(pitch) };
 }
 const TMP = [0, 0, 0];
@@ -976,7 +987,8 @@ function shape(name, i, T, V, o) {
       if (q[2] < 0.2) { o.a = 0; o.s = 0; return; }
       o.s = Math.max(7, Math.min(32, C.f / q[2] * 0.05));
       o.a = .9 * c01((q[2] - 0.2) / 0.5) * (0.28 + 0.72 * c01(1.35 - q[2] / (C.dist * 1.6)));
-      const w = WS[k];
+      const w = WS[k], dimm = rv(T, 13.2, 1.2) * (1 - rv(T, 22.4, 0.8));
+      if (hash(i, 95) < dimm) { o.g = -1; o.s = 1.4; o.a *= .35; return; }
       o.g = hash(i, 93) < rv(T, 22.6, 1.4) ? gi('0123456789'[Math.floor(hash(i, Math.floor(T * 6)) * 10)]) : gi(w[Math.floor(i / NW) % w.length]);
       return;
     }
@@ -1081,51 +1093,80 @@ function drawWordSpace(T, C) {
   const la = rv(T, 10.4, 1.4) * (1 - rv(T, 23.4, 1.2));
   if (la <= 0) return;
   const pos = WC.map(c => { const q = p3(c[0], c[1], c[2], C); return [q[0], q[1], q[2]]; });
-  const dm = rv(T, 22.6, 1), u = (T - S0T) / SD, inSent = new Set();
-  const locked = u < 0 ? 0 : Math.min(STEPS.length, Math.floor(u + 0.28));
-  for (let j = 0; j <= locked; j++) inSent.add(WIX[SENT[j]]);
-  WS.forEach((w, k) => {
-    const p = pos[k]; if (p[2] < 0.3) return;
-    const px = Math.max(13, Math.min(52, C.f / p[2] * 0.085)), da = c01((p[2] - 0.3) / 0.5) * (0.35 + 0.65 * c01(1.4 - p[2] / (C.dist * 1.7)));
-    const hi = inSent.has(k) ? 1 : 0.7;
-    txt(w, p[0], p[1] - px * 0.9, Math.round(px), 'd', la * da * hi * (1 - dm), 'center');
-    if (dm > 0) txt(vec(w), p[0], p[1] - px * 0.9, Math.round(px * 0.5), 'm', la * da * dm, 'center');
-  });
-  for (let j = 0; j < STEPS.length; j++) {
-    const uj = (T - (S0T + j * SD)) / SD; if (uj < 0.72) break;
-    const A = pos[WIX[SENT[j]]], B = pos[WIX[SENT[j + 1]]], g = c01((uj - 0.72) / 0.28);
+  const dm = rv(T, 22.6, 1), sp = stepAt(T), n = STEPS.length, cur = sp.ph >= 0 && sp.j < n ? sp.j : -1, ph = sp.ph;
+  let locked = 0; for (let j = 0; j < n; j++) if (T >= stepStart(j) + LK * stepDur(j)) locked++;
+  const lk = cur >= 0 && ph >= LK, rl = cur >= 0 && ph >= 0.3 && !lk ? rollAt(T, cur) : -1, grow = c01(ph / 0.25);
+  const role = new Map();
+  for (let j = 0; j <= locked; j++) role.set(WIX[SENT[j]], 'sent');
+  if (cur >= 0) { STEPS[cur].forEach(([w]) => { if (role.get(WIX[w]) !== 'sent') role.set(WIX[w], 'cand'); }); role.set(WIX[SENT[cur]], 'cur'); }
+  // le chemin déjà écrit
+  for (let j = 0; j < n; j++) {
+    const s = stepStart(j), d = stepDur(j); if (T < s + LK * d) break;
+    const A = pos[WIX[SENT[j]]], B = pos[WIX[SENT[j + 1]]], g = c01((T - s - LK * d) / ((1 - LK) * d));
     if (A[2] < 0.3 || B[2] < 0.3) continue;
     const E = [lerp(A[0], B[0], g), lerp(A[1], B[1], g)];
-    pen([A, E], .18 * la, 7); pen([A, E], .95 * la, 1.8);
+    pen([A, E], .15 * la, 8); pen([A, E], .9 * la, 2);
   }
-  if (u >= 0 && u < STEPS.length) {
-    const j = Math.floor(u), ph = u - j, A = pos[WIX[SENT[j]]], st = STEPS[j];
+  // les faisceaux vers les suites possibles
+  let hotK = -1;
+  if (cur >= 0) {
+    const A = pos[WIX[SENT[cur]]], st = STEPS[cur];
     if (A[2] > 0.3) {
-      glow(true); spr(A[0], A[1], 10 + 4 * Math.sin(T * 8), .5 * la, 0); glow(false);
-      const grow = c01(ph / 0.35), rl = ph >= 0.4 && ph < 0.72 ? Math.floor((ph - 0.4) * 34) % st.length : -1, lk = ph >= 0.72;
+      glow(true); spr(A[0], A[1], 16 + 5 * Math.sin(T * 6), .45 * la, 0); glow(false);
       st.forEach(([w, p], c) => {
         const B = pos[WIX[w]]; if (B[2] < 0.3) return;
-        const E = [lerp(A[0], B[0], grow), lerp(A[1], B[1], grow)], hot = lk ? c === PICK[j] : c === rl;
-        pen([A, E], (hot ? .95 : lk ? .12 : .45) * la, 1 + p * 9);
-        const L = [lerp(A[0], B[0], .55 * grow), lerp(A[1], B[1], .55 * grow)];
-        txt(`${Math.round(p * 100)} %`, L[0] + 6, L[1] - 8, 12, 'm', (lk && !hot ? .2 : .85) * la * grow);
+        const hot = lk ? c === PICK[cur] : c === rl; if (hot) hotK = WIX[w];
+        pen([A, [lerp(A[0], B[0], grow), lerp(A[1], B[1], grow)]], (hot ? .95 : lk ? .1 : .38) * la, hot ? 2.6 : 1 + p * 3, hot ? null : [4, 5]);
       });
     }
   }
+  // les mots : les importants devant, grands et détourés
+  const ks = WS.map((w, k) => k).sort((a, b) => (role.has(a) ? 1 : 0) - (role.has(b) ? 1 : 0));
+  ks.forEach(k => {
+    const p = pos[k]; if (p[2] < 0.3) return;
+    const r = role.get(k), dsc = Math.max(0.75, Math.min(1.3, 2.8 / p[2])), da = c01((p[2] - 0.3) / 0.5);
+    const px = Math.round((r === 'cur' ? 32 : r === 'cand' ? 24 : r === 'sent' ? 20 : 13) * dsc);
+    let label = WS[k];
+    if (r === 'cand' && cur >= 0) { const c = STEPS[cur].findIndex(e => e[0] === WS[k]); if (c >= 0) label += `  ${Math.round(STEPS[cur][c][1] * 100)} %`; }
+    txt(label, p[0], p[1] - px * 0.9, px, 'd', la * da * (r ? 1 : .32) * (1 - dm), 'center', !!r);
+    if (k === hotK) { ctx.globalAlpha = .8 * la; ctx.strokeStyle = FG; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p[0], p[1], 9, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; }
+    if (dm > 0) txt(vec(WS[k]), p[0], p[1] - px * 0.9, Math.round(px * 0.55), 'm', la * da * dm * (r ? 1 : .5), 'center', true);
+  });
+  // le panneau : le calcul, lisible
+  if (cur >= 0) {
+    const st = STEPS[cur], pk = PICK[cur], pw = Math.min(360, W * 0.86), rowH = 30, phh = 58 + st.length * rowH + 30;
+    const x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - phh - 150 : H * 0.5, pa = la * rv(T, S0T - 0.4, 0.4);
+    ctx.globalAlpha = .84 * pa; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, phh);
+    ctx.globalAlpha = .3 * pa; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, phh - 1); ctx.globalAlpha = 1;
+    const sv = DISP; DISP = false;
+    txt('le mot suivant ?', x0 + 18, y0 + 20, 11, 'm', .6 * pa);
+    txt(`… ${SENT.slice(Math.max(0, cur - 2), cur + 1).join(' ')} ___`, x0 + 18, y0 + 44, 18, 'd', .95 * pa);
+    const bx = x0 + 120, bmax = pw - 190;
+    st.forEach(([w, p], c) => {
+      const y = y0 + 76 + c * rowH, hot = lk ? c === pk : c === rl, bw = Math.max(2, p / 0.55 * bmax * grow);
+      if (hot) txt('●', x0 + 8, y, 8, 'm', pa);
+      txt(w, x0 + 18, y, 17, 'd', (hot ? 1 : .65) * pa);
+      ctx.globalAlpha = (hot ? .95 : .35) * pa; ctx.fillStyle = FG; ctx.fillRect(bx, y - 5, bw, 10); ctx.globalAlpha = 1;
+      txt(`${Math.round(p * 100)} %`, bx + bw + 8, y, 12, 'm', .85 * pa);
+    });
+    const msg = lk ? (pk === 0 ? 'tiré au sort : le plus probable' : 'tiré au sort : pas le plus probable !') : ph >= 0.3 ? 'tirage au sort…' : 'calcul des probabilités…';
+    txt(msg, x0 + 18, y0 + phh - 20, 12, 'm', .85 * pa);
+    DISP = sv;
+  }
+  // la phrase
   const sa = la * rv(T, S0T - 0.6, .6);
   if (sa > 0) {
-    const s = SENT.slice(0, locked + 1).join(' ');
-    let extra = '';
-    if (u >= 0 && u < STEPS.length) { const j = Math.floor(u), ph = u - j; if (ph >= 0.4 && ph < 0.72) extra = ' ' + STEPS[j][Math.floor((ph - 0.4) * 34) % 4][0]; }
+    const s = SENT.slice(0, locked + 1).join(' '), extra = rl >= 0 ? ' ' + STEPS[cur][rl][0] : '';
     const px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : 118;
     ctx.font = `500 ${px}px ${DISPLAY}`;
     const w1 = ctx.measureText(s).width, w2 = extra ? ctx.measureText(extra).width : 0, x0 = W / 2 - (w1 + w2) / 2;
-    txt(s, x0, y, px, 'd', .95 * sa);
-    if (extra) txt(extra, x0 + w1, y, px, 'd', .4 * sa);
-    else if (Math.floor(T * 3) % 2 === 0 && u < STEPS.length) { ctx.globalAlpha = .8 * sa; ctx.fillStyle = FG; ctx.fillRect(x0 + w1 + 6, y - px * .45, 3, px * .9); ctx.globalAlpha = 1; }
+    const sv = DISP; DISP = false;
+    txt(s, x0, y, px, 'd', .95 * sa, 'left', true);
+    if (extra) txt(extra, x0 + w1, y, px, 'd', .4 * sa, 'left', true);
+    else if (Math.floor(T * 3) % 2 === 0 && locked < n) { ctx.globalAlpha = .8 * sa; ctx.fillStyle = FG; ctx.fillRect(x0 + w1 + 6, y - px * .45, 3, px * .9); ctx.globalAlpha = 1; }
+    DISP = sv;
   }
 }
-
 
 /* ——— le son : les calculs qu'on entend (seulement après un clic) ——— */
 let AC = null, master = null, seaG = null, droneLP = null, NOISE = null, scanO = null, scanG = null, FOU = [], audioOn = false, aT = -1;
@@ -1183,9 +1224,9 @@ function audioFrame(T) {
   if (crossed(p, T, 1.6)) { noise(2.2, .35, { type: 'lowpass', f: 180, to: 5000, att: .05 }); tone(46, 2.4, .35, { to: 38 }); }
   if (crossed(p, T, 7.2)) [220, 261.63, 329.63, 392].forEach((f, k) => tone(f, 4, .045, { att: .6, delay: k * .08 }));
   for (let j = 0; j < STEPS.length; j++) {
-    const t0 = S0T + j * SD, ph = (T - t0) / SD;
-    if (crossed(p, T, t0 + .72 * SD)) tone(PENT[(j * 3) % 10], 1.4, .07);
-    if (ph >= 0.4 && ph < 0.72 && Math.floor(((p - t0) / SD - 0.4) * 34) !== Math.floor((ph - 0.4) * 34)) noise(.025, .08, { f: 5000, q: 3 });
+    const s0 = stepStart(j), d = stepDur(j);
+    if (crossed(p, T, s0 + LK * d)) tone(PENT[(j * 3) % 10], j < SLOW ? 1.6 : .9, .07);
+    if (T >= s0 + .3 * d && T < s0 + LK * d && p >= s0 + .3 * d && rollAt(p, j) !== rollAt(T, j)) noise(.025, .08, { f: 5000, q: 3 });
   }
   if (crossed(p, T, 23.4)) noise(3, .12, { f: 6000, to: 800, q: .7, att: .8 });
   if (crossed(p, T, 31)) tone(1400, 1.2, .03, { to: 500 });
