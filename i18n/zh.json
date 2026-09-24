@@ -522,5 +522,7 @@
   "paused_click": "已暂停 · 点击继续",
   "paused_tap": "已暂停 · 轻触继续",
   "read_essay": "阅读完整的思考（英文）→",
-  "card_cta": "观看互动影片"
+  "card_cta": "观看互动影片",
+  "atoms_nav": "星座",
+  "atoms_cta": "留下你的原子 →"
 }
