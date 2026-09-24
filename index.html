@@ -46,7 +46,11 @@ select.btn option{color:#141312;background:#eae8e2}
 #snd:not(.used){opacity:1;animation:call 2.4s ease-in-out 4}
 @keyframes call{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--fg) 18%,transparent)}}
 body{cursor:none}
+/* les écritures liées (devanagari, bengali, arabe) et les idéogrammes ne supportent pas l'espacement des lettres */
+html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.lbl,.lead,.hint,.brand small,#chap .lbl,select){letter-spacing:0!important}
 .btn,#chap button{cursor:pointer}
+#sharebox,#cardv,.ctrl,.brand,#chap{cursor:default}
+#sharebox button,#cardv button,.orb,select{cursor:pointer}
 .btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);opacity:1}
 :focus-visible{outline:2px solid var(--fg);outline-offset:3px}
 
@@ -73,42 +77,43 @@ body{cursor:none}
 .orb.big i{display:none}
 .orb.big.sel{background:color-mix(in srgb,rgb(var(--c)) 26%,var(--bg));border-color:rgb(var(--c));box-shadow:0 0 1.6rem rgba(var(--c),.35)}
 .orb span{overflow:hidden;text-overflow:ellipsis}
-#sharebox{box-sizing:border-box;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);width:min(94vw,60rem);max-height:calc(100vh - 130px);overflow:auto;padding:1.6rem 1.6rem 1.4rem;border:1px solid color-mix(in srgb,var(--fg) 30%,transparent);border-radius:22px;background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 30px 120px rgba(0,0,0,.45),0 0 0 1px rgba(157,180,255,.08) inset;text-align:center;opacity:0;visibility:hidden;transition:opacity 1s ease,transform 1s ease,visibility 0s 1s}
+#sharebox{box-sizing:border-box;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);width:min(94vw,62rem);max-height:calc(100vh - 120px);overflow:auto;overscroll-behavior:contain;padding:2rem 2.1rem 2rem;border:1px solid color-mix(in srgb,var(--fg) 30%,transparent);border-radius:22px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 30px 120px rgba(0,0,0,.45),0 0 0 1px rgba(157,180,255,.08) inset;text-align:center;opacity:0;visibility:hidden;transition:opacity 1s ease,transform 1s ease,visibility 0s 1s}
 #sharebox.on{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1);transition:opacity 1s ease,transform 1s ease}
-#sharebox .lead{margin:0 0 .9rem;font:500 .7rem/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;opacity:.75}
-#sharebox .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;min-height:3.3rem;margin-bottom:1.1rem}
+#sharebox .lead{margin:0 0 1.3rem;font:500 .7rem/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;opacity:.75}
+#sharebox .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;min-height:3.3rem;margin-bottom:1.9rem}
 #sharebox .slots span{min-height:3.3rem}
-#sharebox .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start;text-align:left}
-#sharebox .lbl{margin:0 0 .5rem;font:500 .6rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;opacity:.6}
-#sharebox .qsw{display:grid;grid-template-columns:2.2rem 1fr 2.2rem;align-items:center;gap:.5rem;margin-bottom:1rem}
+#sharebox .cols{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem;align-items:start;text-align:start}
+#sharebox .lbl{margin:0 0 .75rem;font:500 .6rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;opacity:.6}
+#sharebox .qsw{display:grid;grid-template-columns:2.2rem 1fr 2.2rem;align-items:center;gap:.8rem;margin-bottom:1.6rem}
 #sharebox .q{margin:0;min-height:3.9em;display:flex;align-items:center;justify-content:center;text-align:center;font:600 clamp(.95rem,1.35vw,1.15rem)/1.3 var(--display);transition:opacity .3s ease,transform .3s ease}
 #sharebox .q.sw{opacity:0;transform:translateY(5px)}
 #sharebox .arr{all:unset;box-sizing:border-box;cursor:pointer;width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid color-mix(in srgb,var(--fg) 35%,transparent);transition:background .25s,border-color .25s}
 #sharebox .arr svg{width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
 #sharebox .arr:hover,#sharebox .arr:focus-visible{background:color-mix(in srgb,var(--fg) 14%,transparent);border-color:var(--fg)}
-#sharebox .bgs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+#sharebox .bgs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.6rem}
 #sharebox .bgs button{all:unset;cursor:pointer;width:2.3rem;height:2.3rem;border-radius:50%;overflow:hidden;outline:1px solid color-mix(in srgb,var(--fg) 25%,transparent);outline-offset:2px;transition:outline-color .25s,transform .25s}
 #sharebox .bgs button canvas{width:100%;height:100%;display:block}
 #sharebox .bgs button:hover{transform:scale(1.08)}
 #sharebox .bgs button.on{outline:2px solid var(--fg)}
-#sharebox .fmts{display:none;gap:.35rem;margin-bottom:1rem}
+#sharebox .fmts{display:none;gap:.45rem;margin:-.4rem 0 1.6rem}
 #sharebox[data-p="insta"] .fmts{display:flex}
 #sharebox .fmts .btn.on{background:var(--fg);color:var(--bg);opacity:1}
-#sharebox .acts{display:flex;gap:.5rem;flex-wrap:wrap}
+#sharebox .acts{display:flex;gap:.7rem;flex-wrap:wrap;padding-top:1.4rem;border-top:1px solid color-mix(in srgb,var(--fg) 14%,transparent)}
 #sharebox .acts .btn{padding:.75rem 1rem}
 #sharebox .pvw{min-width:0}
-.pv{border-radius:14px;border:1px solid rgba(255,255,255,.12);background:#16161a;color:#e9e7e2;padding:.8rem .9rem;font:400 .82rem/1.35 system-ui,-apple-system,"Segoe UI",sans-serif;max-height:min(54vh,30rem);overflow:hidden;transition:opacity .25s}
+.pv{border-radius:14px;border:1px solid rgba(255,255,255,.12);background:#16161a;color:#e9e7e2;padding:1rem 1.1rem;font:400 .82rem/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-wrap:anywhere;transition:opacity .25s}
 .pv.sw{opacity:.3}
 .pv .hd{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;font-size:.78rem}
 .pv .hd b{font-weight:700}.pv .hd span,.pv small{opacity:.6}
 .pv .av{width:1.7rem;height:1.7rem;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 40% 40%,#f8f7ff 0 12%,#9db4ff 30%,#ff7a5c 70%,#16161a 72%)}
 .pv p{margin:0 0 .6rem}
 .pv img{display:block;width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.1)}
-.pv img.tall{max-height:min(34vh,19rem);width:auto;margin:0 auto}
+.pv img{max-height:min(26vh,15rem);object-fit:contain;background:#0c0b0a}
+.pv img.tall{max-height:min(30vh,17rem);width:auto;max-width:100%;margin:0 auto}
 .pv .t{display:block;font-size:.95rem;font-weight:700;margin-bottom:.55rem}
 .pv small{display:block;margin-top:.45rem;font-size:.72rem}
 .pv .bar{display:flex;gap:1.1rem;margin-top:.55rem;opacity:.55;font-size:.75rem}
-@media (max-aspect-ratio:23/20){#sharebox .cols{grid-template-columns:1fr;gap:.8rem}#sharebox .bgs button{width:2.1rem;height:2.1rem}#sharebox .slots{grid-template-columns:repeat(4,1fr);gap:.35rem}.pv{max-height:30vh}.orb.big svg{display:none}.orb.big{font-size:.56rem!important;letter-spacing:.04em!important;padding:.8rem .2rem!important}#sharebox{padding:1.3rem .9rem 1.1rem}.orb.big{font-size:.66rem;padding:.85rem .5rem;gap:.45rem;letter-spacing:.08em}}
+@media (max-aspect-ratio:23/20){#sharebox{padding:1.4rem 1.1rem}#sharebox .slots{margin-bottom:1.3rem}#sharebox .cols{grid-template-columns:1fr;gap:1.2rem}#sharebox .qsw,#sharebox .bgs{margin-bottom:1.2rem}#sharebox .acts{padding-top:1.1rem}.pv img{max-height:22vh}#sharebox .bgs button{width:2.1rem;height:2.1rem}#sharebox .slots{grid-template-columns:repeat(4,1fr);gap:.35rem}.orb.big svg{display:none}.orb.big{font-size:.56rem!important;letter-spacing:.04em!important;padding:.6rem .3rem!important;min-height:3rem}.orb.big span{white-space:normal;text-align:center;line-height:1.2}#sharebox{padding:1.3rem .9rem 1.1rem}.orb.big{font-size:.66rem;padding:.85rem .5rem;gap:.45rem;letter-spacing:.08em}}
 .orb i{width:.62rem;height:.62rem;border-radius:50%;background:rgb(var(--c));box-shadow:0 0 .5rem .15rem rgba(var(--c),.75),0 0 1.6rem .45rem rgba(var(--c),.28);animation:orbtw 2.6s ease-in-out infinite alternate}
 .orb:nth-child(2) i{animation-delay:-.7s}.orb:nth-child(3) i{animation-delay:-1.4s}.orb:nth-child(4) i{animation-delay:-2s}
 .orb span{opacity:.72;transition:opacity .3s}
@@ -212,12 +217,13 @@ function pickLang() {
   for (const l of (navigator.languages || [navigator.language || 'en'])) { const c = String(l).slice(0, 2).toLowerCase(); if (I18N[c]) return c; }
   return I18N.en ? 'en' : 'fr';
 }
-const LANG = pickLang(), LX = Object.assign({}, I18N.fr, I18N[LANG]), S = Object.assign({}, I18N.fr.s, (I18N[LANG] || {}).s);
+const LANG = pickLang(), LX = Object.assign({}, I18N.en || I18N.fr, I18N[LANG]), S = Object.assign({}, (I18N.en || I18N.fr).s, (I18N[LANG] || {}).s);
 const tr = (k, ...a) => String(S[k] === undefined ? k : S[k]).replace(/\{(\d)\}/g, (_, i) => a[i]);
 const NUML = LANG + '-u-nu-latn', DEC = (1.5).toLocaleString(NUML).replace(/[15]/g, '') || '.';
 const num = v => v.toLocaleString(NUML);
 const dn = str => DEC === '.' ? str : str.replace(/(\d)\.(\d)/g, `$1${DEC}$2`);
 const CJK = !!LX.cjk, RTL = LX.dir === 'rtl', WJ = LX.words.join;
+const QM = { fr: ['« ', ' »'], es: ['«', '»'], ru: ['«', '»'], ar: ['«', '»'], ja: ['「', '」'], zh: ['“', '”'] }[LANG] || ['“', '”'], quo = v => QM[0] + v + QM[1];
 const LFONT = { zh: ['Noto Serif SC', 'Noto Sans SC'], ja: ['Shippori Mincho B1', 'Noto Sans JP'], hi: ['Noto Serif Devanagari', 'Noto Sans Devanagari'], bn: ['Noto Serif Bengali', 'Noto Sans Bengali'], ar: ['Noto Naskh Arabic', 'Noto Sans Arabic'], ru: ['Noto Serif', 'IBM Plex Mono'] }[LANG];
 const DISPLAY = (LANG === 'zh' ? '"Noto Serif SC","Songti SC","SimSun",' : '"Shippori Mincho B1",') + (LFONT ? `"${LFONT[0]}",` : '') + '"Hiragino Mincho ProN","Yu Mincho",Georgia,serif';
 const MONO = '"IBM Plex Mono",' + (LFONT ? `"${LFONT[1]}",` : '') + 'ui-monospace,Menlo,monospace';
@@ -1749,7 +1755,7 @@ function lensLens(T, V) {
     const nb = WC.map((B, k) => [k, (A[0] * B[0] + A[1] * B[1] + A[2] * B[2]) / (nA * Math.hypot(...B))]).filter(e => e[0] !== b).sort((p, q) => q[1] - p[1]).slice(0, 2);
     lensRing(WSP[b], 10, 1);
     nb.forEach(([k]) => { const q = WSP[k]; if (q[2] > 0.3) { pen([WSP[b], q], .7, 1.2, [4, 3]); lensRing(q, 6, .8); } });
-    return [`« ${WS[b]} »`, [tr('lens_word_vec', vec(WS[b])), ...nb.map(([k, c]) => tr('lens_word_near', WS[k], fx(c, 2))), tr('lens_word_sense')]];
+    return [quo(WS[b]), [tr('lens_word_vec', vec(WS[b])), ...nb.map(([k, c]) => tr('lens_word_near', WS[k], fx(c, 2))), tr('lens_word_sense')]];
   }
   // le rivage
   if (T > 24.4 && T < 43 && v[0].a > .5) {
@@ -1872,7 +1878,7 @@ function lensLens(T, V) {
   return null;
 }
 function drawLens(T, V) {
-  if (MACT < 0.03 || SMX < -1e3) return;
+  if (MACT < 0.03 || SMX < -1e3 || UIHOV) return;
   const sv = DISP; DISP = false;
   const r = lensLens(T, V);
   if (r) lensBox(r[0], r[1], MACT);
@@ -2060,7 +2066,7 @@ function audioFrame(T) {
 
 /* ——— la souris déforme la matière, sans arrêter le film ——— */
 let MX = -1e4, MY = -1e4, SMX = -1e4, SMY = -1e4, MIN = 0, MACT = 0, needs = false;
-window.addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; MX = e.clientX; MY = e.clientY; MIN = 1; if (SMX < -1e3) { SMX = MX; SMY = MY; } needs = true; }, { passive: true });
+window.addEventListener('pointermove', e => { UIHOV = !!(e.target && e.target.closest && e.target.closest('#sharebox,#cardv,.ctrl,.brand,#chap,.orb')); if (e.pointerType === 'touch') return; MX = e.clientX; MY = e.clientY; MIN = 1; if (SMX < -1e3) { SMX = MX; SMY = MY; } needs = true; }, { passive: true });
 document.documentElement.addEventListener('mouseleave', () => { MIN = 0; needs = true; });
 function mouseStep() { if (SMX < -1e3) return; SMX = lerp(SMX, MX, .2); SMY = lerp(SMY, MY, .2); MACT = lerp(MACT, MIN, .08); }
 function mouseFx(name, o) {
@@ -2071,8 +2077,9 @@ function mouseFx(name, o) {
   const d = Math.sqrt(d2) || 1, f = Math.pow(1 - d / R, 2) * R * 0.7 * MACT;
   o.x += dx / d * f; o.y += dy / d * f;
 }
+let UIHOV = false;
 function drawCursor() {
-  if (MACT < 0.02) return;
+  if (MACT < 0.02 || UIHOV) return;
   ctx.globalAlpha = .45 * MACT; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(SMX, SMY, 16, 0, TAU); ctx.stroke();
   ctx.globalAlpha = .9 * MACT; ctx.fillStyle = FG; ctx.beginPath(); ctx.arc(MX, MY, 2.2, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
 }
@@ -2178,7 +2185,7 @@ function buildBgs() {
     pvTimer = setTimeout(() => {
       const q = fr(LX.outro_q[SQ]), host = (location.host || 'human') + (location.pathname.length > 1 ? '/…' : ''), you = esc(LX.you);
       cardC = makeCard(SPF === 'insta' ? SFMT : 'wide', q, SBG); const src = cardC.toDataURL('image/jpeg', 0.86);
-      const Q = esc(`« ${q} »`);
+      const Q = esc(quo(q));
       pv.innerHTML = SPF === 'x' ? `<div class="hd"><i class="av"></i><b>${you}</b><span>@${you.toLowerCase()}</span></div><p>${Q} — HUman</p><img alt="" src="${src}"><small>${esc(host)}</small><div class="bar"><span>↩</span><span>⟳</span><span>♡</span></div>`
         : SPF === 'reddit' ? `<div class="hd"><i class="av"></i><span>r/HUman · ${you}</span></div><span class="t">${esc(q)}</span><img alt="" src="${src}"><small>${esc(host)}</small><div class="bar"><span>▲ 1</span><span>▼</span><span>💬</span></div>`
         : SPF === 'insta' ? `<div class="hd"><i class="av"></i><b>${you}</b></div><img class="tall" alt="" src="${src}"><p style="margin:.6rem 0 0"><b>${you}</b> ${Q}</p>`
@@ -2187,16 +2194,16 @@ function buildBgs() {
     }, 120);
   };
   const tr0 = (f, v) => String(f).replace('{0}', v);
-  qEl.textContent = '« ' + fr(LX.outro_q[SQ]) + ' »';
+  qEl.textContent = quo(fr(LX.outro_q[SQ]));
   arrs.forEach(a => a.addEventListener('click', () => {
     const n = LX.outro_q.length; SQ = (SQ + +a.dataset.d + n) % n;
-    qEl.classList.add('sw'); setTimeout(() => { qEl.textContent = '« ' + fr(LX.outro_q[SQ]) + ' »'; qEl.classList.remove('sw'); }, 250);
+    qEl.classList.add('sw'); setTimeout(() => { qEl.textContent = quo(fr(LX.outro_q[SQ])); qEl.classList.remove('sw'); }, 250);
     updPv();
   }));
   fm.forEach(b => b.addEventListener('click', () => { SFMT = b.dataset.fmt; updPv(); }));
   // l'action principale, selon la plateforme
   go.addEventListener('click', async () => {
-    const t = encodeURIComponent(`« ${curQuestion()} » — HUman`), u = encodeURIComponent(shareUrl());
+    const t = encodeURIComponent(`${quo(curQuestion())} — HUman`), u = encodeURIComponent(shareUrl());
     if (NETS[SPF]) { window.open(NETS[SPF](u, t), '_blank', 'noopener,width=620,height=560'); return; }
     if (SPF === 'insta') {
       try { const bl = await new Promise(r => cardC.toBlob(r, 'image/png')), f = new File([bl], `human-${SFMT}.png`, { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: LX.doc_title }); return; } } catch (er) { return; }
@@ -2227,7 +2234,7 @@ const ease01 = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
 {
   const box = document.getElementById('outro'), orbs = [...box.querySelectorAll('.orb')];
   const sbox = document.getElementById('sharebox'), slots = [...sbox.querySelectorAll('.slots span')];
-  sbox.querySelector('.q').textContent = '« ' + fr(LX.outro_q[LX.outro_q.length - 1]) + ' »';
+  sbox.querySelector('.q').textContent = quo(fr(LX.outro_q[LX.outro_q.length - 1]));
   if (navigator.share && matchMedia('(max-aspect-ratio:23/20)').matches) { const sp = box.querySelector('[data-net="link"] span'); sp.removeAttribute('data-i'); sp.textContent = LX.share; }
   orbs.forEach(b => b.addEventListener('click', () => {
     SPF = b.dataset.net; updPv();
