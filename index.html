@@ -1719,7 +1719,10 @@ function drawWordSpace(T, C) {
   const sa = la * rv(T, S0T - 0.6, .6);
   if (sa > 0) {
     const s = SENT.slice(0, locked + 1).join(WJ), extra = rl >= 0 ? WJ + STEPS[cur][rl][0] : '';
-    const px = Math.round(Math.min(34, W * 0.06)), y = !CAPB ? (LAND ? H - 120 : H - 96) : LAND ? 84 + 208 + 44 : H - 208 - 258 - 26;
+    let px = Math.round(Math.min(34, W * 0.06));
+    const y = !CAPB ? (LAND ? H - 120 : H - 96) : LAND ? 84 + 208 + 44 : H - 208 - 258 - 26;
+    // la taille se règle sur la phrase complète : elle tient dans l'écran et ne change pas pendant qu'elle s'écrit
+    ctx.font = `500 ${px}px ${DISPLAY}`; const full = ctx.measureText(SENT.join(WJ)).width; if (full > W - 36) px = Math.max(12, Math.floor(px * (W - 36) / full));
     ctx.font = `500 ${px}px ${DISPLAY}`;
     const w1 = ctx.measureText(s).width, w2 = extra ? ctx.measureText(extra).width : 0, x0 = W / 2 - (w1 + w2) / 2;
     const sv = DISP; DISP = false;
@@ -2161,6 +2164,8 @@ const ART_URL = 'https://areweai.dev/';
 const shareUrl = () => { const web = /^https?:$/.test(location.protocol) && !/claudeusercontent|claude\.ai|localhost|127\.0\.0\.1/.test(location.host); return (web ? location.origin + location.pathname : ART_URL) + (LANG !== 'en' ? '#lang=' + LANG : ''); };
 const SHQ = fr(LX.sr_title.replace(/ /g, ' '));
 const curQuestion = () => SHQ;
+// #nocap : la scène sans les phrases (visuels composés à part, comme les stories)
+const NOCAP = /[#&]nocap\b/.test(location.hash);
 let NOUI = false; const SNAP = {}, SBG = 'stars';
 const BGS = [{ k: 'stars', ch: 10 }];
 function snapScene(t) {
@@ -2384,7 +2389,7 @@ function render(T) {
     drawNeuronDemo(T); drawBrainPredict(T);
   }
   drawFinale(T);
-  if (!NOUI) { drawCaps(T); drawLens(T, V); mouseStep(); DISP = false; drawCursor(); DISP = true; }
+  if (!NOUI) { if (!NOCAP) drawCaps(T); drawLens(T, V); mouseStep(); DISP = false; drawCursor(); DISP = true; }
   const logS = Math.log(v[0].S), speed = Math.abs(logS - prevLogS); prevLogS = logS;
   let k = reduced || jump ? 1 : Math.max(0.28, 0.62 - speed * 9);
   if (!reduced && !jump) {
@@ -2417,7 +2422,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 window.__seek = t => { T = realOf(t); TR = T; jump = true; render(story(T)); };
-window.__frame = t => { T = t; TR = T; render(story(T)); VNOW = t * 1000; VT.share && VT.share(VNOW); VT.logo && VT.logo(VNOW); };
+window.__frame = (t, j) => { if (j) jump = true; T = t; TR = T; render(story(T)); VNOW = t * 1000; VT.share && VT.share(VNOW); VT.logo && VT.logo(VNOW); };
 window.__pause = () => setPlaying(false);
 requestAnimationFrame(frame);
 /* ——— le logo : des étoiles en orbite, des paramètres, des neurones… qui deviennent 人 ——— */
