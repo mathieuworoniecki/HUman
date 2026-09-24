@@ -9,4 +9,6 @@ Ouvrir `index.html` dans un navigateur. Aucune dépendance, aucun build.
 - Lecture automatique, environ 2 min 15
 - Molette ou glisser : avancer et reculer dans le temps
 - Flèches : chapitre suivant ou précédent, espace : pause
-- Bouton « Son » : ambiance sonore générative (Web Audio)
+- Bouton « Activer le son » : un son calculé (Web Audio) où la vague joue ses trois ondes, les graines chantent leur angle, l'ADN se lit à voix haute et les neurones claquent
+- La souris déforme la matière sans arrêter le film : les graines s'écartent, l'électron la suit, la mer ondule, les neurones s'allument
+- L'expérience boucle, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
