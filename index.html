@@ -66,7 +66,7 @@ select.btn option{color:#141312;background:#eae8e2}
 @keyframes call{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--fg) 18%,transparent)}}
 body{cursor:none}
 /* les écritures liées (devanagari, bengali, arabe) et les idéogrammes ne supportent pas l'espacement des lettres */
-html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.sbtn,.lbl,.lead,.toast,.essay,.hint,.pzl,.brand small,#chap .lbl,select){letter-spacing:0!important}
+html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.sbtn,.lbl,.lead,.toast,.essay,.rfl,.hint,.pzl,.brand small,#chap .lbl,select){letter-spacing:0!important}
 .btn,#chap button{cursor:pointer}
 #sharebox,.ctrl,.brand,#chap,#gh{cursor:default}
 #sharebox button,.orb,select{cursor:pointer}
@@ -88,6 +88,12 @@ html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.sbtn,.
 #outro:not(.on){transition:opacity .35s ease}
 #outro.on .orb{pointer-events:auto}
 #outro.on #sharebox.on{pointer-events:auto}
+/* pendant les questions : un accès direct au texte complet */
+.rfl{position:absolute;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);display:inline-flex;align-items:center;gap:.6rem;padding:.7rem 1.15rem .7rem .95rem;border-radius:999px;border:1px solid color-mix(in srgb,var(--fg) 55%,transparent);background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--fg);font:500 .68rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;box-shadow:0 0 28px rgba(157,180,255,.18);transition:opacity .8s ease,transform .8s ease,visibility 0s .8s,background .2s,color .2s}
+.rfl i{width:.5rem;height:.5rem;border-radius:50%;background:rgb(157,180,255);box-shadow:0 0 .5rem .15rem rgba(157,180,255,.7);animation:orbtw 2.6s ease-in-out infinite alternate}
+@media (min-aspect-ratio:23/20){.rfl{left:auto;right:clamp(18px,3vw,36px);bottom:calc(40px + env(safe-area-inset-bottom,0px));transform:translateY(10px)}#outro.on .rfl.on{transform:none!important}}
+#outro.on .rfl.on{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0);transition:opacity .8s ease,transform .8s ease,background .2s,color .2s}
+.rfl:hover,.rfl:focus-visible{background:var(--fg);color:var(--bg)}
 .orb{all:unset;position:absolute;left:0;top:0;z-index:2;display:flex;align-items:center;gap:.5rem;padding:.5rem .8rem .5rem .55rem;border-radius:999px;cursor:pointer;font:500 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:var(--fg);border:1px solid rgba(var(--c),.55);background:color-mix(in srgb,var(--bg) 55%,transparent);box-shadow:0 0 1.2rem rgba(var(--c),.18);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);will-change:transform;transition:opacity .8s ease,background .3s,letter-spacing .3s,padding .9s ease,font-size .9s ease,gap .9s ease,border-radius .9s ease}
 .orb svg{width:.95rem;height:.95rem;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85;transition:width .9s,height .9s}
 .orb.big{box-sizing:border-box;justify-content:center;padding:.95rem .6rem;font-size:.74rem;gap:.55rem;border-radius:14px;letter-spacing:.08em}
@@ -168,7 +174,7 @@ html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.sbtn,.
 <div id="vig"></div>
 <div id="pz" aria-hidden="true"><div class="pzb"><svg viewBox="0 0 24 24"><path d="M8.5 5.2v13.6L19.5 12z"/></svg></div><p class="pzl"></p></div>
 
-<div class="brand"><canvas id="logo" aria-hidden="true"></canvas><b>HU<i>man</i></b><small data-i="brand_sub">une réflexion de Mathieu</small></div>
+<div class="brand"><canvas id="logo" aria-hidden="true"></canvas><b>HU<i>man</i></b></div>
 <div class="ctrl">
   <select class="btn" id="lng" aria-label="Langue"></select>
   <button class="btn" id="snd" type="button" aria-pressed="false" data-i="sound_on">Activer le son</button>
@@ -179,6 +185,7 @@ html:is([lang=hi],[lang=bn],[lang=ar],[lang=zh],[lang=ja]) :is(.btn,.orb,.sbtn,.
 <div id="caps" aria-hidden="true"></div>
 <div id="outro">
   <div id="sharebox"><p class="lead" data-i="share_lead">Partage</p><p class="q"></p><div class="slots"><button class="sbtn" type="button" data-net="x" style="--c:248,247,255"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>X</span></button><button class="sbtn" type="button" data-net="reddit" style="--c:255,122,92"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Reddit</span></button><button class="sbtn" type="button" data-net="insta" style="--c:255,206,158"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg><span>Instagram</span></button><button class="sbtn" type="button" data-net="link" style="--c:157,180,255"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span data-i="copy_link">Copier le lien</span></button></div><p class="toast" aria-live="polite"></p><a class="essay" id="essay" data-i="read_essay" href="essay.html">Read the full reflection →</a></div>
+  <a class="rfl" id="rfl" href="essay.html"><i></i><span data-i="read_essay">Read the full reflection →</span></a>
   <button class="orb" type="button" data-net="x" style="--c:248,247,255"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>X</span></button>
   <button class="orb" type="button" data-net="reddit" style="--c:255,122,92"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Reddit</span></button>
   <button class="orb" type="button" data-net="insta" style="--c:255,206,158"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg><span>Instagram</span></button>
@@ -225,7 +232,7 @@ document.documentElement.lang = LANG; document.title = LX.doc_title;
 document.documentElement.style.setProperty('--display', DISPLAY); document.documentElement.style.setProperty('--mono', MONO);
 document.querySelectorAll('[data-il]').forEach(el => el.setAttribute('aria-label', LX[el.dataset.il]));
 // le texte complet : sur le site /essay, ailleurs (fichier local, claude.ai) la bonne adresse
-{ const e = document.getElementById('essay'); if (e) { if (/areweai\.dev$/.test(location.hostname)) e.href = '/essay'; else if (location.protocol !== 'file:') { e.href = 'https://areweai.dev/essay'; e.target = '_blank'; e.rel = 'noopener'; } } }
+['essay', 'rfl'].forEach(id => { const e = document.getElementById(id); if (e) { if (/areweai\.dev$/.test(location.hostname)) e.href = '/essay'; else if (location.protocol !== 'file:') { e.href = 'https://areweai.dev/essay'; e.target = '_blank'; e.rel = 'noopener'; } } });
 document.querySelectorAll('[data-i]').forEach(el => { const v = LX[el.dataset.i]; if (typeof v === 'string') { el.textContent = v; if (RTL) el.dir = 'rtl'; } });
 if (matchMedia('(max-aspect-ratio:23/20)').matches) document.getElementById('snd').textContent = LX.sound;
 { const sel = document.getElementById('lng'); sel.setAttribute('aria-label', LX.lang_label);
@@ -246,7 +253,7 @@ const gauss = (u, v) => Math.sqrt(-2 * Math.log(u + 1e-9)) * Math.cos(TAU * v);
 const fr = s => LANG === 'fr' ? s.replace(/ ([?:!;])/g, ' $1') : s;
 
 /* ——— le temps ——— */
-const END = 198.2, OUT = 156.4, OUTQ = 157.2;
+const END = 185.5, OUT = 156.4, OUTQ = 157.2;
 const HOLD_AT = 9.3, HOLD = 3.2;
 // le temps du film se dilate par endroits : le titre reste affiché, l'atome prend son temps
 const WARP = [[HOLD_AT, HOLD_AT, HOLD], [72.8, 76.6, 9.4]];
@@ -298,8 +305,8 @@ const CAPS = [
 CAPS.forEach((c, i) => { c.text = fr(LX.caps[i] || c.text); });
 // l'écran de fin : les questions naissent de la sphère, se transforment l'une en l'autre, y retournent
 CAPS.push({ t0: 157.6, t1: 161.6, k: 'q', text: fr(LX.outro_title) });
-LX.outro_q.forEach((q, i) => CAPS.push({ t0: 162 + i * 7, t1: 168.6 + i * 7, k: 'q', text: fr(q) }));
-const SHARE_T = 196.9;
+LX.outro_q.forEach((q, i) => CAPS.push({ t0: 162 + i * 4.4, t1: 166 + i * 4.4, k: 'q', text: fr(q) }));
+const SHARE_T = 184.2;
 document.getElementById('sr-list').innerHTML = CAPS.map(c => `<li>${c.text}</li>`).join('');
 
 /* ——— couleurs : papier le jour, encre la nuit ——— */
@@ -2113,7 +2120,7 @@ function audioFrame(T) {
 
 /* ——— la souris déforme la matière, sans arrêter le film ——— */
 let MX = -1e4, MY = -1e4, SMX = -1e4, SMY = -1e4, MIN = 0, MACT = 0, needs = false;
-window.addEventListener('pointermove', e => { UIHOV = !!(e.target && e.target.closest && e.target.closest('#sharebox,.ctrl,.brand,#chap,.orb,#gh')); if (e.pointerType === 'touch') return; MX = e.clientX; MY = e.clientY; MIN = 1; if (SMX < -1e3) { SMX = MX; SMY = MY; } needs = true; }, { passive: true });
+window.addEventListener('pointermove', e => { UIHOV = !!(e.target && e.target.closest && e.target.closest('#sharebox,.ctrl,.brand,#chap,.orb,#gh,.rfl')); if (e.pointerType === 'touch') return; MX = e.clientX; MY = e.clientY; MIN = 1; if (SMX < -1e3) { SMX = MX; SMY = MY; } needs = true; }, { passive: true });
 document.documentElement.addEventListener('mouseleave', () => { MIN = 0; needs = true; });
 function mouseStep() { if (SMX < -1e3) return; SMX = lerp(SMX, MX, .2); SMY = lerp(SMY, MY, .2); MACT = lerp(MACT, MIN, .08); }
 function mouseFx(name, o) {
@@ -2186,7 +2193,7 @@ function updateChap(T) {
 
 /* ——— la boucle ——— */
 let T = reduced ? realOf(8.8) : 0, playing = !reduced, last = performance.now(), prevLogS = 0, slow = 0;
-const outEl = document.getElementById('outro'), ppBtn = document.getElementById('pp');
+const rflEl = document.getElementById('rfl'), outEl = document.getElementById('outro'), ppBtn = document.getElementById('pp');
 document.getElementById('of').innerHTML = LX.further.map(([t, a, d]) => `<li>${t} — ${a} · ${d}</li>`).join('');
 if (RTL) outEl.dir = 'rtl';
 /* ——— le partage : simple — une question, quatre gestes ——— */
@@ -2450,6 +2457,7 @@ function render(T) {
   if (NOUI) return;
   updateCaps(T); updateChap(T); audioFrame(T);
   outEl.classList.toggle('on', T >= OUT);
+  rflEl.classList.toggle('on', T >= OUTQ + 1 && T < SHARE_T - 0.2);
 }
 
 function frame(now) {
