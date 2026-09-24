@@ -1896,7 +1896,9 @@ const CW = CAPS.map((c, k) => {
 });
 function capTop() { return LAND ? Math.max(88, H * 0.13) : 74; }
 // sur mobile, tablette et petits écrans, les phrases reposent en bas à gauche, au-dessus du badge
-function capFoot() { return LAND ? Math.max(104, H * 0.15) : 128; }
+// #safe=N : marge basse en plus (exports vidéo pour les réseaux, dont l'interface couvre le bas)
+const SAFEB = +((/[#&]safe=(\d+)/.exec(location.hash) || [])[1] || 0);
+function capFoot() { return (LAND ? Math.max(104, H * 0.15) : 128) + SAFEB; }
 function buildCaps() {
   try {
     const fs = LAND ? Math.max(34, Math.min(58, W * 0.031)) : Math.max(24, Math.min(34, W * 0.072));
