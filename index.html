@@ -1449,13 +1449,14 @@ function vec(word) {
 }
 
 /* ——— le titre, écrit avec des milliers de lettres ——— */
-let TPTS = [], TGS = 6;
+let TPTS = [], TGS = 6, TINK = null;
+const SMALLT = () => !LAND || W < 760;
 function buildTitle() {
   try {
     const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(W)); c.height = Math.max(1, Math.round(H));
     const x = c.getContext('2d');
     const lines = (LAND ? LX.title_land : LX.title_port).map(l => fr(l));
-    let fs = LAND ? Math.min(W * 0.07, H * 0.14) : W * 0.11;
+    let fs = LAND ? Math.min(W * 0.07, H * 0.14) : W * 0.125;
     x.font = `800 ${fs}px ${DISPLAY}`;
     const mw = Math.max(...lines.map(l => x.measureText(l).width)), lim = (LAND ? 0.74 : 0.9) * W;
     if (mw > lim) { fs *= lim / mw; x.font = `800 ${fs}px ${DISPLAY}`; }
@@ -1468,7 +1469,8 @@ function buildTitle() {
     const cand = [];
     for (let yy = 0; yy < c.height; yy += step) for (let xx = 0; xx < c.width; xx += step) if (d[(yy * c.width + xx) * 4 + 3] > 128) cand.push([xx, yy]);
     for (let i = cand.length - 1; i > 0; i--) { const j = Math.floor(hash(i, 91) * (i + 1)); const t = cand[i]; cand[i] = cand[j]; cand[j] = t; }
-    TPTS = cand; TGS = Math.max(5, Math.min(12, step * 1.9));
+    TPTS = cand; TGS = SMALLT() ? Math.max(3.5, Math.min(8, step * 1.35)) : Math.max(5, Math.min(12, step * 1.9));
+    TINK = { lines, fs, y0, lh };
   } catch (e) { TPTS = []; }
 }
 
@@ -1644,6 +1646,19 @@ function drawParticles(T, V) {
 }
 
 /* ——— l'ouverture : on pose la question ——— */
+// sur petit écran, les lettres-particules sont trop fines : une fois arrivées, le titre se fixe à l'encre
+function drawTitleInk(T) {
+  if (!TINK || T < 6.6 || T > 9.8) return;
+  const a = rv(T, 7.5, 0.9) * (1 - rv(T, 9.25, 0.3)); if (a <= 0.01) return;
+  const sv = DISP; DISP = false;
+  ctx.font = `800 ${TINK.fs}px ${DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  TINK.lines.forEach((l, i) => {
+    const y = TINK.y0 + i * TINK.lh;
+    ctx.globalAlpha = a * 0.55; ctx.strokeStyle = BG; ctx.lineWidth = TINK.fs * 0.16; ctx.strokeText(l, W / 2, y);
+    ctx.globalAlpha = a * 0.84; ctx.fillStyle = FG; ctx.fillText(l, W / 2, y);
+  });
+  ctx.globalAlpha = 1; DISP = sv;
+}
 function drawPrompt(T) {
   if (T > 2.8) return;
   // l'ouverture : un point de lumière qui bat, puis l'étincelle d'où jaillissent les lettres du titre
@@ -2387,6 +2402,7 @@ function render(T) {
   else {
     if (T < 79) { drawCoast(v[0], T); drawFlower(v[1], T); drawSeed(v[2], T); drawNucleus(v[3], T); drawAtom(v[4], T); }
     drawPrompt(T);
+    if (SMALLT()) drawTitleInk(T);
     drawSpace(T);
     drawBrain(T);
     DISP = false; drawParticles(T, V); DISP = true;
