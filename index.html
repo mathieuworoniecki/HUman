@@ -2160,7 +2160,13 @@ window.__card = (fmt, q) => makeCard(fmt, q || LX.outro_q[0]).toDataURL('image/p
   document.querySelectorAll('[data-card]').forEach(b => b.addEventListener('click', () => open(b.dataset.card)));
   document.getElementById('cv-close').addEventListener('click', () => view.classList.remove('on'));
   view.addEventListener('click', e => { if (e.target === view) view.classList.remove('on'); });
-  document.getElementById('cv-dl').addEventListener('click', () => { const a = document.createElement('a'); a.href = img.src; a.download = `human-${fmtNow}.png`; document.body.appendChild(a); a.click(); a.remove(); });
+  // dans claude.ai, le téléchargement passe par la capacité « downloads » ; ailleurs, un lien classique
+  let DL = null; try { if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { DL = d; }, () => {}); } catch (er) {}
+  document.getElementById('cv-dl').addEventListener('click', () => {
+    const name = `human-${fmtNow}.png`;
+    if (DL && blob) { DL.save({ filename: name, data: blob }).catch(() => {}); return; }
+    const a = document.createElement('a'); a.href = img.src; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  });
   const sh = document.getElementById('cv-share');
   sh.addEventListener('click', async () => {
     try { const f = new File([blob], `human-${fmtNow}.png`, { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f], title: LX.doc_title, text: shareUrl() }); else document.getElementById('cv-dl').click(); } catch (er) {}
