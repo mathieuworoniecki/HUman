@@ -17,10 +17,35 @@
   "lang_label": "Idioma",
   "sr_title": "¿Y si fuéramos el LLM más grande jamás observado?",
   "sr_desc": "Una experiencia animada en tinta china, en diez capítulos, que sigue la reflexión de Mathieu.",
-  "chapters": ["Apertura", "La IA", "El mundo", "La flor", "En el fondo", "El universo", "El cerebro", "El espejo", "El gran final", "El átomo"],
-  "questions": ["¿cómo funciona una IA?", "¿y yo, cómo funciono?", "¿qué me hace estar vivo?"],
-  "title_land": ["¿Y si fuéramos", "el LLM más grande", "jamás observado?"],
-  "title_port": ["¿Y si", "fuéramos el LLM", "más grande", "jamás observado?"],
+  "chapters": [
+    "Apertura",
+    "La IA",
+    "El mundo",
+    "La flor",
+    "En el fondo",
+    "El universo",
+    "El cerebro",
+    "El espejo",
+    "El gran final",
+    "El átomo",
+    "¿Y tú?"
+  ],
+  "questions": [
+    "¿cómo funciona una IA?",
+    "¿y yo, cómo funciono?",
+    "¿qué me hace estar vivo?"
+  ],
+  "title_land": [
+    "¿Y si fuéramos",
+    "el LLM más grande",
+    "jamás observado?"
+  ],
+  "title_port": [
+    "¿Y si",
+    "fuéramos el LLM",
+    "más grande",
+    "jamás observado?"
+  ],
   "caps": [
     "Para una IA, cada palabra es un punto en el espacio.",
     "Una frase es un camino. La palabra siguiente: un cálculo, y luego un sorteo.",
@@ -54,29 +79,243 @@
   "words": {
     "join": " ",
     "groups": [
-      ["mar", "luna", "flor", "árbol", "ola", "cielo", "estrella", "luz", "semilla"],
-      ["yo", "miro", "pienso", "soy", "sueño", "calculo", "mí", "ti", "corazón"],
-      ["el", "la", "los", "mi", "y", "que", "luego", "desde", "todo", "nada", "en", "mucho", "demasiado", "entonces"],
-      ["vida", "universo", "número", "espiral", "tiempo", "código"]
+      [
+        "mar",
+        "luna",
+        "flor",
+        "árbol",
+        "ola",
+        "cielo",
+        "estrella",
+        "luz",
+        "semilla"
+      ],
+      [
+        "yo",
+        "miro",
+        "pienso",
+        "soy",
+        "sueño",
+        "calculo",
+        "mí",
+        "ti",
+        "corazón"
+      ],
+      [
+        "el",
+        "la",
+        "los",
+        "mi",
+        "y",
+        "que",
+        "luego",
+        "desde",
+        "todo",
+        "nada",
+        "en",
+        "mucho",
+        "demasiado",
+        "entonces"
+      ],
+      [
+        "vida",
+        "universo",
+        "número",
+        "espiral",
+        "tiempo",
+        "código"
+      ]
     ],
     "start": "yo",
     "steps": [
-      [["miro", 0.41], ["pienso", 0.28], ["soy", 0.19], ["sueño", 0.07]],
-      [["el", 0.52], ["la", 0.31], ["los", 0.12], ["mi", 0.03]],
-      [["cielo", 0.34], ["mar", 0.29], ["árbol", 0.18], ["tiempo", 0.06]],
-      [["y", 0.44], ["que", 0.27], ["luego", 0.18], ["desde", 0.06]],
-      [["pienso", 0.39], ["sueño", 0.22], ["todo", 0.18], ["nada", 0.05]],
-      [["en", 0.36], ["que", 0.24], ["mucho", 0.21], ["demasiado", 0.09]],
-      [["el", 0.48], ["la", 0.30], ["mí", 0.08], ["ti", 0.05]],
-      [["universo", 0.31], ["tiempo", 0.27], ["cielo", 0.17], ["código", 0.06]]
+      [
+        [
+          "miro",
+          0.41
+        ],
+        [
+          "pienso",
+          0.28
+        ],
+        [
+          "soy",
+          0.19
+        ],
+        [
+          "sueño",
+          0.07
+        ]
+      ],
+      [
+        [
+          "el",
+          0.52
+        ],
+        [
+          "la",
+          0.31
+        ],
+        [
+          "los",
+          0.12
+        ],
+        [
+          "mi",
+          0.03
+        ]
+      ],
+      [
+        [
+          "cielo",
+          0.34
+        ],
+        [
+          "mar",
+          0.29
+        ],
+        [
+          "árbol",
+          0.18
+        ],
+        [
+          "tiempo",
+          0.06
+        ]
+      ],
+      [
+        [
+          "y",
+          0.44
+        ],
+        [
+          "que",
+          0.27
+        ],
+        [
+          "luego",
+          0.18
+        ],
+        [
+          "desde",
+          0.06
+        ]
+      ],
+      [
+        [
+          "pienso",
+          0.39
+        ],
+        [
+          "sueño",
+          0.22
+        ],
+        [
+          "todo",
+          0.18
+        ],
+        [
+          "nada",
+          0.05
+        ]
+      ],
+      [
+        [
+          "en",
+          0.36
+        ],
+        [
+          "que",
+          0.24
+        ],
+        [
+          "mucho",
+          0.21
+        ],
+        [
+          "demasiado",
+          0.09
+        ]
+      ],
+      [
+        [
+          "el",
+          0.48
+        ],
+        [
+          "la",
+          0.3
+        ],
+        [
+          "mí",
+          0.08
+        ],
+        [
+          "ti",
+          0.05
+        ]
+      ],
+      [
+        [
+          "universo",
+          0.31
+        ],
+        [
+          "tiempo",
+          0.27
+        ],
+        [
+          "cielo",
+          0.17
+        ],
+        [
+          "código",
+          0.06
+        ]
+      ]
     ],
-    "pick": [0, 0, 1, 0, 0, 0, 0, 0]
+    "pick": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "predict": {
     "sentence": "El gato bebe",
-    "rows": [["leche", 0.78], ["café", 0.09], ["té", 0.07], ["sangre", 0.02]]
+    "rows": [
+      [
+        "leche",
+        0.78
+      ],
+      [
+        "café",
+        0.09
+      ],
+      [
+        "té",
+        0.07
+      ],
+      [
+        "sangre",
+        0.02
+      ]
+    ]
   },
-  "amino": { "Met": "metionina", "Ala": "alanina", "Ile": "isoleucina", "Val": "valina", "Lys": "lisina", "Gly": "glicina", "Arg": "arginina", "Phe": "fenilalanina", "stop": "fin de la frase" },
+  "amino": {
+    "Met": "metionina",
+    "Ala": "alanina",
+    "Ile": "isoleucina",
+    "Val": "valina",
+    "Lys": "lisina",
+    "Gly": "glicina",
+    "Arg": "arginina",
+    "Phe": "fenilalanina",
+    "stop": "fin de la frase"
+  },
   "s": {
     "pct": "{0} %",
     "moon_r": "r = 1737 km",
@@ -223,5 +462,44 @@
     "lens_current": "la corriente",
     "lens_current_2": "cargas que circulan",
     "lens_current_3": "lo mismo, en todas partes"
-  }
+  },
+  "outro_kick": "Fin · ahora te toca a ti",
+  "outro_title": "¿Y tú, qué piensas?",
+  "outro_q": [
+    "Si mi cerebro predice lo que viene como un LLM, ¿qué me hace distinto: el cuerpo, el hambre, el miedo?",
+    "Si una IA dijera «me duele», ¿cómo sabría si de verdad siente algo?",
+    "Si todo es cálculo, ¿de verdad elegí mi última decisión?",
+    "El ADN es el prompt de la vida, reescrito en cada generación. ¿Quién escribió el primero?",
+    "¿Y si comprender no fuera más que predecir bien?"
+  ],
+  "further_title": "Para ir más lejos",
+  "further": [
+    [
+      "Being You",
+      "Anil Seth · 2021",
+      "la conciencia como predicción"
+    ],
+    [
+      "Surfing Uncertainty",
+      "Andy Clark · 2015",
+      "el cerebro, máquina de predecir"
+    ],
+    [
+      "I Am a Strange Loop",
+      "Douglas Hofstadter · 2007",
+      "el «yo», un bucle"
+    ],
+    [
+      "Our Mathematical Universe",
+      "Max Tegmark · 2014",
+      "¿está hecho de matemáticas el universo?"
+    ],
+    [
+      "Neural networks",
+      "3Blue1Brown · YouTube",
+      "cómo aprende una IA, en imágenes"
+    ]
+  ],
+  "share": "Compartir",
+  "copied": "Enlace copiado"
 }

@@ -1,0 +1,505 @@
+{
+  "name": "Português",
+  "dir": "ltr",
+  "cjk": false,
+  "doc_title": "Somos IAs?",
+  "brand_sub": "uma reflexão de Mathieu",
+  "sound_on": "Ativar o som",
+  "sound": "Som",
+  "pause": "Pausar",
+  "play": "Reproduzir",
+  "replay": "Repetir",
+  "again": "Rever",
+  "credit": "Uma reflexão de Mathieu, posta em imagens com Claude",
+  "chapters_label": "Capítulos",
+  "chapter_n": "Capítulo {0}: {1}",
+  "hint": "Roda do mouse: avançar, voltar",
+  "lang_label": "Idioma",
+  "sr_title": "E se fôssemos o maior LLM já observado?",
+  "sr_desc": "Uma experiência animada em nanquim, em dez capítulos, que acompanha a reflexão de Mathieu.",
+  "chapters": [
+    "Abertura",
+    "A IA",
+    "O mundo",
+    "A flor",
+    "Lá no fundo",
+    "O universo",
+    "O cérebro",
+    "O espelho",
+    "Os fogos",
+    "O átomo",
+    "E você?"
+  ],
+  "questions": [
+    "como funciona uma IA?",
+    "e eu, como é que eu funciono?",
+    "o que me faz estar vivo?"
+  ],
+  "title_land": [
+    "E se fôssemos",
+    "o maior LLM",
+    "já observado?"
+  ],
+  "title_port": [
+    "E se",
+    "fôssemos o",
+    "maior LLM",
+    "já observado?"
+  ],
+  "caps": [
+    "Para uma IA, cada palavra é um ponto no espaço.",
+    "Uma frase é um caminho. A próxima palavra: um cálculo, depois um sorteio.",
+    "Eu quis entender a IA. Encontrei matemática.",
+    "Então levantei os olhos.",
+    "E, para onde eu olhava, cálculos.",
+    "O mar: ondas simples que se somam.",
+    "Uma flor: cada semente a 137,5° da anterior.",
+    "Ela nunca aprendeu matemática. É a solução que sobreviveu.",
+    "Mais perto.",
+    "Em cada semente, um código. Quatro letras, lidas de três em três.",
+    "E, lá no fundo, a natureza tira a sorte.",
+    "O mundo se calcula. Mas não se prevê.",
+    "Espirais, da flor à galáxia.",
+    "E se o universo fosse só um grande algoritmo?",
+    "E eu? Sinais entre 86 bilhões de neurônios.",
+    "Um neurônio soma os sinais que recebe, cada um com seu peso. Um neurônio artificial faz o mesmo cálculo.",
+    "E meu cérebro passa o tempo prevendo o que vem a seguir. Como um LLM.",
+    "Eu sou uma IA?",
+    "Não um LLM. Um corpo que aprendeu a falar por último.",
+    "Um corpo que se mantém sozinho, e que sente.",
+    "E se a gente refizesse todo o caminho, de uma vez só?",
+    "A complexidade da vida, em ritmo acelerado.",
+    "E tudo se resume a isto: um átomo.",
+    "Eletricidade que circula.",
+    "Num neurônio.",
+    "Nos parâmetros de uma IA.",
+    "Se tudo é cálculo, por que eu sinto o que é ser eu?"
+  ],
+  "glyphs": "abcdefghijlmnopqrstuvxzçãé",
+  "words": {
+    "join": " ",
+    "groups": [
+      [
+        "mar",
+        "lua",
+        "flor",
+        "árvore",
+        "onda",
+        "céu",
+        "estrela",
+        "luz",
+        "sol"
+      ],
+      [
+        "eu",
+        "olho",
+        "penso",
+        "sou",
+        "sonho",
+        "calculo",
+        "mim",
+        "você",
+        "coração"
+      ],
+      [
+        "o",
+        "a",
+        "os",
+        "meu",
+        "e",
+        "que",
+        "para",
+        "no",
+        "em",
+        "enquanto",
+        "depois",
+        "tudo",
+        "nada",
+        "demais"
+      ],
+      [
+        "vida",
+        "universo",
+        "número",
+        "espiral",
+        "tempo",
+        "código"
+      ]
+    ],
+    "start": "eu",
+    "steps": [
+      [
+        [
+          "olho",
+          0.41
+        ],
+        [
+          "penso",
+          0.28
+        ],
+        [
+          "sou",
+          0.19
+        ],
+        [
+          "sonho",
+          0.07
+        ]
+      ],
+      [
+        [
+          "para",
+          0.52
+        ],
+        [
+          "o",
+          0.31
+        ],
+        [
+          "a",
+          0.12
+        ],
+        [
+          "meu",
+          0.03
+        ]
+      ],
+      [
+        [
+          "o",
+          0.34
+        ],
+        [
+          "a",
+          0.29
+        ],
+        [
+          "os",
+          0.18
+        ],
+        [
+          "mim",
+          0.06
+        ]
+      ],
+      [
+        [
+          "céu",
+          0.44
+        ],
+        [
+          "mar",
+          0.27
+        ],
+        [
+          "sol",
+          0.18
+        ],
+        [
+          "tempo",
+          0.06
+        ]
+      ],
+      [
+        [
+          "e",
+          0.39
+        ],
+        [
+          "que",
+          0.22
+        ],
+        [
+          "enquanto",
+          0.18
+        ],
+        [
+          "depois",
+          0.05
+        ]
+      ],
+      [
+        [
+          "penso",
+          0.36
+        ],
+        [
+          "sonho",
+          0.24
+        ],
+        [
+          "calculo",
+          0.21
+        ],
+        [
+          "sou",
+          0.09
+        ]
+      ],
+      [
+        [
+          "no",
+          0.48
+        ],
+        [
+          "em",
+          0.3
+        ],
+        [
+          "que",
+          0.08
+        ],
+        [
+          "demais",
+          0.05
+        ]
+      ],
+      [
+        [
+          "universo",
+          0.31
+        ],
+        [
+          "tempo",
+          0.27
+        ],
+        [
+          "céu",
+          0.17
+        ],
+        [
+          "código",
+          0.06
+        ]
+      ]
+    ],
+    "pick": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "predict": {
+    "sentence": "O gato bebe",
+    "rows": [
+      [
+        "leite",
+        0.78
+      ],
+      [
+        "café",
+        0.09
+      ],
+      [
+        "chá",
+        0.07
+      ],
+      [
+        "sangue",
+        0.02
+      ]
+    ]
+  },
+  "amino": {
+    "Met": "metionina",
+    "Ala": "alanina",
+    "Ile": "isoleucina",
+    "Val": "valina",
+    "Lys": "lisina",
+    "Gly": "glicina",
+    "Arg": "arginina",
+    "Phe": "fenilalanina",
+    "stop": "fim da frase"
+  },
+  "s": {
+    "pct": "{0}%",
+    "moon_r": "r = 1.737 km",
+    "horizon": "horizonte: d ≈ 3,57 √h ≈ 11 km",
+    "rule7": "uma regra · repetida 7 vezes",
+    "wave_n": "onda {0}",
+    "wave_sum": "= a onda do mar",
+    "dna_startstop": "ATG = início · TAG = fim",
+    "atom_where": "onde estará o elétron?",
+    "atom_draws": "sorteios: {0}",
+    "atom_dist": "distância ao núcleo →",
+    "atom_calc": "┄ o cálculo: |ψ|²",
+    "atom_msg1": "cada sorteio: imprevisível",
+    "atom_msg2": "…mas, somados, desenham uma forma",
+    "atom_msg3": "o acaso segue o cálculo, exatamente",
+    "atom_draw_n": "sorteio nº {0}",
+    "atom_shape": "a forma: calculada",
+    "atom_nucleus": "núcleo",
+    "neurons_w": "≈ 86.000.000.000 neurônios · ≈ 20 W",
+    "bio_neuron": "NEURÔNIO BIOLÓGICO",
+    "dendrites": "dendritos: as entradas",
+    "soma": "o corpo soma",
+    "axon": "axônio: a saída",
+    "art_neuron": "NEURÔNIO ARTIFICIAL",
+    "neuron_sum": "0,8×0,9 + 0,3×0,4 + 0,6×(−0,2) = 0,72",
+    "neuron_fire": "0,72 > limiar → o neurônio se ativa",
+    "pred_head": "o que o seu cérebro prevê",
+    "pred_msg0": "seu cérebro prevê…",
+    "pred_msg1": "previsão: {0}",
+    "pred_msg2": "a palavra chega: “{0}”. Prevista, nenhuma surpresa.",
+    "pred_msg2s": "“{0}”: prevista, nenhuma surpresa.",
+    "pred_ok": "✓ previsto",
+    "lorenz_gap": "um milésimo de diferença na partida",
+    "lorenz": "atrator de Lorenz · 1963",
+    "fin_atom": "ÁTOMO",
+    "fin_atom_l": "cargas que se movem",
+    "fin_neuron": "NEURÔNIO",
+    "fin_neuron_l": "um sinal elétrico",
+    "fin_ia": "IA",
+    "fin_ia_l": "bilhões de pesos",
+    "fin_same": "a mesma corrente",
+    "fin_three": "átomo · neurônio · IA",
+    "ws_next": "a próxima palavra?",
+    "ws_calc": "calculando as probabilidades…",
+    "ws_roll": "sorteando…",
+    "ws_top": "sorteada: a mais provável",
+    "ws_nottop": "sorteada: não a mais provável!",
+    "lens_pt": "um ponto entre {0}",
+    "lens_pt_2": "uma letra = pontos",
+    "lens_pt_3": "um ponto = dois números",
+    "lens_word_vec": "vetor {0}",
+    "lens_word_near": "perto de “{0}” · cos = {1}",
+    "lens_word_sense": "o sentido = uma direção",
+    "lens_moon": "a Lua",
+    "lens_moon_1": "distância: 384.400 km",
+    "lens_moon_3": "ela puxa o mar: duas marés por dia",
+    "lens_me": "eu",
+    "lens_me_1": "≈ 86 bilhões de neurônios",
+    "lens_me_2": "≈ 20 W: uma lâmpada",
+    "lens_me_3": "eu olho, eu prevejo, eu calculo",
+    "lens_branch": "galho · nível {0}",
+    "lens_branch_1": "comprimento = tronco × 0,72^{0}",
+    "lens_branch_2": "ângulo ≈ ±24° a cada bifurcação",
+    "lens_branch_3": "{0} galhos neste nível",
+    "lens_branch_4": "a mesma regra, repetida: um fractal",
+    "lens_wave": "uma onda",
+    "lens_wave_4": "três ondas simples, somadas",
+    "lens_star": "uma estrela",
+    "lens_star_1": "sua luz partiu há {0} anos",
+    "lens_star_2": "no coração: 4 H → He + energia",
+    "lens_seed": "semente nº {0}",
+    "lens_seed_1": "ângulo = {0} × 137,5° = {1}°",
+    "lens_seed_2": "ou seja, {0}° após {1} voltas",
+    "lens_seed_3": "distância ao centro ∝ √{0} = {1}",
+    "lens_seed_4": "vizinhas: ±21 e ±34, de Fibonacci",
+    "lens_petal": "pétala {0} / 34",
+    "lens_petal_1": "34: um número de Fibonacci",
+    "lens_petal_3": "cada um = a soma dos dois anteriores",
+    "lens_nucleus": "o núcleo",
+    "lens_nucleus_1": "o programa da planta",
+    "lens_nucleus_2": "bilhões de letras",
+    "lens_nucleus_3": "a mesma cópia em cada célula",
+    "lens_cell": "uma célula",
+    "lens_cell_1": "ela se divide: 1 → 2 → 4 → 8",
+    "lens_cell_2": "após 40 divisões: {0} × 10¹²",
+    "lens_cell_3": "cada uma leva o código inteiro",
+    "lens_dna_1": "{0} ligações de hidrogênio",
+    "lens_dna_2": "palavra {0} → {1}",
+    "lens_dna_3": "4 letras, lidas de 3 em 3: 64 palavras",
+    "lens_dna_4": "um erro de leitura = uma mutação",
+    "lens_chrom": "um cromossomo",
+    "lens_chrom_1": "o DNA de uma célula: ≈ 2 m",
+    "lens_chrom_2": "dobrado em 6 milésimos de mm",
+    "lens_chrom_3": "temos 46 cromossomos",
+    "lens_psi": "|ψ|² aqui",
+    "lens_psi_1": "densidade: {0}% do máximo",
+    "lens_psi_2": "sorteios neste círculo: {0} / {1}",
+    "lens_psi_3": "distância ao núcleo: {0} raios de Bohr",
+    "lens_psi_4": "provável, nunca certo",
+    "lens_bang_1": "tudo cabia num ponto",
+    "lens_bang_2": "depois, a expansão: v = H₀ · d",
+    "lens_bang_3": "H₀ ≈ 70 km/s por megaparsec",
+    "lens_lorenz": "atrator de Lorenz",
+    "lens_lorenz_4": "regras simples, um futuro imprevisível",
+    "lens_gal": "um braço da galáxia",
+    "lens_gal_1": "r = a · e^(0,22 · θ): espiral logarítmica",
+    "lens_gal_2": "aqui θ = {0} rad",
+    "lens_gal_3": "≈ 200 bilhões de estrelas",
+    "lens_gal_4": "a mesma espiral da flor",
+    "lens_cluster": "um aglomerado de galáxias",
+    "lens_cluster_1": "{0} filamentos o ligam",
+    "lens_cluster_2": "a matéria segue a gravidade",
+    "lens_cluster_3": "a teia cósmica se parece com…",
+    "lens_neuron": "um neurônio",
+    "lens_neuron_1": "{0} sinapses · pesos {1}",
+    "lens_neuron_2": "Σ peso × sinal > limiar → ele se ativa",
+    "lens_neuron_3": "…um cérebro",
+    "lens_sum_on": "> 0,5 → ele se ativa",
+    "lens_sum_off": "< 0,5 → ele se cala",
+    "lens_brain_3": "e 86 bilhões fazem igual, ao mesmo tempo",
+    "lens_mirror_me_1": "≈ 37 °C, e eu preciso comer",
+    "lens_mirror_me_2": "≈ 30 trilhões de células",
+    "lens_mirror_me_3": "eu sinto: a fome, o frio, o medo",
+    "lens_ai": "uma IA",
+    "lens_mirror_ai_1": "≈ 10¹² parâmetros: números",
+    "lens_mirror_ai_2": "sem corpo, sem fome",
+    "lens_mirror_ai_3": "ela calcula. Será que sente?",
+    "lens_sheaf": "um feixe de faíscas",
+    "lens_sheaf_1": "cada faísca: uma parábola",
+    "lens_sheaf_3": "aqui t = {0} s",
+    "lens_life": "a vida, acelerada",
+    "lens_life_1": "estrelas → átomos → DNA → flor → cérebro",
+    "lens_life_2": "13,8 bilhões de anos",
+    "lens_life_3": "em 6 segundos",
+    "lens_electron": "o elétron",
+    "lens_electron_1": "carga: −1,602 × 10⁻¹⁹ C",
+    "lens_electron_2": "quando ele se move: corrente",
+    "lens_electron_3": "≈ 10⁻¹⁰ m, quase só vazio",
+    "lens_fneuron_1": "repouso: −70 mV",
+    "lens_fneuron_2": "ele dispara a +30 mV, em 1 ms",
+    "lens_fneuron_3": "íons que passam: corrente",
+    "lens_fai_2": "bilhões de pesos w",
+    "lens_fai_3": "em transistores: ≈ 1 V",
+    "lens_current": "a corrente",
+    "lens_current_2": "cargas que circulam",
+    "lens_current_3": "a mesma coisa, em toda parte"
+  },
+  "outro_kick": "Fim · agora é com você",
+  "outro_title": "E você, o que acha?",
+  "outro_q": [
+    "Se meu cérebro prevê o que vem a seguir como um LLM, o que me torna diferente: o corpo, a fome, o medo?",
+    "Se uma IA dissesse “está doendo”, como eu saberia se ela sente algo de verdade?",
+    "Se tudo é cálculo, eu realmente escolhi minha última decisão?",
+    "O DNA é o prompt da vida, reescrito a cada geração. Quem escreveu o primeiro?",
+    "E se entender fosse só prever bem?"
+  ],
+  "further_title": "Para ir mais longe",
+  "further": [
+    [
+      "Being You",
+      "Anil Seth · 2021",
+      "a consciência como previsão"
+    ],
+    [
+      "Surfing Uncertainty",
+      "Andy Clark · 2015",
+      "o cérebro, máquina de prever"
+    ],
+    [
+      "I Am a Strange Loop",
+      "Douglas Hofstadter · 2007",
+      "o “eu”, um laço"
+    ],
+    [
+      "Our Mathematical Universe",
+      "Max Tegmark · 2014",
+      "o universo é feito de matemática?"
+    ],
+    [
+      "Neural networks",
+      "3Blue1Brown · YouTube",
+      "como uma IA aprende, em imagens"
+    ]
+  ],
+  "share": "Compartilhar",
+  "copied": "Link copiado"
+}

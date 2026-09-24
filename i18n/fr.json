@@ -17,10 +17,35 @@
   "lang_label": "Langue",
   "sr_title": "Et si nous étions le plus gros LLM jamais observé ?",
   "sr_desc": "Une expérience animée à l'encre de Chine, en dix chapitres, qui suit la réflexion de Mathieu.",
-  "chapters": ["Ouverture", "L'IA", "Le monde", "La fleur", "Au fond", "L'univers", "Le cerveau", "Le miroir", "Le bouquet", "L'atome"],
-  "questions": ["comment marche une IA ?", "et moi, comment je marche ?", "qu'est-ce qui me rend vivant ?"],
-  "title_land": ["Et si nous étions", "le plus gros LLM", "jamais observé ?"],
-  "title_port": ["Et si nous", "étions le plus", "gros LLM jamais", "observé ?"],
+  "chapters": [
+    "Ouverture",
+    "L'IA",
+    "Le monde",
+    "La fleur",
+    "Au fond",
+    "L'univers",
+    "Le cerveau",
+    "Le miroir",
+    "Le bouquet",
+    "L'atome",
+    "Et toi ?"
+  ],
+  "questions": [
+    "comment marche une IA ?",
+    "et moi, comment je marche ?",
+    "qu'est-ce qui me rend vivant ?"
+  ],
+  "title_land": [
+    "Et si nous étions",
+    "le plus gros LLM",
+    "jamais observé ?"
+  ],
+  "title_port": [
+    "Et si nous",
+    "étions le plus",
+    "gros LLM jamais",
+    "observé ?"
+  ],
   "caps": [
     "Pour une IA, chaque mot est un point dans l'espace.",
     "Une phrase est un chemin. Le mot suivant : un calcul, puis un tirage au sort.",
@@ -54,29 +79,243 @@
   "words": {
     "join": " ",
     "groups": [
-      ["mer", "lune", "fleur", "arbre", "vague", "ciel", "étoile", "lumière", "graine"],
-      ["je", "regarde", "pense", "suis", "rêve", "calcule", "moi", "toi", "cœur"],
-      ["la", "le", "les", "mon", "et", "qui", "puis", "depuis", "tout", "rien", "à", "que", "trop", "donc"],
-      ["vie", "l'univers", "nombre", "spirale", "temps", "code"]
+      [
+        "mer",
+        "lune",
+        "fleur",
+        "arbre",
+        "vague",
+        "ciel",
+        "étoile",
+        "lumière",
+        "graine"
+      ],
+      [
+        "je",
+        "regarde",
+        "pense",
+        "suis",
+        "rêve",
+        "calcule",
+        "moi",
+        "toi",
+        "cœur"
+      ],
+      [
+        "la",
+        "le",
+        "les",
+        "mon",
+        "et",
+        "qui",
+        "puis",
+        "depuis",
+        "tout",
+        "rien",
+        "à",
+        "que",
+        "trop",
+        "donc"
+      ],
+      [
+        "vie",
+        "l'univers",
+        "nombre",
+        "spirale",
+        "temps",
+        "code"
+      ]
     ],
     "start": "je",
     "steps": [
-      [["regarde", 0.41], ["pense", 0.28], ["suis", 0.19], ["rêve", 0.07]],
-      [["la", 0.52], ["le", 0.31], ["les", 0.12], ["mon", 0.03]],
-      [["lune", 0.34], ["mer", 0.29], ["fleur", 0.18], ["vie", 0.06]],
-      [["et", 0.44], ["qui", 0.27], ["puis", 0.18], ["depuis", 0.06]],
-      [["je", 0.39], ["tout", 0.22], ["rien", 0.18], ["donc", 0.05]],
-      [["pense", 0.36], ["rêve", 0.24], ["calcule", 0.21], ["suis", 0.09]],
-      [["à", 0.48], ["que", 0.30], ["trop", 0.08], ["donc", 0.05]],
-      [["l'univers", 0.31], ["moi", 0.27], ["toi", 0.17], ["rien", 0.06]]
+      [
+        [
+          "regarde",
+          0.41
+        ],
+        [
+          "pense",
+          0.28
+        ],
+        [
+          "suis",
+          0.19
+        ],
+        [
+          "rêve",
+          0.07
+        ]
+      ],
+      [
+        [
+          "la",
+          0.52
+        ],
+        [
+          "le",
+          0.31
+        ],
+        [
+          "les",
+          0.12
+        ],
+        [
+          "mon",
+          0.03
+        ]
+      ],
+      [
+        [
+          "lune",
+          0.34
+        ],
+        [
+          "mer",
+          0.29
+        ],
+        [
+          "fleur",
+          0.18
+        ],
+        [
+          "vie",
+          0.06
+        ]
+      ],
+      [
+        [
+          "et",
+          0.44
+        ],
+        [
+          "qui",
+          0.27
+        ],
+        [
+          "puis",
+          0.18
+        ],
+        [
+          "depuis",
+          0.06
+        ]
+      ],
+      [
+        [
+          "je",
+          0.39
+        ],
+        [
+          "tout",
+          0.22
+        ],
+        [
+          "rien",
+          0.18
+        ],
+        [
+          "donc",
+          0.05
+        ]
+      ],
+      [
+        [
+          "pense",
+          0.36
+        ],
+        [
+          "rêve",
+          0.24
+        ],
+        [
+          "calcule",
+          0.21
+        ],
+        [
+          "suis",
+          0.09
+        ]
+      ],
+      [
+        [
+          "à",
+          0.48
+        ],
+        [
+          "que",
+          0.3
+        ],
+        [
+          "trop",
+          0.08
+        ],
+        [
+          "donc",
+          0.05
+        ]
+      ],
+      [
+        [
+          "l'univers",
+          0.31
+        ],
+        [
+          "moi",
+          0.27
+        ],
+        [
+          "toi",
+          0.17
+        ],
+        [
+          "rien",
+          0.06
+        ]
+      ]
     ],
-    "pick": [0, 0, 1, 0, 0, 0, 0, 0]
+    "pick": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "predict": {
     "sentence": "Le chat boit du",
-    "rows": [["lait", 0.78], ["café", 0.09], ["thé", 0.07], ["sang", 0.02]]
+    "rows": [
+      [
+        "lait",
+        0.78
+      ],
+      [
+        "café",
+        0.09
+      ],
+      [
+        "thé",
+        0.07
+      ],
+      [
+        "sang",
+        0.02
+      ]
+    ]
   },
-  "amino": { "Met": "méthionine", "Ala": "alanine", "Ile": "isoleucine", "Val": "valine", "Lys": "lysine", "Gly": "glycine", "Arg": "arginine", "Phe": "phénylalanine", "stop": "fin de la phrase" },
+  "amino": {
+    "Met": "méthionine",
+    "Ala": "alanine",
+    "Ile": "isoleucine",
+    "Val": "valine",
+    "Lys": "lysine",
+    "Gly": "glycine",
+    "Arg": "arginine",
+    "Phe": "phénylalanine",
+    "stop": "fin de la phrase"
+  },
   "s": {
     "pct": "{0} %",
     "moon_r": "r = 1 737 km",
@@ -223,5 +462,44 @@
     "lens_current": "le courant",
     "lens_current_2": "des charges qui circulent",
     "lens_current_3": "la même chose, partout"
-  }
+  },
+  "outro_kick": "Fin · à toi de continuer",
+  "outro_title": "Et toi, qu'en penses-tu ?",
+  "outro_q": [
+    "Si mon cerveau prédit la suite comme un LLM, qu'est-ce qui me rend différent : le corps, la faim, la peur ?",
+    "Si une IA disait « j'ai mal », comment saurais-je qu'elle ressent vraiment quelque chose ?",
+    "Si tout est calcul, ai-je vraiment choisi ma dernière décision ?",
+    "L'ADN est le prompt de la vie, réécrit à chaque génération. Qui a écrit le premier ?",
+    "Et si comprendre, ce n'était que bien prédire ?"
+  ],
+  "further_title": "Pour aller plus loin",
+  "further": [
+    [
+      "Being You",
+      "Anil Seth · 2021",
+      "la conscience comme prédiction"
+    ],
+    [
+      "Surfing Uncertainty",
+      "Andy Clark · 2015",
+      "le cerveau, machine à prédire"
+    ],
+    [
+      "I Am a Strange Loop",
+      "Douglas Hofstadter · 2007",
+      "le « je », une boucle"
+    ],
+    [
+      "Our Mathematical Universe",
+      "Max Tegmark · 2014",
+      "l'univers est-il fait de maths ?"
+    ],
+    [
+      "Neural networks",
+      "3Blue1Brown · YouTube",
+      "comment une IA apprend, en images"
+    ]
+  ],
+  "share": "Partager",
+  "copied": "Lien copié"
 }

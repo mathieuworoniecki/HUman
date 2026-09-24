@@ -6,7 +6,7 @@ ref = json.loads((root / 'fr.json').read_text(encoding='utf-8'))
 def check(c, d):
     assert set(d) == set(ref), (c, set(ref) ^ set(d))
     assert set(d['s']) == set(ref['s']), (c, set(ref['s']) ^ set(d['s']))
-    assert len(d['caps']) == len(ref['caps']) and len(d['chapters']) == 10, c
+    assert len(d['caps']) == len(ref['caps']) and len(d['chapters']) == 11, c
     ws = set(w for g in d['words']['groups'] for w in g)
     assert all(w in ws for st in d['words']['steps'] for w, _ in st) and d['words']['start'] in ws, c
     assert len(d['words']['steps']) == 8 and len(d['words']['pick']) == 8, c

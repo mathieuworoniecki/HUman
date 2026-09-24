@@ -17,10 +17,35 @@
   "lang_label": "Language",
   "sr_title": "What if we were the biggest LLM ever observed?",
   "sr_desc": "An animated experience in India ink, in ten chapters, following Mathieu's reflection.",
-  "chapters": ["Opening", "AI", "The world", "The flower", "Deep down", "The universe", "The brain", "The mirror", "The finale", "The atom"],
-  "questions": ["how does an AI work?", "and me, how do I work?", "what makes me alive?"],
-  "title_land": ["What if we were", "the biggest LLM", "ever observed?"],
-  "title_port": ["What if", "we were the", "biggest LLM", "ever observed?"],
+  "chapters": [
+    "Opening",
+    "AI",
+    "The world",
+    "The flower",
+    "Deep down",
+    "The universe",
+    "The brain",
+    "The mirror",
+    "The finale",
+    "The atom",
+    "And you?"
+  ],
+  "questions": [
+    "how does an AI work?",
+    "and me, how do I work?",
+    "what makes me alive?"
+  ],
+  "title_land": [
+    "What if we were",
+    "the biggest LLM",
+    "ever observed?"
+  ],
+  "title_port": [
+    "What if",
+    "we were the",
+    "biggest LLM",
+    "ever observed?"
+  ],
   "caps": [
     "To an AI, every word is a point in space.",
     "A sentence is a path. The next word: a calculation, then a roll of the dice.",
@@ -54,29 +79,243 @@
   "words": {
     "join": " ",
     "groups": [
-      ["sea", "moon", "flower", "tree", "wave", "sky", "star", "light", "seed"],
-      ["I", "look at", "think", "am", "dream", "compute", "me", "you", "heart"],
-      ["the", "a", "my", "this", "and", "that", "then", "since", "everything", "nothing", "of", "about", "too", "so"],
-      ["life", "the universe", "number", "spiral", "time", "code"]
+      [
+        "sea",
+        "moon",
+        "flower",
+        "tree",
+        "wave",
+        "sky",
+        "star",
+        "light",
+        "seed"
+      ],
+      [
+        "I",
+        "look at",
+        "think",
+        "am",
+        "dream",
+        "compute",
+        "me",
+        "you",
+        "heart"
+      ],
+      [
+        "the",
+        "a",
+        "my",
+        "this",
+        "and",
+        "that",
+        "then",
+        "since",
+        "everything",
+        "nothing",
+        "of",
+        "about",
+        "too",
+        "so"
+      ],
+      [
+        "life",
+        "the universe",
+        "number",
+        "spiral",
+        "time",
+        "code"
+      ]
     ],
     "start": "I",
     "steps": [
-      [["look at", 0.41], ["think", 0.28], ["am", 0.19], ["dream", 0.07]],
-      [["the", 0.52], ["a", 0.31], ["my", 0.12], ["this", 0.03]],
-      [["moon", 0.34], ["sea", 0.29], ["flower", 0.18], ["life", 0.06]],
-      [["and", 0.44], ["that", 0.27], ["then", 0.18], ["since", 0.06]],
-      [["I", 0.39], ["everything", 0.22], ["nothing", 0.18], ["so", 0.05]],
-      [["think", 0.36], ["dream", 0.24], ["compute", 0.21], ["am", 0.09]],
-      [["of", 0.48], ["about", 0.30], ["that", 0.08], ["too", 0.05]],
-      [["the universe", 0.31], ["me", 0.27], ["you", 0.17], ["nothing", 0.06]]
+      [
+        [
+          "look at",
+          0.41
+        ],
+        [
+          "think",
+          0.28
+        ],
+        [
+          "am",
+          0.19
+        ],
+        [
+          "dream",
+          0.07
+        ]
+      ],
+      [
+        [
+          "the",
+          0.52
+        ],
+        [
+          "a",
+          0.31
+        ],
+        [
+          "my",
+          0.12
+        ],
+        [
+          "this",
+          0.03
+        ]
+      ],
+      [
+        [
+          "moon",
+          0.34
+        ],
+        [
+          "sea",
+          0.29
+        ],
+        [
+          "flower",
+          0.18
+        ],
+        [
+          "life",
+          0.06
+        ]
+      ],
+      [
+        [
+          "and",
+          0.44
+        ],
+        [
+          "that",
+          0.27
+        ],
+        [
+          "then",
+          0.18
+        ],
+        [
+          "since",
+          0.06
+        ]
+      ],
+      [
+        [
+          "I",
+          0.39
+        ],
+        [
+          "everything",
+          0.22
+        ],
+        [
+          "nothing",
+          0.18
+        ],
+        [
+          "so",
+          0.05
+        ]
+      ],
+      [
+        [
+          "think",
+          0.36
+        ],
+        [
+          "dream",
+          0.24
+        ],
+        [
+          "compute",
+          0.21
+        ],
+        [
+          "am",
+          0.09
+        ]
+      ],
+      [
+        [
+          "of",
+          0.48
+        ],
+        [
+          "about",
+          0.3
+        ],
+        [
+          "that",
+          0.08
+        ],
+        [
+          "too",
+          0.05
+        ]
+      ],
+      [
+        [
+          "the universe",
+          0.31
+        ],
+        [
+          "me",
+          0.27
+        ],
+        [
+          "you",
+          0.17
+        ],
+        [
+          "nothing",
+          0.06
+        ]
+      ]
     ],
-    "pick": [0, 0, 1, 0, 0, 0, 0, 0]
+    "pick": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "predict": {
     "sentence": "The cat drinks",
-    "rows": [["milk", 0.78], ["coffee", 0.09], ["tea", 0.07], ["blood", 0.02]]
+    "rows": [
+      [
+        "milk",
+        0.78
+      ],
+      [
+        "coffee",
+        0.09
+      ],
+      [
+        "tea",
+        0.07
+      ],
+      [
+        "blood",
+        0.02
+      ]
+    ]
   },
-  "amino": { "Met": "methionine", "Ala": "alanine", "Ile": "isoleucine", "Val": "valine", "Lys": "lysine", "Gly": "glycine", "Arg": "arginine", "Phe": "phenylalanine", "stop": "end of the sentence" },
+  "amino": {
+    "Met": "methionine",
+    "Ala": "alanine",
+    "Ile": "isoleucine",
+    "Val": "valine",
+    "Lys": "lysine",
+    "Gly": "glycine",
+    "Arg": "arginine",
+    "Phe": "phenylalanine",
+    "stop": "end of the sentence"
+  },
   "s": {
     "pct": "{0}%",
     "moon_r": "r = 1,737 km",
@@ -223,5 +462,44 @@
     "lens_current": "the current",
     "lens_current_2": "charges on the move",
     "lens_current_3": "the same thing, everywhere"
-  }
+  },
+  "outro_kick": "The end · your turn",
+  "outro_title": "And you, what do you think?",
+  "outro_q": [
+    "If my brain predicts what comes next like an LLM, what makes me different: my body, hunger, fear?",
+    "If an AI said “it hurts”, how would I know whether it really feels anything?",
+    "If everything is calculation, did I really choose my last decision?",
+    "DNA is life's prompt, rewritten with every generation. Who wrote the first one?",
+    "And what if understanding were simply predicting well?"
+  ],
+  "further_title": "To go further",
+  "further": [
+    [
+      "Being You",
+      "Anil Seth · 2021",
+      "consciousness as prediction"
+    ],
+    [
+      "Surfing Uncertainty",
+      "Andy Clark · 2015",
+      "the brain as a prediction machine"
+    ],
+    [
+      "I Am a Strange Loop",
+      "Douglas Hofstadter · 2007",
+      "the “I” as a loop"
+    ],
+    [
+      "Our Mathematical Universe",
+      "Max Tegmark · 2014",
+      "is the universe made of math?"
+    ],
+    [
+      "Neural networks",
+      "3Blue1Brown · YouTube",
+      "how an AI learns, visually"
+    ]
+  ],
+  "share": "Share",
+  "copied": "Link copied"
 }
