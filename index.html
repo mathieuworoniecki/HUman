@@ -292,7 +292,7 @@ function setNight(n) {
 const cv = document.getElementById('c'), out = cv.getContext('2d');
 const sc = document.createElement('canvas'), ctx = sc.getContext('2d');
 const bl = document.createElement('canvas'), blx = bl.getContext('2d');
-let W = 1, H = 1, DPR = 1, dprCap = 1.75, S0b = 1, LAND = true, CX = 0, CY = 0, MM = 1, NP = 1400, jump = true;
+let W = 1, H = 1, DPR = 1, dprCap = 1.75, S0b = 1, LAND = true, CAPB = false, CX = 0, CY = 0, MM = 1, NP = 1400, jump = true;
 let zMoon = 5, CF = [0, 0], RF = 1, PCX = 0, PCY = 0, SP = 1, PGAP = 1;
 const NS = 600, NPMAX = 2400;
 
@@ -802,9 +802,48 @@ for (let k = 0; k < 9; k++) {
   CHROM.push(P);
 }
 const CODONS = [['ATG','Met'],['GCC','Ala'],['ATT','Ile'],['GTA','Val'],['AAG','Lys'],['GGC','Gly'],['CGC','Arg'],['TTC','Phe'],['AAG','Lys'],['GGT','Gly'],['GCC','Ala'],['TAG','stop']];
+// en fond, on entre dans un brin : une double hélice géante tourne sur elle-même et glisse vers nous
+const BASEC = { A: 'T', T: 'A', G: 'C', C: 'G' };
+function helixBack(T, a, g, o) {
+  const R = o.r * MM * g, P = 3.4 * R, ux = Math.cos(o.ang), uy = Math.sin(o.ang), nx = -uy, ny = ux;
+  const cx = CX + o.dx * W, cy = CY + o.dy * H, L = Math.hypot(W, H) * 0.62, s0 = T * o.v * MM, w = T * o.w;
+  const step = Math.max(2, R * 0.06), bp = P / 10.5, back = [], front = [], lw = o.sz * Math.sqrt(g);
+  const at = (s, k) => { const ph = TAU * (s + s0) / P + w + k * 2.2, q = R * Math.cos(ph); return [cx + ux * s + nx * q, cy + uy * s + ny * q, Math.sin(ph)]; };
+  const fall = s => Math.max(0, 1 - Math.pow(Math.abs(s) / L, 2.2));
+  for (let k = 0; k < 2; k++) for (let s = -L; s < L; s += step) {
+    const p = at(s, k), q = at(s + step, k), z = (p[2] + q[2]) / 2;
+    (z < 0 ? back : front).push([p[0], p[1], q[0], q[1], z, fall(s)]);
+  }
+  const segs = Ls => { for (const [x1, y1, x2, y2, z, f] of Ls) { const e = (z + 1) / 2; ctx.globalAlpha = a * o.al * f * (0.25 + 0.75 * e); ctx.lineWidth = (1 + 4.5 * e) * lw; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); } };
+  ctx.strokeStyle = FG; ctx.lineCap = 'round';
+  segs(back);
+  // les barreaux : une paire de bases tous les 1/10,5 de tour ; au premier plan, on lit les lettres
+  const px = Math.round(Math.min(20, R * 0.13));
+  for (let j = Math.ceil((-L + s0) / bp); j * bp - s0 <= L; j++) {
+    const s = j * bp - s0, f = fall(s); if (f <= 0) continue;
+    const A = at(s, 0), B = at(s, 1), e = (A[2] + B[2] + 2) / 4, mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+    ctx.globalAlpha = a * o.al * f * (0.12 + 0.45 * e); ctx.lineWidth = (0.6 + 1.6 * e) * lw;
+    ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(lerp(A[0], mx, .93), lerp(A[1], my, .93)); ctx.moveTo(lerp(B[0], mx, .93), lerp(B[1], my, .93)); ctx.lineTo(B[0], B[1]); ctx.stroke();
+    if (o.txt && px >= 9 && e > 0.5) {
+      const b = DNA[((j % DNA.length) + DNA.length) % DNA.length];
+      ctx.font = `500 ${px}px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = FG;
+      ctx.globalAlpha = a * o.al * f * (e - 0.5) * 1.4;
+      ctx.fillText(b, lerp(A[0], mx, .5), lerp(A[1], my, .5) - px * 0.7); ctx.fillText(BASEC[b], lerp(B[0], mx, .5), lerp(B[1], my, .5) - px * 0.7);
+    }
+  }
+  segs(front);
+  ctx.globalAlpha = 1;
+}
 function drawNucleus(v, T) {
   const a = v.a; if (a < 0.004) return;
   const m = (x, y) => MP(v, x, y), S = v.S;
+  {
+    // on s'enfonce : le brin grossit pendant la scène, puis file quand on plonge vers l'atome
+    const g = Math.max(0.4, Math.min(6, S / (0.45 * MM))) * (1 + 0.35 * eio((T - 64) / 7.5)), sv = DISP; DISP = false;
+    helixBack(T, a, g, { r: 0.07, ang: -0.75, dx: 0.3, dy: -0.05, v: 0.01, w: -0.35, al: 0.22, sz: 0.6, txt: false });
+    helixBack(T, a, g, { r: 0.15, ang: 0.5, dx: -0.1, dy: 0.06, v: 0.025, w: 0.45, al: 0.3, sz: 1, txt: true });
+    DISP = sv;
+  }
   for (const R of [1, 0.93]) for (let k = 0; k < 12; k++) {
     const P = []; for (let s = 0; s <= 8; s++) { const an = (k * 30 + 4 + s * 22 / 8) * Math.PI / 180; P.push(m(Math.cos(an) * R, Math.sin(an) * R)); }
     ribbon(P, 0.012 * S, { alpha: .7 * a, dry: 0, taper: [.2,.2], seed: k });
@@ -884,7 +923,7 @@ const nDet = T => T < AT0 ? 0 : T < AT6 ? Math.min(6, Math.floor((T - AT0) / ASP
 const fr2 = v => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(1).replace('.', DEC);
 function atomPanel(T, a) {
   const n = nDet(T), pw = LAND ? Math.min(340, W * 0.27) : Math.min(340, W - 40), ph = 212;
-  const x0 = LAND ? Math.max(40, W * 0.05) : (W - pw) / 2, y0 = LAND ? Math.max(H * 0.4, 230) : Math.min(H - ph - 96, CY + 0.4 * MM);
+  const x0 = LAND ? Math.max(40, W * 0.05) : (W - pw) / 2, y0 = LAND ? Math.max(H * 0.4, 230) : Math.min(H - ph - (CAPB ? 250 : 96), CY + 0.4 * MM);
   const sv = DISP; DISP = false;
   ctx.globalAlpha = .86 * a; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, ph);
   ctx.globalAlpha = .3 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, ph - 1); ctx.globalAlpha = 1;
@@ -979,7 +1018,7 @@ for (let k = 0; FOLDS.length < 16 && k < 600; k++) {
   for (let s = 0; s < 9; s++) { an += (hash(k, s + 320) - .5) * 1.6; const nx = x + Math.cos(an) * 0.035, ny = y + Math.sin(an) * 0.035; if (!inPoly(nx, ny, BRAIN) || !inPoly(nx + 0.03, ny, BRAIN) || !inPoly(nx - 0.03, ny, BRAIN)) break; x = nx; y = ny; P.push([x, y]); }
   if (P.length > 4) FOLDS.push(P);
 }
-function brainBox() { return { cx: LAND ? W * 0.47 : W / 2, cy: LAND ? H * 0.58 : H * 0.42, bw: LAND ? Math.min(0.36 * W, 0.95 * H) : 0.86 * W }; }
+function brainBox() { return { cx: LAND ? W * 0.47 : W / 2, cy: !CAPB ? (LAND ? H * 0.58 : H * 0.42) : LAND ? H * 0.45 : H * 0.3, bw: LAND ? Math.min(0.36 * W, 0.95 * H) : 0.86 * W }; }
 const bmap = (B, x, y) => [B.cx + (x - 0.5) * B.bw, B.cy + (y - 0.35) * B.bw];
 const brainDim = T => 1 - 0.82 * rv(T, 103.4, .8) * (1 - rv(T, 107.8, .8));
 function probPanel(x0, y0, pw, head, line, rows, hot, grow, msg, pa) {
@@ -1022,7 +1061,7 @@ function drawNeuronDemo(T) {
   const da = rv(T, 103.3, .8) * (1 - rv(T, 107.9, .6));
   if (da <= 0) return;
   const U = LAND ? Math.min(W * 0.15, H * 0.26) : W * 0.3;
-  const LX = LAND ? W * 0.3 : W / 2, RX = LAND ? W * 0.72 : W / 2, LY = LAND ? H * 0.68 : H * 0.45, RY = LAND ? H * 0.68 : H * 0.73;
+  const LX = LAND ? W * 0.3 : W / 2, RX = LAND ? W * 0.72 : W / 2, LY = !CAPB ? (LAND ? H * 0.68 : H * 0.45) : LAND ? H * 0.46 : H * 0.28, RY = !CAPB ? (LAND ? H * 0.68 : H * 0.73) : LAND ? H * 0.46 : H * 0.3 + W * 0.41;
   const c = ((T - 103.6) % 2.0 + 2.0) % 2.0, inP = c01(c / 0.8), sums = [.8, .3, .6], wts = [.9, .4, -.2];
   const charge = c < 0.8 ? 0 : c < 1.1 ? (c - 0.8) / 0.3 : 1, fire = c >= 1.1 && c < 1.9;
   // le neurone biologique
@@ -1072,11 +1111,11 @@ function drawBrainPredict(T) {
   const rows = LX.predict.rows, PW = rows[0][0], PS = LX.predict.sentence;
   const grow = rv(T, 109.2, .6), hot = T >= 110.2 ? 0 : -1, seen = T >= 111;
   const msg = seen ? (LAND ? tr('pred_msg2', PW) : tr('pred_msg2s', PW)) : T >= 110.2 ? tr('pred_msg1', PW) : tr('pred_msg0');
-  const pw = Math.min(380, W * 0.86), x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - 244 - 150 : H - 244 - 84;
+  const pw = Math.min(380, W * 0.86), x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = !CAPB ? (LAND ? H - 244 - 150 : H - 244 - 84) : LAND ? 84 : H - 244 - 250;
   probPanel(x0, y0, pw, tr('pred_head'), PS + WJ + '___', rows, hot, grow, msg, pa);
-  const s = [...PS].slice(0, Math.floor(c01((T - 108.5) / 0.8) * [...PS].length)).join(''), px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : y0 - 26;
+  const s = [...PS].slice(0, Math.floor(c01((T - 108.5) / 0.8) * [...PS].length)).join(''), px = Math.round(Math.min(34, W * 0.06)), y = !CAPB ? (LAND ? H - 120 : y0 - 26) : LAND ? y0 + 244 + 44 : y0 - 26;
   ctx.font = `500 ${px}px ${DISPLAY}`;
-  const w1 = ctx.measureText(s).width, extra = seen ? WJ + PW : '', w2 = extra ? ctx.measureText(extra).width : 0, xs = W / 2 - (w1 + w2) / 2;
+  const w1 = ctx.measureText(s).width, extra = seen ? WJ + PW : '', w2 = extra ? ctx.measureText(extra).width : 0, xs = (LAND && CAPB ? x0 + pw / 2 : W / 2) - (w1 + w2) / 2;
   const sv = DISP; DISP = false;
   txt(s, xs, y, px, 'd', .95 * pa, 'left', true);
   if (extra) txt(extra, xs + w1, y, px, 'd', .95 * pa * rv(T, 111, .4), 'left', true);
@@ -1242,8 +1281,8 @@ function drawBooks(T) {
 function finLayout(T) {
   // à la fin, le circuit s'écarte vers la droite pour laisser place aux questions
   const o = 0;
-  const R = lerp(LAND ? 0.31 * MM : 0.36 * W, 0.2 * MM, o), cx = lerp(CX, W * 0.8, o), cy = lerp(LAND ? H * 0.57 : H * 0.58, H * 0.52, o), sh = eio((T - 141.4) / 1.3);
-  return { R, cx, cy, ac: [lerp(CX, cx, sh), lerp(LAND ? H * 0.52 : H * 0.5, cy - R, sh)], as: lerp(LAND ? 0.36 * MM : 0.42 * W, lerp(0.15, 0.1, o) * MM, sh), sh, k: 1 - 0.3 * o };
+  const R = lerp(LAND ? 0.31 * MM : 0.36 * W, 0.2 * MM, o), cx = lerp(CX, W * 0.8, o), cy = lerp(!CAPB ? (LAND ? H * 0.57 : H * 0.58) : LAND ? H * 0.49 : H * 0.44, H * 0.52, o), sh = eio((T - 141.4) / 1.3);
+  return { R, cx, cy, ac: [lerp(CX, cx, sh), lerp(!CAPB ? (LAND ? H * 0.52 : H * 0.5) : LAND ? H * 0.46 : H * 0.4, cy - R, sh)], as: lerp(LAND ? 0.36 * MM : 0.42 * W, lerp(0.15, 0.1, o) * MM, sh), sh, k: 1 - 0.3 * o };
 }
 const cirPt = (L, s) => { const th = -Math.PI / 2 + s * TAU; return [L.cx + Math.cos(th) * L.R, L.cy + Math.sin(th) * L.R]; };
 const cirFr = s => { const th = -Math.PI / 2 + s * TAU; return { t: [-Math.sin(th), Math.cos(th)], n: [Math.cos(th), Math.sin(th)] }; };
@@ -1443,13 +1482,13 @@ function cam3(T) {
   }
   dist = lerp(dist, 9.5, eio((T - 22.8) / 2.2));
   const yaw = 0.4 + (T - 9) * 0.05, pitch = 0.24 - 0.08 * w;
-  return { f: 0.9 * MM, dist, tx, ty, tz, cy: Math.cos(yaw), sy: Math.sin(yaw), cp: Math.cos(pitch), sp: Math.sin(pitch) };
+  return { f: 0.9 * MM, oy: !CAPB ? 0 : LAND ? -0.04 * H : -0.12 * H, dist, tx, ty, tz, cy: Math.cos(yaw), sy: Math.sin(yaw), cp: Math.cos(pitch), sp: Math.sin(pitch) };
 }
 const TMP = [0, 0, 0];
 function p3(x, y, z, C) {
   x -= C.tx; y -= C.ty; z -= C.tz;
   const x1 = x * C.cy + z * C.sy, z1 = -x * C.sy + z * C.cy, y1 = y * C.cp - z1 * C.sp, z2 = y * C.sp + z1 * C.cp + C.dist;
-  TMP[0] = CX + x1 * C.f / z2; TMP[1] = CY + y1 * C.f / z2; TMP[2] = z2;
+  TMP[0] = CX + x1 * C.f / z2; TMP[1] = CY + (C.oy || 0) + y1 * C.f / z2; TMP[2] = z2;
   return TMP;
 }
 
@@ -1645,7 +1684,7 @@ function drawWordSpace(T, C) {
   // le panneau : le calcul, lisible
   if (cur >= 0) {
     const st = STEPS[cur], pk = PICK[cur], pw = Math.min(360, W * 0.86), rowH = 30, phh = 58 + st.length * rowH + 30;
-    const x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - phh - 150 : H - phh - 130, pa = la * rv(T, S0T - 0.4, 0.4);
+    const x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = !CAPB ? H - phh - 150 : LAND ? 84 : H - phh - 258, pa = la * rv(T, S0T - 0.4, 0.4);
     ctx.globalAlpha = .84 * pa; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, phh);
     ctx.globalAlpha = .3 * pa; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, phh - 1); ctx.globalAlpha = 1;
     const sv = DISP; DISP = false;
@@ -1667,7 +1706,7 @@ function drawWordSpace(T, C) {
   const sa = la * rv(T, S0T - 0.6, .6);
   if (sa > 0) {
     const s = SENT.slice(0, locked + 1).join(WJ), extra = rl >= 0 ? WJ + STEPS[cur][rl][0] : '';
-    const px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : H - 96;
+    const px = Math.round(Math.min(34, W * 0.06)), y = !CAPB ? (LAND ? H - 120 : H - 96) : LAND ? 84 + 208 + 44 : H - 208 - 258 - 26;
     ctx.font = `500 ${px}px ${DISPLAY}`;
     const w1 = ctx.measureText(s).width, w2 = extra ? ctx.measureText(extra).width : 0, x0 = W / 2 - (w1 + w2) / 2;
     const sv = DISP; DISP = false;
@@ -1855,10 +1894,12 @@ const CW = CAPS.map((c, k) => {
   return { mS, fromPrev, toNext, start: mS, end: toNext ? c.t1 - 0.15 : c.t1 + 0.8 };
 });
 function capTop() { return LAND ? Math.max(88, H * 0.13) : 74; }
+// sur mobile, tablette et petits écrans, les phrases reposent en bas à gauche, au-dessus du badge
+function capFoot() { return LAND ? Math.max(104, H * 0.15) : 128; }
 function buildCaps() {
   try {
     const fs = LAND ? Math.max(34, Math.min(58, W * 0.031)) : Math.max(24, Math.min(34, W * 0.072));
-    const x0 = LAND ? Math.max(20, Math.min(84, W * 0.05)) : 20, top = capTop();
+    const x0 = LAND ? Math.max(20, Math.min(84, W * 0.05)) : 20, top = capTop(), foot = H - capFoot();
     const c = document.createElement('canvas'), x = c.getContext('2d');
     CAPL = CAPS.map((cp, k) => {
       const Q = cp.k === 'q', f = Q ? (LAND ? Math.max(36, Math.min(64, W * 0.036)) : Math.max(26, Math.min(36, W * 0.08))) : cp.k === 'final' ? fs * 1.08 : fs, L = f * 1.18;
@@ -1869,7 +1910,7 @@ function buildCaps() {
       toks.forEach(w => { const t = cur ? cur + sep + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
       if (cur) lines.push(cur);
       const bw = Math.max(...lines.map(l => x.measureText(l).width)), bh = lines.length * L;
-      const al = Q ? 'center' : RTL ? 'right' : 'left', bx = Q ? W / 2 - bw / 2 : x0, by = Q ? (LAND ? H * 0.5 : H * 0.47) - bh / 2 : top;
+      const al = Q ? 'center' : RTL ? 'right' : 'left', bx = Q ? W / 2 - bw / 2 : x0, by = Q ? (LAND ? H * 0.5 : H * 0.47) - bh / 2 : CAPB ? foot - bh : top;
       c.width = Math.ceil(bw + 24); c.height = Math.ceil(bh + 20);
       x.font = `600 ${f}px ${DISPLAY}`; x.fillStyle = '#000'; x.textBaseline = 'middle'; x.textAlign = al; x.direction = RTL ? 'rtl' : 'ltr';
       lines.forEach((l, j) => x.fillText(l, al === 'center' ? 4 + bw / 2 : al === 'right' ? 4 + bw : 4, 10 + L * (j + 0.5)));
@@ -2283,7 +2324,7 @@ function resize() {
   cv.width = sc.width = Math.round(W * DPR); cv.height = sc.height = Math.round(H * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   bl.width = Math.max(1, Math.ceil(cv.width / 6)); bl.height = Math.max(1, Math.ceil(cv.height / 6));
-  LAND = W / H > 1.15; MM = Math.min(W, H); C0[1] = LAND ? 0 : -0.16;
+  LAND = W / H > 1.15; CAPB = !LAND || H <= 800; MM = Math.min(W, H); C0[1] = LAND ? 0 : -0.16;
   S0b = Math.min(H, W / 1.5);
   CX = W / 2 + (LAND ? 0.1 * W : 0); CY = H / 2 + (LAND ? 0 : -0.06 * H);
   NP = W * H < 520000 ? 1200 : 2400; CPN = W * H < 520000 ? 2600 : 4200;
