@@ -2135,7 +2135,7 @@ async function doShare(net, btn) {
   }
   try { if (navigator.share && !LAND) { await navigator.share({ title: LX.doc_title, text: quo(SHQ), url }); return; } await navigator.clipboard.writeText(url); toast(LX.copied); } catch (er) {}
 }
-const SHB = []; let GATH = 0;
+const SHB = []; let GATH = 0, VNOW = null; const VT = { share: null, logo: null };
 const ease01 = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
 {
   const box = document.getElementById('outro'), orbs = [...box.querySelectorAll('.orb')];
@@ -2149,7 +2149,7 @@ const ease01 = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
   box.addEventListener('pointerover', e => { if (e.target.closest('.orb')) hold = 1; });
   box.addEventListener('pointerout', e => { if (e.target.closest('.orb')) hold = 0; });
   const tick = now => {
-    requestAnimationFrame(tick);
+    if (VNOW === null) requestAnimationFrame(tick); else if (now !== VNOW) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (!box.classList.contains('on')) return;
     ang += dt * (hold ? 0 : reduced ? 0.012 : 0.075); bt += hold ? 0 : dt;
@@ -2170,7 +2170,7 @@ const ease01 = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
       SHB[i] = [x - bw / 2 + 14, y, b.style.getPropertyValue('--c')];
     });
   };
-  requestAnimationFrame(tick);
+  VT.share = tick; requestAnimationFrame(tick);
 }
 // un point sur un rectangle aux coins arrondis, parcouru à vitesse constante
 function rrPt(u, hw, hh, r) {
@@ -2359,7 +2359,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 window.__seek = t => { T = realOf(t); TR = T; jump = true; render(story(T)); };
-window.__frame = t => { T = t; TR = T; render(story(T)); };
+window.__frame = t => { T = t; TR = T; render(story(T)); VNOW = t * 1000; VT.share && VT.share(VNOW); VT.logo && VT.logo(VNOW); };
 window.__pause = () => setPlaying(false);
 requestAnimationFrame(frame);
 /* ——— le logo : des étoiles en orbite, des paramètres, des neurones… qui deviennent 人 ——— */
@@ -2395,7 +2395,7 @@ requestAnimationFrame(frame);
   const ease = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
   const Q = new Array(N);
   function frame(now) {
-    requestAnimationFrame(frame);
+    if (VNOW === null) requestAnimationFrame(frame); else if (now !== VNOW) return;
     if (!W || cv.width !== Math.round(cv.getBoundingClientRect().width * dpr)) size();
     const t = (reduced ? 0.25 : 1) * now / 1000, night = typeof NGT === 'number' ? NGT > .5 : true;
     hov += (hovT - hov) * 0.08;
@@ -2450,7 +2450,7 @@ requestAnimationFrame(frame);
     }
     lx.globalAlpha = 1; lx.globalCompositeOperation = 'source-over';
   }
-  requestAnimationFrame(frame);
+  VT.logo = frame; requestAnimationFrame(frame);
 })();
 })();
 </script>
