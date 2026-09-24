@@ -28,6 +28,8 @@ body{font-family:var(--mono);-webkit-font-smoothing:antialiased;overscroll-behav
 
 .ctrl{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:clamp(18px,3vw,36px);display:flex;gap:.5rem}
 .btn{font:500 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);background:transparent;border:1px solid var(--fg);border-radius:999px;padding:.55rem .9rem;cursor:pointer;opacity:.75}
+select.btn{appearance:none;-webkit-appearance:none;text-transform:none;letter-spacing:.06em;max-width:9.5em;text-overflow:ellipsis}
+select.btn option{color:#141312;background:#eae8e2}
 .btn:hover{opacity:1}
 #snd:not(.used){opacity:1;animation:call 2.4s ease-in-out 4}
 @keyframes call{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--fg) 18%,transparent)}}
@@ -72,6 +74,7 @@ body{cursor:none}
   .hint,.brand small,.brand b{display:none}
   .ctrl{gap:.35rem}
   .btn{padding:.5rem .65rem;letter-spacing:.08em}
+  select.btn{max-width:3.6em;padding:.5rem .45rem}
 }
 @media (prefers-reduced-motion:reduce){
   .cap,.cap .ch,#end{transition:none}
@@ -84,21 +87,22 @@ body{cursor:none}
 <div id="grain"></div>
 <div id="vig"></div>
 
-<div class="brand"><span class="seal" aria-hidden="true">人</span><b>HUman</b><small>une réflexion de Mathieu</small></div>
+<div class="brand"><span class="seal" aria-hidden="true">人</span><b>HUman</b><small data-i="brand_sub">une réflexion de Mathieu</small></div>
 <div class="ctrl">
-  <button class="btn" id="snd" type="button" aria-pressed="false">Activer le son</button>
+  <select class="btn" id="lng" aria-label="Langue"></select>
+  <button class="btn" id="snd" type="button" aria-pressed="false" data-i="sound_on">Activer le son</button>
   <button class="btn" id="pp" type="button">Pause</button>
-  <button class="btn" id="rst" type="button">Rejouer</button>
+  <button class="btn" id="rst" type="button" data-i="replay">Rejouer</button>
 </div>
 
 <div id="caps" aria-hidden="true"></div>
-<div id="end"><button class="btn" id="again" type="button">Revoir</button><span>Une réflexion de Mathieu, mise en images avec Claude</span></div>
-<nav id="chap" aria-label="Chapitres"></nav>
-<p class="hint">Molette : avancer, reculer</p>
+<div id="end"><button class="btn" id="again" type="button" data-i="again">Revoir</button><span data-i="credit">Une réflexion de Mathieu, mise en images avec Claude</span></div>
+<nav id="chap" aria-label="Chapitres" data-il="chapters_label"></nav>
+<p class="hint" data-i="hint">Molette : avancer, reculer</p>
 
 <section class="sr">
-  <h1>Et si nous étions le plus gros LLM jamais observé&nbsp;?</h1>
-  <p>Une expérience animée à l'encre de Chine, en neuf chapitres, qui suit la réflexion de Mathieu.</p>
+  <h1 data-i="sr_title">Et si nous étions le plus gros LLM jamais observé&nbsp;?</h1>
+  <p data-i="sr_desc">Une expérience animée à l'encre de Chine, en dix chapitres, qui suit la réflexion de Mathieu.</p>
   <ol id="sr-list"></ol>
 </section>
 
@@ -106,8 +110,32 @@ body{cursor:none}
 (() => {
 const TAU = Math.PI * 2, GA = 137.50776 * Math.PI / 180;
 const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-const DISPLAY = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif';
-const MONO = '"IBM Plex Mono",ui-monospace,Menlo,monospace';
+/* ——— les langues : la langue du navigateur, sinon l'anglais ——— */
+/*I18N*/const I18N = {"fr":{"name":"Français","dir":"ltr","cjk":false,"doc_title":"Sommes-nous des IA ?","brand_sub":"une réflexion de Mathieu","sound_on":"Activer le son","sound":"Son","pause":"Pause","play":"Lecture","replay":"Rejouer","again":"Revoir","credit":"Une réflexion de Mathieu, mise en images avec Claude","chapters_label":"Chapitres","chapter_n":"Chapitre {0} : {1}","hint":"Molette : avancer, reculer","lang_label":"Langue","sr_title":"Et si nous étions le plus gros LLM jamais observé ?","sr_desc":"Une expérience animée à l'encre de Chine, en dix chapitres, qui suit la réflexion de Mathieu.","chapters":["Ouverture","L'IA","Le monde","La fleur","Au fond","L'univers","Le cerveau","Le miroir","Le bouquet","L'atome"],"questions":["comment marche une IA ?","et moi, comment je marche ?","qu'est-ce qui me rend vivant ?"],"title_land":["Et si nous étions","le plus gros LLM","jamais observé ?"],"title_port":["Et si nous","étions le plus","gros LLM jamais","observé ?"],"caps":["Pour une IA, chaque mot est un point dans l'espace.","Une phrase est un chemin. Le mot suivant : un calcul, puis un tirage au sort.","J'ai voulu comprendre l'IA. J'ai trouvé des maths.","Alors j'ai levé les yeux.","Et partout où je regardais, des calculs.","La mer : des ondes simples qui s'additionnent.","Une fleur : chaque graine à 137,5° de la précédente.","Elle n'a jamais appris les maths. C'est la solution qui a survécu.","Plus près.","Dans chaque graine, un code. Quatre lettres, lues trois par trois.","Et tout au fond, la nature tire au sort.","Le monde se calcule. Il ne se prévoit pas.","Des spirales, de la fleur à la galaxie.","Et si l'univers n'était qu'un grand algorithme ?","Et moi ? Des signaux entre 86 milliards de neurones.","Un neurone additionne les signaux qu'il reçoit, chacun avec son poids. Un neurone artificiel fait le même calcul.","Et mon cerveau passe son temps à prédire la suite. Comme un LLM.","Suis-je une IA ?","Pas un LLM. Un corps qui a appris à parler en dernier.","Un corps qui se maintient seul, et qui ressent.","Et si on remontait tout, d'un seul coup ?","La complexité de la vie, en accéléré.","Et tout se ramène à ça : un atome.","De l'électricité qui circule.","Dans un neurone.","Dans les paramètres d'une IA.","Si tout est calcul, pourquoi est-ce que ça fait quelque chose d'être moi ?"],"glyphs":"abcdefghijklmnopqrstuvwxyz","words":{"join":" ","groups":[["mer","lune","fleur","arbre","vague","ciel","étoile","lumière","graine"],["je","regarde","pense","suis","rêve","calcule","moi","toi","cœur"],["la","le","les","mon","et","qui","puis","depuis","tout","rien","à","que","trop","donc"],["vie","l'univers","nombre","spirale","temps","code"]],"start":"je","steps":[[["regarde",0.41],["pense",0.28],["suis",0.19],["rêve",0.07]],[["la",0.52],["le",0.31],["les",0.12],["mon",0.03]],[["lune",0.34],["mer",0.29],["fleur",0.18],["vie",0.06]],[["et",0.44],["qui",0.27],["puis",0.18],["depuis",0.06]],[["je",0.39],["tout",0.22],["rien",0.18],["donc",0.05]],[["pense",0.36],["rêve",0.24],["calcule",0.21],["suis",0.09]],[["à",0.48],["que",0.3],["trop",0.08],["donc",0.05]],[["l'univers",0.31],["moi",0.27],["toi",0.17],["rien",0.06]]],"pick":[0,0,1,0,0,0,0,0]},"predict":{"sentence":"Le chat boit du","rows":[["lait",0.78],["café",0.09],["thé",0.07],["sang",0.02]]},"amino":{"Met":"méthionine","Ala":"alanine","Ile":"isoleucine","Val":"valine","Lys":"lysine","Gly":"glycine","Arg":"arginine","Phe":"phénylalanine","stop":"fin de la phrase"},"s":{"pct":"{0} %","moon_r":"r = 1 737 km","horizon":"horizon : d ≈ 3,57 √h ≈ 11 km","rule7":"une règle · répétée 7 fois","wave_n":"onde {0}","wave_sum":"= la vague","dna_startstop":"ATG = commence · TAG = stop","atom_where":"où sera l'électron ?","atom_draws":"tirages : {0}","atom_dist":"distance au noyau →","atom_calc":"┄ le calcul : |ψ|²","atom_msg1":"chaque tirage : imprévisible","atom_msg2":"…mais leur somme dessine une forme","atom_msg3":"le hasard suit le calcul, exactement","atom_draw_n":"tirage n° {0}","atom_shape":"la forme : calculée","atom_nucleus":"noyau","neurons_w":"≈ 86 000 000 000 neurones · ≈ 20 W","bio_neuron":"NEURONE BIOLOGIQUE","dendrites":"dendrites : les entrées","soma":"le corps additionne","axon":"axone : la sortie","art_neuron":"NEURONE ARTIFICIEL","neuron_sum":"0,8×0,9 + 0,3×0,4 + 0,6×(−0,2) = 0,72","neuron_fire":"0,72 > seuil → le neurone s'active","pred_head":"ce que ton cerveau prédit","pred_msg0":"ton cerveau prédit…","pred_msg1":"prédiction : {0}","pred_msg2":"le mot arrive : « {0} ». Prévu, aucune surprise.","pred_msg2s":"« {0} » : prévu, aucune surprise.","pred_ok":"✓ prévu","lorenz_gap":"un millième d'écart au départ","lorenz":"attracteur de Lorenz · 1963","fin_atom":"ATOME","fin_atom_l":"des charges qui bougent","fin_neuron":"NEURONE","fin_neuron_l":"un signal électrique","fin_ia":"IA","fin_ia_l":"des milliards de poids","fin_same":"le même courant","fin_three":"atome · neurone · IA","ws_next":"le mot suivant ?","ws_calc":"calcul des probabilités…","ws_roll":"tirage au sort…","ws_top":"tiré au sort : le plus probable","ws_nottop":"tiré au sort : pas le plus probable !","lens_pt":"un point parmi {0}","lens_pt_2":"une lettre = des points","lens_pt_3":"un point = deux nombres","lens_word_vec":"vecteur {0}","lens_word_near":"proche de « {0} » · cos = {1}","lens_word_sense":"le sens = une direction","lens_moon":"la Lune","lens_moon_1":"distance : 384 400 km","lens_moon_3":"elle tire la mer : deux marées par jour","lens_me":"moi","lens_me_1":"≈ 86 milliards de neurones","lens_me_2":"≈ 20 W : une ampoule","lens_me_3":"je regarde, je prédis, je calcule","lens_branch":"branche · niveau {0}","lens_branch_1":"longueur = tronc × 0,72^{0}","lens_branch_2":"angle ≈ ±24° à chaque fourche","lens_branch_3":"{0} branches à ce niveau","lens_branch_4":"la même règle, répétée : une fractale","lens_wave":"une vague","lens_wave_4":"trois ondes simples, additionnées","lens_star":"une étoile","lens_star_1":"sa lumière est partie il y a {0} ans","lens_star_2":"au cœur : 4 H → He + énergie","lens_seed":"graine n° {0}","lens_seed_1":"angle = {0} × 137,5° = {1}°","lens_seed_2":"soit {0}° après {1} tours","lens_seed_3":"distance au centre ∝ √{0} = {1}","lens_seed_4":"voisines : ±21 et ±34, des Fibonacci","lens_petal":"pétale {0} / 34","lens_petal_1":"34 : un nombre de Fibonacci","lens_petal_3":"chacun = la somme des deux d'avant","lens_nucleus":"le noyau","lens_nucleus_1":"le programme de la plante","lens_nucleus_2":"des milliards de lettres","lens_nucleus_3":"la même copie dans chaque cellule","lens_cell":"une cellule","lens_cell_1":"elle se divise : 1 → 2 → 4 → 8","lens_cell_2":"après 40 divisions : {0} × 10¹²","lens_cell_3":"chacune emporte tout le code","lens_dna_1":"{0} liaisons hydrogène","lens_dna_2":"mot {0} → {1}","lens_dna_3":"4 lettres, lues 3 par 3 : 64 mots","lens_dna_4":"une erreur de lecture = une mutation","lens_chrom":"un chromosome","lens_chrom_1":"l'ADN d'une cellule : ≈ 2 m","lens_chrom_2":"replié dans 6 millièmes de mm","lens_chrom_3":"46 chromosomes chez nous","lens_psi":"|ψ|² ici","lens_psi_1":"densité : {0} % du maximum","lens_psi_2":"tirages tombés dans ce cercle : {0} / {1}","lens_psi_3":"distance au noyau : {0} rayons de Bohr","lens_psi_4":"probable, jamais certain","lens_bang_1":"tout tenait dans un point","lens_bang_2":"puis l'expansion : v = H₀ · d","lens_bang_3":"H₀ ≈ 70 km/s par mégaparsec","lens_lorenz":"attracteur de Lorenz","lens_lorenz_4":"des règles simples, un futur imprévisible","lens_gal":"un bras de la galaxie","lens_gal_1":"r = a · e^(0,22 · θ) : spirale logarithmique","lens_gal_2":"ici θ = {0} rad","lens_gal_3":"≈ 200 milliards d'étoiles","lens_gal_4":"la même spirale que la fleur","lens_cluster":"un amas de galaxies","lens_cluster_1":"{0} filaments le relient","lens_cluster_2":"la matière suit la gravité","lens_cluster_3":"la toile cosmique ressemble à…","lens_neuron":"un neurone","lens_neuron_1":"{0} synapses · poids {1}","lens_neuron_2":"Σ poids × signal > seuil → il s'active","lens_neuron_3":"…un cerveau","lens_sum_on":"> 0,5 → il s'active","lens_sum_off":"< 0,5 → il se tait","lens_brain_3":"et 86 milliards font pareil, en même temps","lens_mirror_me_1":"≈ 37 °C, et il faut que je mange","lens_mirror_me_2":"≈ 30 000 milliards de cellules","lens_mirror_me_3":"je ressens : la faim, le froid, la peur","lens_ai":"une IA","lens_mirror_ai_1":"≈ 10¹² paramètres : des nombres","lens_mirror_ai_2":"pas de corps, pas de faim","lens_mirror_ai_3":"elle calcule. Ressent-elle ?","lens_sheaf":"une gerbe","lens_sheaf_1":"chaque étincelle : une parabole","lens_sheaf_3":"ici t = {0} s","lens_life":"la vie, en accéléré","lens_life_1":"étoiles → atomes → ADN → fleur → cerveau","lens_life_2":"13,8 milliards d'années","lens_life_3":"en 6 secondes","lens_electron":"l'électron","lens_electron_1":"charge : −1,602 × 10⁻¹⁹ C","lens_electron_2":"quand il bouge : du courant","lens_electron_3":"≈ 10⁻¹⁰ m, presque du vide","lens_fneuron_1":"repos : −70 mV","lens_fneuron_2":"il décharge à +30 mV, en 1 ms","lens_fneuron_3":"des ions qui passent : du courant","lens_fai_2":"des milliards de poids w","lens_fai_3":"dans des transistors : ≈ 1 V","lens_current":"le courant","lens_current_2":"des charges qui circulent","lens_current_3":"la même chose, partout"}},"en":{"name":"English","dir":"ltr","cjk":false,"doc_title":"Are we AI?","brand_sub":"a reflection by Mathieu","sound_on":"Turn sound on","sound":"Sound","pause":"Pause","play":"Play","replay":"Replay","again":"Watch again","credit":"A reflection by Mathieu, turned into images with Claude","chapters_label":"Chapters","chapter_n":"Chapter {0}: {1}","hint":"Scroll: forward, back","lang_label":"Language","sr_title":"What if we were the biggest LLM ever observed?","sr_desc":"An animated experience in India ink, in ten chapters, following Mathieu's reflection.","chapters":["Opening","AI","The world","The flower","Deep down","The universe","The brain","The mirror","The finale","The atom"],"questions":["how does an AI work?","and me, how do I work?","what makes me alive?"],"title_land":["What if we were","the biggest LLM","ever observed?"],"title_port":["What if","we were the","biggest LLM","ever observed?"],"caps":["To an AI, every word is a point in space.","A sentence is a path. The next word: a calculation, then a roll of the dice.","I wanted to understand AI. I found math.","So I looked up.","And everywhere I looked, calculations.","The sea: simple waves adding up.","A flower: each seed at 137.5° from the last.","It never learned math. It's the solution that survived.","Closer.","In every seed, a code. Four letters, read three at a time.","And deep down, nature rolls the dice.","The world can be calculated. It can't be predicted.","Spirals, from the flower to the galaxy.","What if the universe were just one big algorithm?","And me? Signals between 86 billion neurons.","A neuron adds up the signals it receives, each with its own weight. An artificial neuron does the same math.","And my brain spends its time predicting what comes next. Like an LLM.","Am I an AI?","Not an LLM. A body that learned to speak last.","A body that keeps itself going, and feels.","What if we retraced it all, in one go?","The complexity of life, fast-forwarded.","And it all comes down to this: an atom.","Electricity, flowing.","In a neuron.","In an AI's parameters.","If everything is calculation, why does it feel like something to be me?"],"glyphs":"abcdefghijklmnopqrstuvwxyz","words":{"join":" ","groups":[["sea","moon","flower","tree","wave","sky","star","light","seed"],["I","look at","think","am","dream","compute","me","you","heart"],["the","a","my","this","and","that","then","since","everything","nothing","of","about","too","so"],["life","the universe","number","spiral","time","code"]],"start":"I","steps":[[["look at",0.41],["think",0.28],["am",0.19],["dream",0.07]],[["the",0.52],["a",0.31],["my",0.12],["this",0.03]],[["moon",0.34],["sea",0.29],["flower",0.18],["life",0.06]],[["and",0.44],["that",0.27],["then",0.18],["since",0.06]],[["I",0.39],["everything",0.22],["nothing",0.18],["so",0.05]],[["think",0.36],["dream",0.24],["compute",0.21],["am",0.09]],[["of",0.48],["about",0.3],["that",0.08],["too",0.05]],[["the universe",0.31],["me",0.27],["you",0.17],["nothing",0.06]]],"pick":[0,0,1,0,0,0,0,0]},"predict":{"sentence":"The cat drinks","rows":[["milk",0.78],["coffee",0.09],["tea",0.07],["blood",0.02]]},"amino":{"Met":"methionine","Ala":"alanine","Ile":"isoleucine","Val":"valine","Lys":"lysine","Gly":"glycine","Arg":"arginine","Phe":"phenylalanine","stop":"end of the sentence"},"s":{"pct":"{0}%","moon_r":"r = 1,737 km","horizon":"horizon: d ≈ 3.57 √h ≈ 11 km","rule7":"one rule · repeated 7 times","wave_n":"wave {0}","wave_sum":"= the wave","dna_startstop":"ATG = start · TAG = stop","atom_where":"where will the electron be?","atom_draws":"draws: {0}","atom_dist":"distance from nucleus →","atom_calc":"┄ the calculation: |ψ|²","atom_msg1":"each draw: unpredictable","atom_msg2":"…but together they draw a shape","atom_msg3":"chance follows the math, exactly","atom_draw_n":"draw #{0}","atom_shape":"the shape: calculated","atom_nucleus":"nucleus","neurons_w":"≈ 86,000,000,000 neurons · ≈ 20 W","bio_neuron":"BIOLOGICAL NEURON","dendrites":"dendrites: the inputs","soma":"the body adds up","axon":"axon: the output","art_neuron":"ARTIFICIAL NEURON","neuron_sum":"0.8×0.9 + 0.3×0.4 + 0.6×(−0.2) = 0.72","neuron_fire":"0.72 > threshold → the neuron fires","pred_head":"what your brain predicts","pred_msg0":"your brain predicts…","pred_msg1":"prediction: {0}","pred_msg2":"the word arrives: “{0}”. Expected, no surprise.","pred_msg2s":"“{0}”: expected, no surprise.","pred_ok":"✓ expected","lorenz_gap":"a gap of one thousandth at the start","lorenz":"Lorenz attractor · 1963","fin_atom":"ATOM","fin_atom_l":"moving charges","fin_neuron":"NEURON","fin_neuron_l":"an electrical signal","fin_ia":"AI","fin_ia_l":"billions of weights","fin_same":"the same current","fin_three":"atom · neuron · AI","ws_next":"the next word?","ws_calc":"computing probabilities…","ws_roll":"rolling the dice…","ws_top":"drawn: the most likely","ws_nottop":"drawn: not the most likely!","lens_pt":"one point among {0}","lens_pt_2":"a letter = points","lens_pt_3":"a point = two numbers","lens_word_vec":"vector {0}","lens_word_near":"close to “{0}” · cos = {1}","lens_word_sense":"meaning = a direction","lens_moon":"the Moon","lens_moon_1":"distance: 384,400 km","lens_moon_3":"it pulls the sea: two tides a day","lens_me":"me","lens_me_1":"≈ 86 billion neurons","lens_me_2":"≈ 20 W: a light bulb","lens_me_3":"I look, I predict, I calculate","lens_branch":"branch · level {0}","lens_branch_1":"length = trunk × 0.72^{0}","lens_branch_2":"angle ≈ ±24° at each fork","lens_branch_3":"{0} branches at this level","lens_branch_4":"the same rule, repeated: a fractal","lens_wave":"a wave","lens_wave_4":"three simple waves, added up","lens_star":"a star","lens_star_1":"its light left {0} years ago","lens_star_2":"at its core: 4 H → He + energy","lens_seed":"seed #{0}","lens_seed_1":"angle = {0} × 137.5° = {1}°","lens_seed_2":"that is {0}° after {1} turns","lens_seed_3":"distance from center ∝ √{0} = {1}","lens_seed_4":"neighbors: ±21 and ±34, Fibonacci","lens_petal":"petal {0} / 34","lens_petal_1":"34: a Fibonacci number","lens_petal_3":"each = the sum of the two before","lens_nucleus":"the nucleus","lens_nucleus_1":"the plant's program","lens_nucleus_2":"billions of letters","lens_nucleus_3":"the same copy in every cell","lens_cell":"a cell","lens_cell_1":"it divides: 1 → 2 → 4 → 8","lens_cell_2":"after 40 divisions: {0} × 10¹²","lens_cell_3":"each one carries the whole code","lens_dna_1":"{0} hydrogen bonds","lens_dna_2":"word {0} → {1}","lens_dna_3":"4 letters, read 3 by 3: 64 words","lens_dna_4":"a misreading = a mutation","lens_chrom":"a chromosome","lens_chrom_1":"the DNA of one cell: ≈ 2 m","lens_chrom_2":"folded into 6 thousandths of a mm","lens_chrom_3":"46 chromosomes in us","lens_psi":"|ψ|² here","lens_psi_1":"density: {0}% of the maximum","lens_psi_2":"draws in this circle: {0} / {1}","lens_psi_3":"distance from nucleus: {0} Bohr radii","lens_psi_4":"likely, never certain","lens_bang_1":"everything fit in a single point","lens_bang_2":"then expansion: v = H₀ · d","lens_bang_3":"H₀ ≈ 70 km/s per megaparsec","lens_lorenz":"Lorenz attractor","lens_lorenz_4":"simple rules, an unpredictable future","lens_gal":"an arm of the galaxy","lens_gal_1":"r = a · e^(0.22 · θ): logarithmic spiral","lens_gal_2":"here θ = {0} rad","lens_gal_3":"≈ 200 billion stars","lens_gal_4":"the same spiral as the flower","lens_cluster":"a galaxy cluster","lens_cluster_1":"{0} filaments connect it","lens_cluster_2":"matter follows gravity","lens_cluster_3":"the cosmic web looks like…","lens_neuron":"a neuron","lens_neuron_1":"{0} synapses · weight {1}","lens_neuron_2":"Σ weight × signal > threshold → it fires","lens_neuron_3":"…a brain","lens_sum_on":"> 0.5 → it fires","lens_sum_off":"< 0.5 → it stays silent","lens_brain_3":"and 86 billion do the same, all at once","lens_mirror_me_1":"≈ 37 °C, and I need to eat","lens_mirror_me_2":"≈ 30 trillion cells","lens_mirror_me_3":"I feel: hunger, cold, fear","lens_ai":"an AI","lens_mirror_ai_1":"≈ 10¹² parameters: numbers","lens_mirror_ai_2":"no body, no hunger","lens_mirror_ai_3":"it calculates. Does it feel?","lens_sheaf":"a burst","lens_sheaf_1":"each spark: a parabola","lens_sheaf_3":"here t = {0} s","lens_life":"life, fast-forwarded","lens_life_1":"stars → atoms → DNA → flower → brain","lens_life_2":"13.8 billion years","lens_life_3":"in 6 seconds","lens_electron":"the electron","lens_electron_1":"charge: −1.602 × 10⁻¹⁹ C","lens_electron_2":"when it moves: current","lens_electron_3":"≈ 10⁻¹⁰ m, almost empty space","lens_fneuron_1":"at rest: −70 mV","lens_fneuron_2":"it fires at +30 mV, in 1 ms","lens_fneuron_3":"ions passing through: current","lens_fai_2":"billions of weights w","lens_fai_3":"in transistors: ≈ 1 V","lens_current":"the current","lens_current_2":"charges on the move","lens_current_3":"the same thing, everywhere"}},"zh":{"name":"中文","dir":"ltr","cjk":true,"doc_title":"我们是 AI 吗？","brand_sub":"Mathieu 的一段思考","sound_on":"开启声音","sound":"声音","pause":"暂停","play":"播放","replay":"重播","again":"再看一遍","credit":"Mathieu 的思考，与 Claude 一起化为影像","chapters_label":"章节","chapter_n":"第 {0} 章：{1}","hint":"滚轮：前进、后退","lang_label":"语言","sr_title":"如果我们就是迄今观测到的最大的 LLM 呢？","sr_desc":"一段以水墨绘成的动画体验，共十章，跟随 Mathieu 的思考。","chapters":["序章","AI","世界","花","深处","宇宙","大脑","镜子","烟花","原子"],"questions":["AI 是怎么运作的？","那我呢，我又是怎么运作的？","是什么让我活着？"],"title_land":["如果我们就是","迄今观测到的","最大的LLM呢？"],"title_port":["如果我们就是","迄今观测到的","最大的","LLM呢？"],"caps":["对 AI 来说，每个词都是空间中的一个点。","一句话是一条路径。下一个词：先计算，再抽签。","我想弄懂 AI，却找到了数学。","于是，我抬起了头。","无论望向哪里，都是计算。","大海：简单的波，层层相加。","一朵花：每粒种子与前一粒相隔 137.5°。","它从没学过数学。只是这个解法活了下来。","再近一点。","每粒种子里都藏着一段密码。四个字母，三个一读。","而在最深处，自然在抽签。","世界可以计算，却无法预知。","螺旋，从花朵到星系。","如果宇宙只是一个巨大的算法呢？","那我呢？860亿个神经元之间的信号。","一个神经元把收到的信号相加，每个信号都有自己的权重。人工神经元做的是同样的计算。","而我的大脑一直在预测接下来会发生什么。就像 LLM。","我是 AI 吗？","不是 LLM。是一具最后才学会说话的身体。","一具自己维持自己、并且会感受的身体。","如果把一切一口气倒放回去呢？","生命的复杂，快进播放。","而一切都归结为这个：一个原子。","流动的电。","在神经元里。","在 AI 的参数里。","如果一切都是计算，为什么身为我，会有一种感觉？"],"glyphs":"天地人心海月花光星水火木山风云雨生命数字算梦时空电波","words":{"join":"","groups":[["大海","月亮","花","树","波浪","天空","星星","光","种子"],["我","看","想","是","梦","算","忘","自己","你"],["着","向","了","见","就","又","然后","便","会","到","起","过","整个","那","什么"],["生命","宇宙","数字","螺旋","时间","代码"]],"start":"我","steps":[[["看",0.41],["想",0.28],["是",0.19],["梦",0.07]],[["着",0.52],["向",0.31],["了",0.12],["见",0.03]],[["月亮",0.34],["大海",0.29],["花",0.18],["生命",0.06]],[["就",0.44],["又",0.27],["然后",0.18],["便",0.06]],[["想",0.39],["会",0.22],["什么",0.18],["忘",0.05]],[["到",0.36],["起",0.24],["着",0.21],["过",0.09]],[["了",0.48],["整个",0.3],["过",0.08],["那",0.05]],[["宇宙",0.31],["自己",0.27],["你",0.17],["时间",0.06]]],"pick":[0,0,1,0,0,0,0,0]},"predict":{"sentence":"猫在喝","rows":[["牛奶",0.78],["咖啡",0.09],["茶",0.07],["血",0.02]]},"amino":{"Met":"甲硫氨酸","Ala":"丙氨酸","Ile":"异亮氨酸","Val":"缬氨酸","Lys":"赖氨酸","Gly":"甘氨酸","Arg":"精氨酸","Phe":"苯丙氨酸","stop":"句子结束"},"s":{"pct":"{0}%","moon_r":"r = 1,737 km","horizon":"地平线：d ≈ 3.57 √h ≈ 11 km","rule7":"一条规则 · 重复 7 次","wave_n":"波 {0}","wave_sum":"= 海浪","dna_startstop":"ATG = 开始 · TAG = 终止","atom_where":"电子会出现在哪里？","atom_draws":"抽取：{0} 次","atom_dist":"到原子核的距离 →","atom_calc":"┄ 计算：|ψ|²","atom_msg1":"每一次抽取：不可预测","atom_msg2":"……但合在一起，画出了一个形状","atom_msg3":"随机，精确地遵循着计算","atom_draw_n":"第 {0} 次抽取","atom_shape":"形状：算出来的","atom_nucleus":"原子核","neurons_w":"≈ 86,000,000,000 个神经元 · ≈ 20 W","bio_neuron":"生物神经元","dendrites":"树突：输入","soma":"胞体负责相加","axon":"轴突：输出","art_neuron":"人工神经元","neuron_sum":"0.8×0.9 + 0.3×0.4 + 0.6×(−0.2) = 0.72","neuron_fire":"0.72 > 阈值 → 神经元激活","pred_head":"你的大脑在预测什么","pred_msg0":"你的大脑在预测……","pred_msg1":"预测：{0}","pred_msg2":"词来了：“{0}”。意料之中，毫无意外。","pred_msg2s":"“{0}”：意料之中，毫无意外。","pred_ok":"✓ 意料之中","lorenz_gap":"起点只差千分之一","lorenz":"洛伦茨吸引子 · 1963","fin_atom":"原子","fin_atom_l":"运动的电荷","fin_neuron":"神经元","fin_neuron_l":"一个电信号","fin_ia":"AI","fin_ia_l":"数十亿个权重","fin_same":"同一股电流","fin_three":"原子 · 神经元 · AI","ws_next":"下一个词？","ws_calc":"正在计算概率……","ws_roll":"抽签中……","ws_top":"抽中：最可能的那个","ws_nottop":"抽中：不是最可能的那个！","lens_pt":"{0} 个点中的一个","lens_pt_2":"一个字 = 一组点","lens_pt_3":"一个点 = 两个数","lens_word_vec":"向量 {0}","lens_word_near":"接近“{0}” · cos = {1}","lens_word_sense":"意义 = 一个方向","lens_moon":"月亮","lens_moon_1":"距离：384,400 km","lens_moon_3":"它牵引着大海：一天两次潮汐","lens_me":"我","lens_me_1":"≈ 860亿个神经元","lens_me_2":"≈ 20 W：一只灯泡","lens_me_3":"我看，我预测，我计算","lens_branch":"树枝 · 第 {0} 层","lens_branch_1":"长度 = 树干 × 0.72^{0}","lens_branch_2":"每个分叉，角度 ≈ ±24°","lens_branch_3":"这一层有 {0} 根树枝","lens_branch_4":"同一条规则，不断重复：分形","lens_wave":"一道海浪","lens_wave_4":"三道简单的波，相加而成","lens_star":"一颗星星","lens_star_1":"它的光在 {0} 年前出发","lens_star_2":"核心：4 H → He + 能量","lens_seed":"第 {0} 粒种子","lens_seed_1":"角度 = {0} × 137.5° = {1}°","lens_seed_2":"即转了 {1} 圈后的 {0}°","lens_seed_3":"到中心的距离 ∝ √{0} = {1}","lens_seed_4":"相邻：±21 和 ±34，斐波那契数","lens_petal":"花瓣 {0} / 34","lens_petal_1":"34：一个斐波那契数","lens_petal_3":"每个数 = 前两个数之和","lens_nucleus":"细胞核","lens_nucleus_1":"植物的程序","lens_nucleus_2":"数十亿个字母","lens_nucleus_3":"每个细胞里都有同一份副本","lens_cell":"一个细胞","lens_cell_1":"它分裂：1 → 2 → 4 → 8","lens_cell_2":"分裂 40 次后：{0} × 10¹²","lens_cell_3":"每一个都带着全部代码","lens_dna_1":"{0} 个氢键","lens_dna_2":"词 {0} → {1}","lens_dna_3":"4 个字母，三个一读：64 个词","lens_dna_4":"读错一次 = 一次突变","lens_chrom":"一条染色体","lens_chrom_1":"一个细胞的 DNA：≈ 2 m","lens_chrom_2":"折叠在千分之六毫米之内","lens_chrom_3":"我们有 46 条染色体","lens_psi":"此处的 |ψ|²","lens_psi_1":"密度：最大值的 {0}%","lens_psi_2":"落在这个圆里的抽取：{0} / {1}","lens_psi_3":"到原子核：{0} 个玻尔半径","lens_psi_4":"可能，但永远不确定","lens_bang_1":"一切曾容纳于一个点","lens_bang_2":"然后膨胀：v = H₀ · d","lens_bang_3":"H₀ ≈ 70 km/s 每百万秒差距","lens_lorenz":"洛伦茨吸引子","lens_lorenz_4":"简单的规则，不可预测的未来","lens_gal":"星系的一条旋臂","lens_gal_1":"r = a · e^(0.22 · θ)：对数螺线","lens_gal_2":"此处 θ = {0} rad","lens_gal_3":"≈ 2000亿颗恒星","lens_gal_4":"和花朵一样的螺旋","lens_cluster":"一个星系团","lens_cluster_1":"{0} 条纤维与它相连","lens_cluster_2":"物质追随引力","lens_cluster_3":"宇宙之网看起来像……","lens_neuron":"一个神经元","lens_neuron_1":"{0} 个突触 · 权重 {1}","lens_neuron_2":"Σ 权重 × 信号 > 阈值 → 激活","lens_neuron_3":"……一个大脑","lens_sum_on":"> 0.5 → 激活","lens_sum_off":"< 0.5 → 沉默","lens_brain_3":"860亿个神经元，同时这样做","lens_mirror_me_1":"≈ 37 °C，而且我得吃东西","lens_mirror_me_2":"≈ 30万亿个细胞","lens_mirror_me_3":"我会感受：饥饿、寒冷、恐惧","lens_ai":"一个 AI","lens_mirror_ai_1":"≈ 10¹² 个参数：一堆数字","lens_mirror_ai_2":"没有身体，没有饥饿","lens_mirror_ai_3":"它会计算。它有感受吗？","lens_sheaf":"一束烟花","lens_sheaf_1":"每一点火花：一条抛物线","lens_sheaf_3":"此处 t = {0} s","lens_life":"生命，快进播放","lens_life_1":"恒星 → 原子 → DNA → 花 → 大脑","lens_life_2":"138亿年","lens_life_3":"压缩进 6 秒","lens_electron":"电子","lens_electron_1":"电荷：−1.602 × 10⁻¹⁹ C","lens_electron_2":"它一移动，就有了电流","lens_electron_3":"≈ 10⁻¹⁰ m，几乎是空的","lens_fneuron_1":"静息：−70 mV","lens_fneuron_2":"1 ms 内放电至 +30 mV","lens_fneuron_3":"离子穿过：形成电流","lens_fai_2":"数十亿个权重 w","lens_fai_3":"在晶体管里：≈ 1 V","lens_current":"电流","lens_current_2":"流动的电荷","lens_current_3":"到处都是同一回事"}},"es":{"name":"Español","dir":"ltr","cjk":false,"doc_title":"¿Somos IA?","brand_sub":"una reflexión de Mathieu","sound_on":"Activar el sonido","sound":"Sonido","pause":"Pausa","play":"Reproducir","replay":"Repetir","again":"Volver a ver","credit":"Una reflexión de Mathieu, llevada a imágenes con Claude","chapters_label":"Capítulos","chapter_n":"Capítulo {0}: {1}","hint":"Rueda: avanzar, retroceder","lang_label":"Idioma","sr_title":"¿Y si fuéramos el LLM más grande jamás observado?","sr_desc":"Una experiencia animada en tinta china, en diez capítulos, que sigue la reflexión de Mathieu.","chapters":["Apertura","La IA","El mundo","La flor","En el fondo","El universo","El cerebro","El espejo","El gran final","El átomo"],"questions":["¿cómo funciona una IA?","¿y yo, cómo funciono?","¿qué me hace estar vivo?"],"title_land":["¿Y si fuéramos","el LLM más grande","jamás observado?"],"title_port":["¿Y si","fuéramos el LLM","más grande","jamás observado?"],"caps":["Para una IA, cada palabra es un punto en el espacio.","Una frase es un camino. La palabra siguiente: un cálculo, y luego un sorteo.","Quise entender la IA. Encontré matemáticas.","Entonces levanté la vista.","Y mirara donde mirara, cálculos.","El mar: ondas simples que se suman.","Una flor: cada semilla a 137,5° de la anterior.","Nunca aprendió matemáticas. Es la solución que sobrevivió.","Más cerca.","En cada semilla, un código. Cuatro letras, leídas de tres en tres.","Y en lo más hondo, la naturaleza lo echa a suertes.","El mundo se calcula. No se predice.","Espirales, de la flor a la galaxia.","¿Y si el universo no fuera más que un gran algoritmo?","¿Y yo? Señales entre 86 000 millones de neuronas.","Una neurona suma las señales que recibe, cada una con su peso. Una neurona artificial hace el mismo cálculo.","Y mi cerebro se pasa el tiempo prediciendo lo que viene. Como un LLM.","¿Soy una IA?","No un LLM. Un cuerpo que aprendió a hablar al final.","Un cuerpo que se sostiene solo, y que siente.","¿Y si lo recorriéramos todo, de una sola vez?","La complejidad de la vida, a cámara rápida.","Y todo se reduce a esto: un átomo.","Electricidad que circula.","En una neurona.","En los parámetros de una IA.","Si todo es cálculo, ¿por qué se siente algo al ser yo?"],"glyphs":"abcdefghijlmnñopqrstuvyzáé","words":{"join":" ","groups":[["mar","luna","flor","árbol","ola","cielo","estrella","luz","semilla"],["yo","miro","pienso","soy","sueño","calculo","mí","ti","corazón"],["el","la","los","mi","y","que","luego","desde","todo","nada","en","mucho","demasiado","entonces"],["vida","universo","número","espiral","tiempo","código"]],"start":"yo","steps":[[["miro",0.41],["pienso",0.28],["soy",0.19],["sueño",0.07]],[["el",0.52],["la",0.31],["los",0.12],["mi",0.03]],[["cielo",0.34],["mar",0.29],["árbol",0.18],["tiempo",0.06]],[["y",0.44],["que",0.27],["luego",0.18],["desde",0.06]],[["pienso",0.39],["sueño",0.22],["todo",0.18],["nada",0.05]],[["en",0.36],["que",0.24],["mucho",0.21],["demasiado",0.09]],[["el",0.48],["la",0.3],["mí",0.08],["ti",0.05]],[["universo",0.31],["tiempo",0.27],["cielo",0.17],["código",0.06]]],"pick":[0,0,1,0,0,0,0,0]},"predict":{"sentence":"El gato bebe","rows":[["leche",0.78],["café",0.09],["té",0.07],["sangre",0.02]]},"amino":{"Met":"metionina","Ala":"alanina","Ile":"isoleucina","Val":"valina","Lys":"lisina","Gly":"glicina","Arg":"arginina","Phe":"fenilalanina","stop":"fin de la frase"},"s":{"pct":"{0} %","moon_r":"r = 1737 km","horizon":"horizonte: d ≈ 3,57 √h ≈ 11 km","rule7":"una regla · repetida 7 veces","wave_n":"onda {0}","wave_sum":"= la ola","dna_startstop":"ATG = empieza · TAG = stop","atom_where":"¿dónde estará el electrón?","atom_draws":"sorteos: {0}","atom_dist":"distancia al núcleo →","atom_calc":"┄ el cálculo: |ψ|²","atom_msg1":"cada sorteo: impredecible","atom_msg2":"…pero juntos dibujan una forma","atom_msg3":"el azar sigue al cálculo, exactamente","atom_draw_n":"sorteo n.º {0}","atom_shape":"la forma: calculada","atom_nucleus":"núcleo","neurons_w":"≈ 86 000 000 000 neuronas · ≈ 20 W","bio_neuron":"NEURONA BIOLÓGICA","dendrites":"dendritas: las entradas","soma":"el cuerpo suma","axon":"axón: la salida","art_neuron":"NEURONA ARTIFICIAL","neuron_sum":"0,8×0,9 + 0,3×0,4 + 0,6×(−0,2) = 0,72","neuron_fire":"0,72 > umbral → la neurona se activa","pred_head":"lo que tu cerebro predice","pred_msg0":"tu cerebro predice…","pred_msg1":"predicción: {0}","pred_msg2":"llega la palabra: «{0}». Prevista, ninguna sorpresa.","pred_msg2s":"«{0}»: prevista, ninguna sorpresa.","pred_ok":"✓ prevista","lorenz_gap":"una milésima de diferencia al principio","lorenz":"atractor de Lorenz · 1963","fin_atom":"ÁTOMO","fin_atom_l":"cargas que se mueven","fin_neuron":"NEURONA","fin_neuron_l":"una señal eléctrica","fin_ia":"IA","fin_ia_l":"miles de millones de pesos","fin_same":"la misma corriente","fin_three":"átomo · neurona · IA","ws_next":"¿la palabra siguiente?","ws_calc":"cálculo de probabilidades…","ws_roll":"sorteo…","ws_top":"sorteada: la más probable","ws_nottop":"sorteada: ¡no la más probable!","lens_pt":"un punto entre {0}","lens_pt_2":"una letra = puntos","lens_pt_3":"un punto = dos números","lens_word_vec":"vector {0}","lens_word_near":"cerca de «{0}» · cos = {1}","lens_word_sense":"el sentido = una dirección","lens_moon":"la Luna","lens_moon_1":"distancia: 384 400 km","lens_moon_3":"atrae el mar: dos mareas al día","lens_me":"yo","lens_me_1":"≈ 86 000 millones de neuronas","lens_me_2":"≈ 20 W: una bombilla","lens_me_3":"miro, predigo, calculo","lens_branch":"rama · nivel {0}","lens_branch_1":"longitud = tronco × 0,72^{0}","lens_branch_2":"ángulo ≈ ±24° en cada bifurcación","lens_branch_3":"{0} ramas en este nivel","lens_branch_4":"la misma regla, repetida: un fractal","lens_wave":"una ola","lens_wave_4":"tres ondas simples, sumadas","lens_star":"una estrella","lens_star_1":"su luz partió hace {0} años","lens_star_2":"en su núcleo: 4 H → He + energía","lens_seed":"semilla n.º {0}","lens_seed_1":"ángulo = {0} × 137,5° = {1}°","lens_seed_2":"o sea, {0}° tras {1} vueltas","lens_seed_3":"distancia al centro ∝ √{0} = {1}","lens_seed_4":"vecinas: ±21 y ±34, de Fibonacci","lens_petal":"pétalo {0} / 34","lens_petal_1":"34: un número de Fibonacci","lens_petal_3":"cada uno = la suma de los dos previos","lens_nucleus":"el núcleo","lens_nucleus_1":"el programa de la planta","lens_nucleus_2":"miles de millones de letras","lens_nucleus_3":"la misma copia en cada célula","lens_cell":"una célula","lens_cell_1":"se divide: 1 → 2 → 4 → 8","lens_cell_2":"tras 40 divisiones: {0} × 10¹²","lens_cell_3":"cada una lleva todo el código","lens_dna_1":"{0} puentes de hidrógeno","lens_dna_2":"palabra {0} → {1}","lens_dna_3":"4 letras, de 3 en 3: 64 palabras","lens_dna_4":"un error de lectura = una mutación","lens_chrom":"un cromosoma","lens_chrom_1":"el ADN de una célula: ≈ 2 m","lens_chrom_2":"plegado en 6 milésimas de mm","lens_chrom_3":"46 cromosomas en nosotros","lens_psi":"|ψ|² aquí","lens_psi_1":"densidad: {0} % del máximo","lens_psi_2":"sorteos en este círculo: {0} / {1}","lens_psi_3":"distancia al núcleo: {0} radios de Bohr","lens_psi_4":"probable, nunca seguro","lens_bang_1":"todo cabía en un punto","lens_bang_2":"luego la expansión: v = H₀ · d","lens_bang_3":"H₀ ≈ 70 km/s por megapársec","lens_lorenz":"atractor de Lorenz","lens_lorenz_4":"reglas simples, un futuro impredecible","lens_gal":"un brazo de la galaxia","lens_gal_1":"r = a · e^(0,22 · θ): espiral logarítmica","lens_gal_2":"aquí θ = {0} rad","lens_gal_3":"≈ 200 000 millones de estrellas","lens_gal_4":"la misma espiral que la flor","lens_cluster":"un cúmulo de galaxias","lens_cluster_1":"{0} filamentos lo conectan","lens_cluster_2":"la materia sigue a la gravedad","lens_cluster_3":"la red cósmica se parece a…","lens_neuron":"una neurona","lens_neuron_1":"{0} sinapsis · peso {1}","lens_neuron_2":"Σ peso × señal > umbral → se activa","lens_neuron_3":"…un cerebro","lens_sum_on":"> 0,5 → se activa","lens_sum_off":"< 0,5 → se calla","lens_brain_3":"y 86 000 millones hacen igual, a la vez","lens_mirror_me_1":"≈ 37 °C, y necesito comer","lens_mirror_me_2":"≈ 30 billones de células","lens_mirror_me_3":"siento: el hambre, el frío, el miedo","lens_ai":"una IA","lens_mirror_ai_1":"≈ 10¹² parámetros: números","lens_mirror_ai_2":"sin cuerpo, sin hambre","lens_mirror_ai_3":"calcula. ¿Siente algo?","lens_sheaf":"un estallido","lens_sheaf_1":"cada chispa: una parábola","lens_sheaf_3":"aquí t = {0} s","lens_life":"la vida, a cámara rápida","lens_life_1":"estrellas → átomos → ADN → flor → cerebro","lens_life_2":"13 800 millones de años","lens_life_3":"en 6 segundos","lens_electron":"el electrón","lens_electron_1":"carga: −1,602 × 10⁻¹⁹ C","lens_electron_2":"cuando se mueve: corriente","lens_electron_3":"≈ 10⁻¹⁰ m, casi vacío","lens_fneuron_1":"reposo: −70 mV","lens_fneuron_2":"se dispara a +30 mV, en 1 ms","lens_fneuron_3":"iones que pasan: corriente","lens_fai_2":"miles de millones de pesos w","lens_fai_3":"en transistores: ≈ 1 V","lens_current":"la corriente","lens_current_2":"cargas que circulan","lens_current_3":"lo mismo, en todas partes"}}};/*/I18N*/
+function pickLang() {
+  let q = null;
+  try { q = (location.hash.match(/lang=([a-z]{2})/) || [])[1] || localStorage.getItem('human-lang'); } catch (e) {}
+  if (q && I18N[q]) return q;
+  for (const l of (navigator.languages || [navigator.language || 'en'])) { const c = String(l).slice(0, 2).toLowerCase(); if (I18N[c]) return c; }
+  return I18N.en ? 'en' : 'fr';
+}
+const LANG = pickLang(), LX = Object.assign({}, I18N.fr, I18N[LANG]), S = Object.assign({}, I18N.fr.s, (I18N[LANG] || {}).s);
+const tr = (k, ...a) => String(S[k] === undefined ? k : S[k]).replace(/\{(\d)\}/g, (_, i) => a[i]);
+const NUML = LANG + '-u-nu-latn', DEC = (1.5).toLocaleString(NUML).replace(/[15]/g, '') || '.';
+const num = v => v.toLocaleString(NUML);
+const dn = str => DEC === '.' ? str : str.replace(/(\d)\.(\d)/g, `$1${DEC}$2`);
+const CJK = !!LX.cjk, RTL = LX.dir === 'rtl', WJ = LX.words.join;
+const LFONT = { zh: ['Noto Serif SC', 'Noto Sans SC'], ja: ['Shippori Mincho B1', 'Noto Sans JP'], hi: ['Noto Serif Devanagari', 'Noto Sans Devanagari'], bn: ['Noto Serif Bengali', 'Noto Sans Bengali'], ar: ['Noto Naskh Arabic', 'Noto Sans Arabic'], ru: ['Noto Serif', 'IBM Plex Mono'] }[LANG];
+const DISPLAY = (LANG === 'zh' ? '"Noto Serif SC","Songti SC","SimSun",' : '"Shippori Mincho B1",') + (LFONT ? `"${LFONT[0]}",` : '') + '"Hiragino Mincho ProN","Yu Mincho",Georgia,serif';
+const MONO = '"IBM Plex Mono",' + (LFONT ? `"${LFONT[1]}",` : '') + 'ui-monospace,Menlo,monospace';
+if (LFONT) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?' + [...new Set(LFONT)].filter(f => f !== 'IBM Plex Mono' && f !== 'Shippori Mincho B1').map(f => 'family=' + f.replace(/ /g, '+') + ':wght@400;600').join('&') + '&display=swap'; document.head.appendChild(l); }
+document.documentElement.lang = LANG; document.title = LX.doc_title;
+document.documentElement.style.setProperty('--display', DISPLAY); document.documentElement.style.setProperty('--mono', MONO);
+document.querySelectorAll('[data-il]').forEach(el => el.setAttribute('aria-label', LX[el.dataset.il]));
+document.querySelectorAll('[data-i]').forEach(el => { const v = LX[el.dataset.i]; if (typeof v === 'string') { el.textContent = v; if (RTL) el.dir = 'rtl'; } });
+{ const sel = document.getElementById('lng'); sel.setAttribute('aria-label', LX.lang_label);
+  Object.keys(I18N).forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c.toUpperCase() + ' · ' + I18N[c].name; o.lang = c; if (c === LANG) o.selected = true; sel.appendChild(o); });
+  sel.addEventListener('change', () => { try { localStorage.setItem('human-lang', sel.value); } catch (e) {} location.hash = 'lang=' + sel.value; location.reload(); }); }
 const c01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 const sm = v => { v = c01(v); return v * v * (3 - 2 * v); };
 const eio = v => { v = c01(v); return v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; };
@@ -120,7 +148,7 @@ function hash(a, b) {
   return (x >>> 0) / 4294967296;
 }
 const gauss = (u, v) => Math.sqrt(-2 * Math.log(u + 1e-9)) * Math.cos(TAU * v);
-const fr = s => s.replace(/ ([?:!;])/g, ' $1');
+const fr = s => LANG === 'fr' ? s.replace(/ ([?:!;])/g, ' $1') : s;
 
 /* ——— le temps ——— */
 const END = 156;
@@ -139,9 +167,9 @@ function realOf(s) {
   return s + off;
 }
 let TR = 0;
-const QUESTIONS = ['comment marche une IA ?', 'et moi, comment je marche ?', "qu'est-ce qui me rend vivant ?"];
+const QUESTIONS = LX.questions.map(q => fr(q));
 let loopN = 0;
-const CH = [[0,'Ouverture'],[10,"L'IA"],[23.2,'Le monde'],[44,'La fleur'],[58.5,'Au fond'],[76.5,"L'univers"],[96.5,'Le cerveau'],[114,'Le miroir'],[129.6,'Le bouquet'],[139.4,"L'atome"]];
+const CH = [0, 10, 23.2, 44, 58.5, 76.5, 96.5, 114, 129.6, 139.4].map((t, i) => [t, LX.chapters[i]]);
 const REST = [8.8, 21, 41.5, 55, 69, 88, 111, 125, 132.4, 152];
 const CAPS = [
   { t0: 11.2, t1: 14.0, text: "Pour une IA, chaque mot est un point dans l'espace." },
@@ -172,7 +200,7 @@ const CAPS = [
   { t0: 144.7, t1: 146.2, text: "Dans les paramètres d'une IA." },
   { t0: 146.4, t1: 1e9, k: 'final', text: "Si tout est calcul, pourquoi est-ce que ça fait quelque chose d'être moi ?" }
 ];
-CAPS.forEach(c => { c.text = fr(c.text); });
+CAPS.forEach((c, i) => { c.text = fr(LX.caps[i] || c.text); });
 document.getElementById('sr-list').innerHTML = CAPS.map(c => `<li>${c.text}</li>`).join('');
 
 /* ——— couleurs : papier le jour, encre la nuit ——— */
@@ -493,7 +521,7 @@ function drawCoast(v, T) {
     const xe = Math.min(1.8, xs);
     for (let y = -0.1; y > -1.35; y -= 0.1) pen([m(-1.8, y), m(xe, y)], gA, 1);
     for (let x = -1.7; x <= xe; x += 0.1) pen([m(x, -0.02), m(x, -1.35)], gA, 1);
-    for (let x = -1.2; x <= Math.min(1.2, xe) + 1e-6; x += 0.2) { const p = m(x, -0.05); txt(x.toFixed(1).replace('-', '−').replace('.', ','), p[0] + 3, p[1], 10, 'm', .55 * a * seen(x)); }
+    for (let x = -1.2; x <= Math.min(1.2, xe) + 1e-6; x += 0.2) { const p = m(x, -0.05); txt(x.toFixed(1).replace('-', '−').replace('.', DEC), p[0] + 3, p[1], 10, 'm', .55 * a * seen(x)); }
   }
   // la lune
   if (mp > 0) {
@@ -583,15 +611,15 @@ function drawCoast(v, T) {
       const c = m(MOON[0], MOON[1]), an = T * 0.8, e = m(MOON[0] + Math.cos(an) * MOON_R, MOON[1] + Math.sin(an) * MOON_R);
       pen([c, e], .8 * mma, 1.2);
       const l1 = m(MOON[0] + 0.15, MOON[1] - 0.015), l2 = m(MOON[0] + 0.15, MOON[1] + 0.022);
-      txt('x² + y² = r²', l1[0], l1[1], 14, 'm', .9 * mma); txt('r = 1 737 km', l2[0], l2[1], 11, 'm', .6 * mma);
+      txt('x² + y² = r²', l1[0], l1[1], 14, 'm', .9 * mma); txt(tr('moon_r'), l2[0], l2[1], 11, 'm', .6 * mma);
     }
     const ha = seen(-0.45) * a;
     if (ha > 0) {
       pen([m(EYE[0], EYE[1]), m(-0.45, -0.02)], .55 * ha, 1, [5, 5], c01((xs + 0.45) / 0.9));
-      const lp = m(-0.08, 0.05); txt('horizon : d ≈ 3,57 √h ≈ 11 km', lp[0], lp[1], 13, 'm', .85 * seen(-0.08) * a, 'center');
+      const lp = m(-0.08, 0.05); txt(tr('horizon'), lp[0], lp[1], 13, 'm', .85 * seen(-0.08) * a, 'center');
     }
     const fa = seen(FLW[0]) * a;
-    if (fa > 0) { pen([m(FLW[0] - 0.03, FLW[1] - 0.025), m(FLW[0] - 0.08, FLW[1] - 0.08)], .6 * fa, 1); const lp = m(FLW[0] - 0.085, FLW[1] - 0.085); txt('137,5°', lp[0] - 4, lp[1], 13, 'm', .9 * fa, 'right'); }
+    if (fa > 0) { pen([m(FLW[0] - 0.03, FLW[1] - 0.025), m(FLW[0] - 0.08, FLW[1] - 0.08)], .6 * fa, 1); const lp = m(FLW[0] - 0.085, FLW[1] - 0.085); txt(dn('137.5°'), lp[0] - 4, lp[1], 13, 'm', .9 * fa, 'right'); }
     const ta = seen(TB[0] - 0.12) * a;
     if (ta > 0 && FORK) {
       TREE.forEach(nd => {
@@ -603,10 +631,10 @@ function drawCoast(v, T) {
       const F = sway(FORK.x, FORK.y, th), Fm = m(F[0], F[1]), k2 = FORK.kids[1], k1 = FORK.kids[0];
       txt(`θ ≈ ${Math.round((k2.ang - k1.ang) * 90 / Math.PI)}°`, Fm[0] + 0.035 * S, Fm[1] + 8, 13, 'm', .85 * ta);
       const km = sway((k1.x + k1.ex) / 2, (k1.y + k1.ey) / 2, th), kp = m(km[0], km[1]);
-      txt('× 0,72', kp[0] - 12, kp[1], 13, 'm', .85 * ta, 'right');
+      txt(dn('× 0.72'), kp[0] - 12, kp[1], 13, 'm', .85 * ta, 'right');
       const rp = m(TB[0] + 0.05, -0.12), rp2 = m(TB[0] + 0.05, -0.085);
       txt('F → F [+F] [−F]', rp[0], rp[1], 15, 'm', .9 * ta, 'center');
-      txt('une règle · répétée 7 fois', rp2[0], rp2[1], 11, 'm', .6 * ta, 'center');
+      txt(tr('rule7'), rp2[0], rp2[1], 11, 'm', .6 * ta, 'center');
     }
   }
   // Fourier : une vague se décompose puis se recompose
@@ -620,9 +648,9 @@ function drawCoast(v, T) {
       const off = (0.08 + j * 0.055) * peel, amp = 0.02 * wt * lerp(1, 2.4, peel), P = [];
       for (let x = -1.9; x <= 1.9; x += 0.012) P.push(m(x, base - off + amp * Math.sin(g(x * 1000 / 0.7))));
       ribbon(P, 0.0018 * S, { alpha: fa2 * .9 * peel, raw: true, dry: 0, taper: [.02,.02] });
-      const lp = m(-0.62, base - off - 0.018); txt(`onde ${j + 1}`, lp[0], lp[1], 12, 'm', .85 * fa2 * peel);
+      const lp = m(-0.62, base - off - 0.018); txt(tr('wave_n', j + 1), lp[0], lp[1], 12, 'm', .85 * fa2 * peel);
     });
-    const lp = m(-0.62, base - 0.025); txt('= la vague', lp[0], lp[1], 12, 'm', .85 * fa2 * (1 - peel) * rv(T, 39, .5));
+    const lp = m(-0.62, base - 0.025); txt(tr('wave_sum'), lp[0], lp[1], 12, 'm', .85 * fa2 * (1 - peel) * rv(T, 39, .5));
   }
   // la ligne du regard
   if (T > 33 && T < 38) {
@@ -652,7 +680,7 @@ function drawFlowerOverlay(v, T) {
     const c = m(0, 0), r0 = 0.55;
     for (let n = 1; n <= 3; n++) { const an = n * GA; pen([c, m(Math.cos(an) * r0, Math.sin(an) * r0)], .65 * da, 1, n === 3 ? [3, 3] : null, rv(T, 49.5 + n * .3, .8)); }
     ctx.globalAlpha = .65 * da; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(c[0], c[1], 0.26 * S, GA, GA + GA * rv(T, 50.3, 1), false); ctx.stroke(); ctx.globalAlpha = 1;
-    txt('137,5°', c[0] + Math.cos(1.5 * GA) * 0.36 * S, c[1] + Math.sin(1.5 * GA) * 0.36 * S, 16, 'm', .95 * da, 'center');
+    txt(dn('137.5°'), c[0] + Math.cos(1.5 * GA) * 0.36 * S, c[1] + Math.sin(1.5 * GA) * 0.36 * S, 16, 'm', .95 * da, 'center');
   }
   const spa = rv(T, 53.8, 1.8) * a;
   if (spa > 0) {
@@ -748,7 +776,7 @@ function drawNucleus(v, T) {
         if (i === cur) { ctx.globalAlpha = .7 * ca; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0[0] + i * cw - px * .2, x0[1] - px * .75, bw + px * .4, px * 1.5); ctx.globalAlpha = 1; }
       });
       if (cur >= 0) { const y = m(0, 0.27); txt(CODONS.slice(0, Math.min(cur + 1, 12)).map(c => c[1]).join(' – '), x0[0], y[1], 0.022 * S, 'm', .8 * ca); }
-      const t = m(-0.5, -0.17); txt('ATG = commence · TAG = stop', t[0], t[1], 0.022 * S, 'm', .75 * ca);
+      const t = m(-0.5, -0.17); txt(tr('dna_startstop'), t[0], t[1], 0.022 * S, 'm', .75 * ca);
     }
   }
 }
@@ -783,15 +811,15 @@ const WASH = (() => {
 const AT0 = 72.9, ASP = 0.32, AT6 = AT0 + 6 * ASP, AD = 1.6;
 const atd = i => i < 6 ? AT0 + i * ASP : AT6 + AD * Math.sqrt((i - 5) / (NP - 6));
 const nDet = T => T < AT0 ? 0 : T < AT6 ? Math.min(6, Math.floor((T - AT0) / ASP) + 1) : Math.min(NP, 6 + Math.floor((NP - 6) * Math.pow(Math.min(1, (T - AT6) / AD), 2)));
-const fr2 = v => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(1).replace('.', ',');
+const fr2 = v => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(1).replace('.', DEC);
 function atomPanel(T, a) {
   const n = nDet(T), pw = LAND ? Math.min(340, W * 0.27) : Math.min(340, W - 40), ph = 212;
   const x0 = LAND ? Math.max(40, W * 0.05) : (W - pw) / 2, y0 = LAND ? Math.max(H * 0.4, 230) : Math.min(H - ph - 96, CY + 0.4 * MM);
   const sv = DISP; DISP = false;
   ctx.globalAlpha = .86 * a; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, ph);
   ctx.globalAlpha = .3 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, ph - 1); ctx.globalAlpha = 1;
-  txt("où sera l'électron ?", x0 + 18, y0 + 20, 11, 'm', .6 * a);
-  txt(`tirages : ${n.toLocaleString('fr-FR')}`, x0 + 18, y0 + 46, 19, 'd', .95 * a);
+  txt(tr('atom_where'), x0 + 18, y0 + 20, 11, 'm', .6 * a);
+  txt(tr('atom_draws', num(n)), x0 + 18, y0 + 46, 19, 'd', .95 * a);
   const bx = x0 + 18, bw = pw - 36, by = y0 + 150, bh = 84, cw = bw / HB, top = Math.max(...HTH) * 1.25;
   for (let b = 0; b < HB; b++) {
     const f = n ? (HPRE[n * HB + b] - HPRE[b]) / n : 0, h = Math.min(1, f / top) * bh;
@@ -802,9 +830,9 @@ function atomPanel(T, a) {
   for (let b = 0; b <= HB * 4; b++) { const u = b / 4, i = Math.min(HB - 1, Math.floor(u)), j = Math.min(HB - 1, i + 1), f = u - i - .5, v = f < 0 ? lerp(HTH[Math.max(0, i - 1)], HTH[i], f + 1) : lerp(HTH[i], HTH[j], f); C.push([bx + u * cw, by - v / top * bh]); }
   pen(C, .9 * ca, 1.6, [5, 3]);
   pen([[bx, by + .5], [bx + bw, by + .5]], .5 * a, 1);
-  txt('distance au noyau →', bx + bw, by + 13, 10, 'm', .55 * a, 'right');
-  txt('┄ le calcul : |ψ|²', bx + bw, y0 + 60, 11, 'm', .85 * ca, 'right');
-  const msg = n <= 6 ? 'chaque tirage : imprévisible' : n < NP * .25 ? '…mais leur somme dessine une forme' : 'le hasard suit le calcul, exactement';
+  txt(tr('atom_dist'), bx + bw, by + 13, 10, 'm', .55 * a, 'right');
+  txt(tr('atom_calc'), bx + bw, y0 + 60, 11, 'm', .85 * ca, 'right');
+  const msg = n <= 6 ? tr('atom_msg1') : n < NP * .25 ? tr('atom_msg2') : tr('atom_msg3');
   txt(msg, x0 + 18, y0 + ph - 18, 12, 'm', .9 * a);
   DISP = sv;
   return [x0, y0, pw, ph];
@@ -825,14 +853,14 @@ function drawAtom(v, T) {
     const q = m(ORB[i][0], ORB[i][1]), e = 1 - age / 2.4;
     ctx.globalAlpha = .8 * la * e; ctx.strokeStyle = FG; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(q[0], q[1], 5 + 34 * (1 - Math.exp(-age * 3)), 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
     const sv = DISP; DISP = false;
-    txt(`tirage n° ${i + 1}`, q[0] + 14, q[1] - 16, 13, 'd', la * Math.min(1, e * 2), 'left', true);
+    txt(tr('atom_draw_n', i + 1), q[0] + 14, q[1] - 16, 13, 'd', la * Math.min(1, e * 2), 'left', true);
     txt(`x ${fr2(ORB[i][0] / ORB_S)} · y ${fr2(-ORB[i][1] / ORB_S)}`, q[0] + 14, q[1] + 2, 11, 'm', .8 * la * Math.min(1, e * 2), 'left', true);
     DISP = sv;
   }
   const lb = la * rv(T, AT6 + .2, .8), tip = m(0.2, -0.62), lp = m(0.42, -0.8);
-  pen([lp, tip], .6 * lb, 1); txt('la forme : calculée', lp[0] + 6, lp[1] - 8, 13, 'm', .85 * lb, 'left', true);
+  pen([lp, tip], .6 * lb, 1); txt(tr('atom_shape'), lp[0] + 6, lp[1] - 8, 13, 'm', .85 * lb, 'left', true);
   const np = m(0.04, 0.02), nl = m(0.3, 0.14);
-  pen([nl, np], .5 * la, 1); txt('noyau', nl[0] + 6, nl[1] + 6, 12, 'm', .7 * la, 'left', true);
+  pen([nl, np], .5 * la, 1); txt(tr('atom_nucleus'), nl[0] + 6, nl[1] + 6, 12, 'm', .7 * la, 'left', true);
   atomPanel(T, la);
 }
 
@@ -897,7 +925,7 @@ function probPanel(x0, y0, pw, head, line, rows, hot, grow, msg, pa) {
     if (h) txt('●', x0 + 8, y, 8, 'm', pa);
     txt(w, x0 + 18, y, 17, 'd', (h ? 1 : .65) * pa);
     ctx.globalAlpha = (h ? .95 : .35) * pa; ctx.fillStyle = FG; ctx.fillRect(bx, y - 5, bw, 10); ctx.globalAlpha = 1;
-    txt(`${Math.round(p * 100)} %`, bx + bw + 8, y, 12, 'm', .85 * pa);
+    txt(tr('pct', Math.round(p * 100)), bx + bw + 8, y, 12, 'm', .85 * pa);
   });
   txt(msg, x0 + 18, y0 + phh - 20, 12, 'm', .85 * pa);
   DISP = sv;
@@ -918,7 +946,7 @@ function drawBrain(T) {
   glow(true);
   for (let k = 0; k < 12; k++) { const F = FOLDS[k % FOLDS.length]; if (!F) break; const u = (T * 0.6 + k * 0.37) % 1, p = along(F.map(q => m(q[0], q[1])), u); spr(p[0], p[1], 3, .9 * al * Math.sin(Math.PI * u), k); }
   glow(false);
-  txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : H - 92, 12, 'm', .7 * ba * rv(T, 101.5, 1) * (1 - rv(T, 103, .6) * (1 - rv(T, 108, .6))), 'right');
+  txt(tr('neurons_w'), W - 24, LAND ? H - 70 : H - 92, 12, 'm', .7 * ba * rv(T, 101.5, 1) * (1 - rv(T, 103, .6) * (1 - rv(T, 108, .6))), 'right');
 }
 function drawNeuronDemo(T) {
   const da = rv(T, 103.3, .8) * (1 - rv(T, 107.9, .6));
@@ -929,7 +957,7 @@ function drawNeuronDemo(T) {
   const charge = c < 0.8 ? 0 : c < 1.1 ? (c - 0.8) / 0.3 : 1, fire = c >= 1.1 && c < 1.9;
   // le neurone biologique
   const soma = [LX + 0.1 * U, LY];
-  txt('NEURONE BIOLOGIQUE', LX, LY - 0.95 * U, 13, 'm', .65 * da, 'center');
+  txt(tr('bio_neuron'), LX, LY - 0.95 * U, 13, 'm', .65 * da, 'center');
   const dends = [[LX - 1.0 * U, LY - 0.55 * U], [LX - 1.05 * U, LY], [LX - 1.0 * U, LY + 0.55 * U]].map((s, i) => [s, [(s[0] + soma[0]) / 2, s[1] * 0.6 + LY * 0.4 + (i - 1) * 0.08 * U], soma]);
   dends.forEach((D, i) => {
     ribbon(D, 3.2, { alpha: .85 * da, taper: [.1,.05], dry: 0, seed: i });
@@ -942,19 +970,19 @@ function drawNeuronDemo(T) {
   for (let k = -1; k <= 1; k++) ribbon([axEnd, [axEnd[0] + 0.18 * U, axEnd[1] + k * 0.16 * U]], 1.6, { alpha: .6 * da, dry: 0 });
   spr(soma[0], soma[1], 0.13 * U * (0.7 + 0.5 * charge), (.55 + .45 * charge) * da, 3);
   if (fire) { const u = c01((c - 1.1) / 0.5), p = along([soma, [LX + 0.55 * U, LY - 0.06 * U], axEnd], u); glow(true); spr(p[0], p[1], 8, .95 * da, 1); if (c > 1.6) spr(axEnd[0], axEnd[1], 14 * (1 - (c - 1.6) / 0.3), .8 * da, 2); glow(false); }
-  txt('dendrites : les entrées', LX - 1.05 * U, LY - 0.72 * U, 13, 'm', .8 * da);
-  txt('le corps additionne', soma[0], LY + 0.3 * U, 13, 'm', .8 * da, 'center');
-  txt('axone : la sortie', axEnd[0], LY - 0.25 * U, 13, 'm', .8 * da, 'right');
+  txt(tr('dendrites'), LX - 1.05 * U, LY - 0.72 * U, 13, 'm', .8 * da);
+  txt(tr('soma'), soma[0], LY + 0.3 * U, 13, 'm', .8 * da, 'center');
+  txt(tr('axon'), axEnd[0], LY - 0.25 * U, 13, 'm', .8 * da, 'right');
   // le neurone artificiel
-  txt('NEURONE ARTIFICIEL', RX, RY - 0.95 * U, 13, 'm', .65 * da, 'center');
+  txt(tr('art_neuron'), RX, RY - 0.95 * U, 13, 'm', .65 * da, 'center');
   const sig = [RX + 0.05 * U, RY], outN = [RX + 0.8 * U, RY];
   [0, 1, 2].forEach(i => {
     const x = [RX - 1.0 * U, RY + (i - 1) * 0.55 * U];
     pen([x, sig], .75 * da, 1 + Math.abs(wts[i]) * 4, wts[i] < 0 ? [5, 4] : null);
     ctx.globalAlpha = da; ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(x[0], x[1], 0.12 * U, 0, TAU); ctx.fill(); ctx.strokeStyle = FG; ctx.lineWidth = 1.2; ctx.stroke(); ctx.globalAlpha = 1;
-    txt(String(sums[i]).replace('.', ','), x[0], x[1], 13, 'm', .95 * da, 'center');
+    txt(String(sums[i]).replace('.', DEC), x[0], x[1], 13, 'm', .95 * da, 'center');
     const mid = [lerp(x[0], sig[0], .45), lerp(x[1], sig[1], .45) - 12];
-    txt(`× ${String(wts[i]).replace('.', ',').replace('-', '−')}`, mid[0], mid[1], 11, 'm', .8 * da, 'center', true);
+    txt(`× ${String(wts[i]).replace('.', DEC).replace('-', '−')}`, mid[0], mid[1], 11, 'm', .8 * da, 'center', true);
     if (c < 0.8) { const p = along([x, sig], inP); glow(true); spr(p[0], p[1], 3 + 6 * sums[i] * Math.abs(wts[i]) * 1.4, .95 * da, i); glow(false); }
   });
   pen([sig, outN], .8 * da, 2);
@@ -964,26 +992,26 @@ function drawNeuronDemo(T) {
   txt('Σ', sig[0], sig[1], Math.round(0.16 * U), 'd', .95 * da, 'center');
   txt(fire ? '1' : '0', outN[0], outN[1], 13, 'm', .95 * da, 'center');
   if (fire) { const u = c01((c - 1.1) / 0.5), p = [lerp(sig[0], outN[0], u), RY]; glow(true); spr(p[0], p[1], 7, .95 * da, 1); glow(false); }
-  txt('0,8×0,9 + 0,3×0,4 + 0,6×(−0,2) = 0,72', RX, RY + 0.85 * U, 14, 'm', .85 * da * c01(charge * 2 + (c > 1.1 ? 1 : 0)), 'center', true);
-  txt('0,72 > seuil → le neurone s’active', RX, RY + 0.85 * U + 22, 14, 'm', .85 * da * (fire ? 1 : .25), 'center', true);
+  txt(tr('neuron_sum'), RX, RY + 0.85 * U, 14, 'm', .85 * da * c01(charge * 2 + (c > 1.1 ? 1 : 0)), 'center', true);
+  txt(tr('neuron_fire'), RX, RY + 0.85 * U + 22, 14, 'm', .85 * da * (fire ? 1 : .25), 'center', true);
   if (LAND) txt('≈', (LX + RX) / 2 + 0.05 * U, LY, Math.round(0.35 * U), 'd', .85 * da, 'center');
 }
 function drawBrainPredict(T) {
   const pa = rv(T, 108.4, .6) * (1 - rv(T, 113.2, .8));
   if (pa <= 0) return;
-  const rows = [['lait', .78], ['café', .09], ['thé', .07], ['sang', .02]];
+  const rows = LX.predict.rows, PW = rows[0][0], PS = LX.predict.sentence;
   const grow = rv(T, 109.2, .6), hot = T >= 110.2 ? 0 : -1, seen = T >= 111;
-  const msg = seen ? (LAND ? 'le mot arrive : « lait ». Prévu, aucune surprise.' : '« lait » : prévu, aucune surprise.') : T >= 110.2 ? 'prédiction : lait' : 'ton cerveau prédit…';
+  const msg = seen ? (LAND ? tr('pred_msg2', PW) : tr('pred_msg2s', PW)) : T >= 110.2 ? tr('pred_msg1', PW) : tr('pred_msg0');
   const pw = Math.min(380, W * 0.86), x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - 244 - 150 : H - 244 - 84;
-  probPanel(x0, y0, pw, 'ce que ton cerveau prédit', 'Le chat boit du ___', rows, hot, grow, msg, pa);
-  const s = 'Le chat boit du'.slice(0, Math.floor(c01((T - 108.5) / 0.8) * 15)), px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : y0 - 26;
+  probPanel(x0, y0, pw, tr('pred_head'), PS + WJ + '___', rows, hot, grow, msg, pa);
+  const s = [...PS].slice(0, Math.floor(c01((T - 108.5) / 0.8) * [...PS].length)).join(''), px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : y0 - 26;
   ctx.font = `500 ${px}px ${DISPLAY}`;
-  const w1 = ctx.measureText(s).width, extra = seen ? ' lait' : '', w2 = extra ? ctx.measureText(extra).width : 0, xs = W / 2 - (w1 + w2) / 2;
+  const w1 = ctx.measureText(s).width, extra = seen ? WJ + PW : '', w2 = extra ? ctx.measureText(extra).width : 0, xs = W / 2 - (w1 + w2) / 2;
   const sv = DISP; DISP = false;
   txt(s, xs, y, px, 'd', .95 * pa, 'left', true);
   if (extra) txt(extra, xs + w1, y, px, 'd', .95 * pa * rv(T, 111, .4), 'left', true);
   else if (Math.floor(T * 3) % 2 === 0) { ctx.globalAlpha = .8 * pa; ctx.fillStyle = FG; ctx.fillRect(xs + w1 + 6, y - px * .45, 3, px * .9); ctx.globalAlpha = 1; }
-  if (seen) txt('✓ prévu', xs + w1 + w2 + 12, y, 14, 'm', .8 * pa * rv(T, 111.3, .5), 'left', true);
+  if (seen) txt(tr('pred_ok'), xs + w1 + w2 + 12, y, 14, 'm', .8 * pa * rv(T, 111.3, .5), 'left', true);
   DISP = sv;
 }
 
@@ -1002,9 +1030,9 @@ function drawSpace(T) {
       if (n > LZ.split) {
         const q = mp(LZ.a[LZ.split]), e = c01((n - LZ.split) / 150) * la;
         ctx.globalAlpha = .7 * e; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q[0], q[1], 16, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
-        txt("un millième d'écart au départ", q[0] + 22, q[1] - 20, 12, 'm', .85 * e);
+        txt(tr('lorenz_gap'), q[0] + 22, q[1] - 20, 12, 'm', .85 * e);
       }
-      txt('attracteur de Lorenz · 1963', CX, CY + 0.43 * MM, 12, 'm', .6 * la, 'center');
+      txt(tr('lorenz'), CX, CY + 0.43 * MM, 12, 'm', .6 * la, 'center');
     }
   }
   if (T > 89 && T < 102.5) {
@@ -1045,7 +1073,7 @@ function drawSpace(T) {
       }
     }
     const la = rv(T, 98, 1.5) * (1 - rv(T, 100, 1));
-    txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : H - 92, 12, 'm', .7 * la, 'right');
+    txt(tr('neurons_w'), W - 24, LAND ? H - 70 : H - 92, 12, 'm', .7 * la, 'right');
   }
   if (T > 113.5 && T < 130) {
     const pa = rv(T, 115, 1) * (1 - rv(T, 127, 1.5));
@@ -1164,7 +1192,7 @@ function drawCircuit(T, fa) {
     if (P.length > 2) ribbon(P, 0.02 * MM, { alpha: .9, taper: [.04, T < FC ? .15 : .55], dry: .55, seed: 7 });
   }
   const aP = LAND ? [c[0] + 0.19 * MM, c[1] - 10] : [c[0], c[1] + 0.19 * MM];
-  finLabel(aP, [1, 0], 'ATOME', 'des charges qui bougent', rv(T, 142.3, .6), LAND ? true : 'c');
+  finLabel(aP, [1, 0], tr('fin_atom'), tr('fin_atom_l'), rv(T, 142.3, .6), LAND ? true : 'c');
   // le neurone, sur le fil
   const na = rv(T, 142.9, .7);
   if (na > 0) {
@@ -1191,7 +1219,7 @@ function drawCircuit(T, fa) {
     const sv = DISP; DISP = false;
     txt(`${Math.round(-70 + 15 * charge + 100 * fire)} mV`, ox + ow + 6, Pv[60][1], 11, 'm', .85 * na * rv(T, 143.2, .5), 'left', true);
     DISP = sv;
-    finLabel(LAND ? [ox, oy - 34] : [p[0], p[1] + 0.62 * U], [1, 0], 'NEURONE', 'un signal électrique', na, LAND ? true : 'c');
+    finLabel(LAND ? [ox, oy - 34] : [p[0], p[1] + 0.62 * U], [1, 0], tr('fin_neuron'), tr('fin_neuron_l'), na, LAND ? true : 'c');
   }
   // l'IA : des couches de nombres, traversées par le même courant
   const ia = rv(T, 144.8, .7);
@@ -1212,11 +1240,11 @@ function drawCircuit(T, fa) {
     for (let k = 0; k < 4; k++) { const A = nodes[1][k], B = nodes[2][(k + 1) % 4], w = hash(Math.floor(T * 5) * 13 + k, 9) * 2 - 1; txt(fx(w, 2), (A[0] + B[0]) / 2, (A[1] + B[1]) / 2 - 8, 10, 'm', .7 * ia * rv(T, 145.2, .5), 'center', true); }
     DISP = sv;
     const lp = LAND ? [p[0] + n[0] * 1.1 * U, p[1] + n[1] * 1.1 * U + 0.3 * U] : [Math.max(p[0], 90), p[1] + 1.05 * U];
-    finLabel(lp, n, 'IA', 'des milliards de poids', ia, LAND ? false : 'c');
+    finLabel(lp, n, tr('fin_ia'), tr('fin_ia_l'), ia, LAND ? false : 'c');
   }
   // au centre : le même courant
   const ca = rv(T, FC + .6, 1);
-  if (ca > 0) { const sv = DISP; DISP = false; txt('le même courant', L.cx, L.cy + (LAND ? 0.02 : 0.1) * MM, Math.round(Math.min(26, 0.035 * MM)), 'd', .9 * ca, 'center', true); txt('atome · neurone · IA', L.cx, L.cy + (LAND ? 0.02 : 0.1) * MM + 26, 11, 'm', .6 * ca, 'center', true); DISP = sv; }
+  if (ca > 0) { const sv = DISP; DISP = false; txt(tr('fin_same'), L.cx, L.cy + (LAND ? 0.02 : 0.1) * MM, Math.round(Math.min(26, 0.035 * MM)), 'd', .9 * ca, 'center', true); txt(tr('fin_three'), L.cx, L.cy + (LAND ? 0.02 : 0.1) * MM + 26, 11, 'm', .6 * ca, 'center', true); DISP = sv; }
 }
 
 /* ——— les particules : le fil rouge ——— */
@@ -1224,7 +1252,7 @@ const PA = new Float32Array(NPMAX), PB = new Float32Array(NPMAX), PC = new Float
 for (let i = 0; i < NPMAX; i++) { PA[i] = hash(i, 1); PB[i] = hash(i, 2); PC[i] = hash(i, 3); PD[i] = hash(i, 4); GX[i] = gauss(hash(i, 11), hash(i, 12)); GY[i] = gauss(hash(i, 13), hash(i, 14)); GZ[i] = gauss(hash(i, 15), hash(i, 16)); }
 
 /* ——— les lettres ——— */
-const GCH = "abcdefghijklmnopqrstuvwxyzéèêàùçôœ0123456789.,−[]'?";
+const GCH = [...new Set([...(LX.glyphs + "abcdefghijklmnopqrstuvwxyz").slice(0, 26), ...(LX.glyphs + "abcdefghijklmnopqrstuvwxyzéèêàùçôœ0123456789.,−[]'?"), ...LX.words.groups.flat().join('')])].join('');
 const GIDX = {}; [...GCH].forEach((c, i) => { GIDX[c] = i; });
 const gi = ch => GIDX[ch] ?? 0, GC = 40;
 let GL = null, GI = null;
@@ -1256,7 +1284,7 @@ function buildTitle() {
   try {
     const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(W)); c.height = Math.max(1, Math.round(H));
     const x = c.getContext('2d');
-    const lines = LAND ? ['Et si nous étions', 'le plus gros LLM', 'jamais observé ?'] : ['Et si nous', 'étions le plus', 'gros LLM jamais', 'observé ?'];
+    const lines = (LAND ? LX.title_land : LX.title_port).map(l => fr(l));
     let fs = LAND ? Math.min(W * 0.07, H * 0.14) : W * 0.11;
     x.font = `800 ${fs}px ${DISPLAY}`;
     const mw = Math.max(...lines.map(l => x.measureText(l).width)), lim = (LAND ? 0.74 : 0.9) * W;
@@ -1275,27 +1303,13 @@ function buildTitle() {
 }
 
 /* ——— l'espace des mots ——— */
-const GROUPS = [
-  [[0.95, -0.25, 0.2], ['mer', 'lune', 'fleur', 'arbre', 'vague', 'ciel', 'étoile', 'lumière', 'graine']],
-  [[-0.9, 0.1, 0.35], ['je', 'regarde', 'pense', 'suis', 'rêve', 'calcule', 'moi', 'toi', 'cœur']],
-  [[0.05, 0.55, -0.6], ['la', 'le', 'les', 'mon', 'et', 'qui', 'puis', 'depuis', 'tout', 'rien', 'à', 'que', 'trop', 'donc']],
-  [[0.1, -0.75, -0.4], ['vie', "l'univers", 'nombre', 'spirale', 'temps', 'code']]
-];
+const GROUPS = [[0.95, -0.25, 0.2], [-0.9, 0.1, 0.35], [0.05, 0.55, -0.6], [0.1, -0.75, -0.4]].map((g, j) => [g, LX.words.groups[j]]);
 const WS = [], WC = [], WIX = {};
 GROUPS.forEach(([g, ws]) => ws.forEach(w => { const k = WS.length; WIX[w] = k; WS.push(w); WC.push([g[0] * 1.3 + (hash(k, 71) - .5) * 1.3, g[1] * 1.3 + (hash(k, 72) - .5) * 1.3, g[2] * 1.3 + (hash(k, 73) - .5) * 1.3]); }));
 const NW = WS.length;
-const STEPS = [
-  [['regarde', .41], ['pense', .28], ['suis', .19], ['rêve', .07]],
-  [['la', .52], ['le', .31], ['les', .12], ['mon', .03]],
-  [['lune', .34], ['mer', .29], ['fleur', .18], ['vie', .06]],
-  [['et', .44], ['qui', .27], ['puis', .18], ['depuis', .06]],
-  [['je', .39], ['tout', .22], ['rien', .18], ['donc', .05]],
-  [['pense', .36], ['rêve', .24], ['calcule', .21], ['suis', .09]],
-  [['à', .48], ['que', .30], ['trop', .08], ['donc', .05]],
-  [["l'univers", .31], ['moi', .27], ['toi', .17], ['rien', .06]]
-];
-const PICK = [0, 0, 1, 0, 0, 0, 0, 0];
-const SENT = ['je']; STEPS.forEach((st, j) => SENT.push(st[PICK[j]][0]));
+const STEPS = LX.words.steps;
+const PICK = LX.words.pick;
+const SENT = [LX.words.start]; STEPS.forEach((st, j) => SENT.push(st[PICK[j]][0]));
 // les trois premiers mots lentement, pour comprendre, puis la phrase accélère comme une vraie IA
 const SLOW = 3, SDS = 1.8, SDF = 0.55, S0T = 14.2, LK = 0.62;
 const stepStart = j => S0T + Math.min(j, SLOW) * SDS + Math.max(0, j - SLOW) * SDF;
@@ -1514,7 +1528,7 @@ function drawWordSpace(T, C) {
     const r = role.get(k), dsc = Math.max(0.75, Math.min(1.3, 2.8 / p[2])), da = c01((p[2] - 0.3) / 0.5);
     const px = Math.round((r === 'cur' ? 32 : r === 'cand' ? 24 : r === 'sent' ? 20 : 13) * dsc);
     let label = WS[k];
-    if (r === 'cand' && cur >= 0) { const c = STEPS[cur].findIndex(e => e[0] === WS[k]); if (c >= 0) label += `  ${Math.round(STEPS[cur][c][1] * 100)} %`; }
+    if (r === 'cand' && cur >= 0) { const c = STEPS[cur].findIndex(e => e[0] === WS[k]); if (c >= 0) label += '  ' + tr('pct', Math.round(STEPS[cur][c][1] * 100)); }
     txt(label, p[0], p[1] - px * 0.9, px, 'd', la * da * (r ? 1 : .32) * (1 - dm), 'center', !!r);
     if (k === hotK) { ctx.globalAlpha = .8 * la; ctx.strokeStyle = FG; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p[0], p[1], 9, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; }
     if (dm > 0) txt(vec(WS[k]), p[0], p[1] - px * 0.9, Math.round(px * 0.55), 'm', la * da * dm * (r ? 1 : .5), 'center', true);
@@ -1526,24 +1540,24 @@ function drawWordSpace(T, C) {
     ctx.globalAlpha = .84 * pa; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, phh);
     ctx.globalAlpha = .3 * pa; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, phh - 1); ctx.globalAlpha = 1;
     const sv = DISP; DISP = false;
-    txt('le mot suivant ?', x0 + 18, y0 + 20, 11, 'm', .6 * pa);
-    txt(`… ${SENT.slice(Math.max(0, cur - 2), cur + 1).join(' ')} ___`, x0 + 18, y0 + 44, 18, 'd', .95 * pa);
+    txt(tr('ws_next'), x0 + 18, y0 + 20, 11, 'm', .6 * pa);
+    txt(`… ${SENT.slice(Math.max(0, cur - 2), cur + 1).join(WJ)}${WJ}___`, x0 + 18, y0 + 44, 18, 'd', .95 * pa);
     const bx = x0 + 120, bmax = pw - 190;
     st.forEach(([w, p], c) => {
       const y = y0 + 76 + c * rowH, hot = lk ? c === pk : c === rl, bw = Math.max(2, p / 0.55 * bmax * grow);
       if (hot) txt('●', x0 + 8, y, 8, 'm', pa);
       txt(w, x0 + 18, y, 17, 'd', (hot ? 1 : .65) * pa);
       ctx.globalAlpha = (hot ? .95 : .35) * pa; ctx.fillStyle = FG; ctx.fillRect(bx, y - 5, bw, 10); ctx.globalAlpha = 1;
-      txt(`${Math.round(p * 100)} %`, bx + bw + 8, y, 12, 'm', .85 * pa);
+      txt(tr('pct', Math.round(p * 100)), bx + bw + 8, y, 12, 'm', .85 * pa);
     });
-    const msg = lk ? (pk === 0 ? 'tiré au sort : le plus probable' : 'tiré au sort : pas le plus probable !') : ph >= 0.3 ? 'tirage au sort…' : 'calcul des probabilités…';
+    const msg = lk ? (pk === 0 ? tr('ws_top') : tr('ws_nottop')) : ph >= 0.3 ? tr('ws_roll') : tr('ws_calc');
     txt(msg, x0 + 18, y0 + phh - 20, 12, 'm', .85 * pa);
     DISP = sv;
   }
   // la phrase
   const sa = la * rv(T, S0T - 0.6, .6);
   if (sa > 0) {
-    const s = SENT.slice(0, locked + 1).join(' '), extra = rl >= 0 ? ' ' + STEPS[cur][rl][0] : '';
+    const s = SENT.slice(0, locked + 1).join(WJ), extra = rl >= 0 ? WJ + STEPS[cur][rl][0] : '';
     const px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : H - 96;
     ctx.font = `500 ${px}px ${DISPLAY}`;
     const w1 = ctx.measureText(s).width, w2 = extra ? ctx.measureText(extra).width : 0, x0 = W / 2 - (w1 + w2) / 2;
@@ -1557,9 +1571,9 @@ function drawWordSpace(T, C) {
 
 /* ——— la loupe : sous la souris, le calcul caché de ce qu'on regarde ——— */
 let WSP = null;
-const fx = (v, d) => v.toFixed(d === undefined ? 1 : d).replace('.', ',').replace('-', '−');
+const fx = (v, d) => v.toFixed(d === undefined ? 1 : d).replace('.', DEC).replace('-', '−');
 const inv = (v, x, y) => [v.fx + (x - CX) / v.S, v.fy + (y - CY) / v.S];
-const AMINO = { Met: 'méthionine', Ala: 'alanine', Ile: 'isoleucine', Val: 'valine', Lys: 'lysine', Gly: 'glycine', Arg: 'arginine', Phe: 'phénylalanine', stop: 'fin de la phrase' };
+const AMINO = LX.amino;
 const DNA = CODONS.map(c => c[0]).join('');
 function lensRing(p, r, a) { ctx.globalAlpha = .85 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; }
 function lensBox(head, lines, a) {
@@ -1579,7 +1593,7 @@ function lensLens(T, V) {
   // l'ouverture : le titre n'est que des points
   if (T > 6 && T < 9.6 && TPTS.length) {
     let b = -1, bd = 1e9; TPTS.forEach((p, i) => { const d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = i; } });
-    if (bd < 900) { const p = TPTS[b]; lensRing(p, 8, 1); return ['un point parmi ' + TPTS.length.toLocaleString('fr-FR'), [`x = ${Math.round(p[0])} · y = ${Math.round(p[1])}`, 'une lettre = des points', 'un point = deux nombres']]; }
+    if (bd < 900) { const p = TPTS[b]; lensRing(p, 8, 1); return [tr('lens_pt', num(TPTS.length)), [`x = ${Math.round(p[0])} · y = ${Math.round(p[1])}`, tr('lens_pt_2'), tr('lens_pt_3')]]; }
     return null;
   }
   // l'IA : un mot = un vecteur, le sens = la proximité
@@ -1591,27 +1605,27 @@ function lensLens(T, V) {
     const nb = WC.map((B, k) => [k, (A[0] * B[0] + A[1] * B[1] + A[2] * B[2]) / (nA * Math.hypot(...B))]).filter(e => e[0] !== b).sort((p, q) => q[1] - p[1]).slice(0, 2);
     lensRing(WSP[b], 10, 1);
     nb.forEach(([k]) => { const q = WSP[k]; if (q[2] > 0.3) { pen([WSP[b], q], .7, 1.2, [4, 3]); lensRing(q, 6, .8); } });
-    return [`« ${WS[b]} »`, [`vecteur ${vec(WS[b])}`, ...nb.map(([k, c]) => `proche de « ${WS[k]} » · cos = ${fx(c, 2)}`), 'le sens = une direction']];
+    return [`« ${WS[b]} »`, [tr('lens_word_vec', vec(WS[b])), ...nb.map(([k, c]) => tr('lens_word_near', WS[k], fx(c, 2))), tr('lens_word_sense')]];
   }
   // le rivage
   if (T > 24.4 && T < 43 && v[0].a > .5) {
     const w = inv(v[0], x, y), m = (p, q) => MP(v[0], p, q);
-    if (Math.hypot(w[0] - MOON[0], w[1] - MOON[1]) < MOON_R * 1.5) { lensRing(m(MOON[0], MOON[1]), MOON_R * 1.25 * v[0].S, 1); return ['la Lune', ['distance : 384 400 km', 'F = G · m₁ · m₂ / r²', 'elle tire la mer : deux marées par jour']]; }
-    if (Math.hypot(w[0] - HEAD[0], w[1] - HEAD[1]) < 0.05 || inPoly(w[0], w[1], BODY)) { lensRing(m(HEAD[0], HEAD[1]), 0.045 * v[0].S, 1); return ['moi', ['≈ 86 milliards de neurones', '≈ 20 W : une ampoule', 'je regarde, je prédis, je calcule']]; }
+    if (Math.hypot(w[0] - MOON[0], w[1] - MOON[1]) < MOON_R * 1.5) { lensRing(m(MOON[0], MOON[1]), MOON_R * 1.25 * v[0].S, 1); return [tr('lens_moon'), [tr('lens_moon_1'), 'F = G · m₁ · m₂ / r²', tr('lens_moon_3')]]; }
+    if (Math.hypot(w[0] - HEAD[0], w[1] - HEAD[1]) < 0.05 || inPoly(w[0], w[1], BODY)) { lensRing(m(HEAD[0], HEAD[1]), 0.045 * v[0].S, 1); return [tr('lens_me'), [tr('lens_me_1'), tr('lens_me_2'), tr('lens_me_3')]]; }
     let tb = null, td = 0.03; TREE.forEach(n => { const d = Math.hypot(w[0] - n.mx, w[1] - n.my); if (d < td) { td = d; tb = n; } });
-    if (tb) { pen([m(tb.x, tb.y), m(tb.ex, tb.ey)], .9, 3); return [`branche · niveau ${tb.d}`, [`longueur = tronc × 0,72^${tb.d}`, 'angle ≈ ±24° à chaque fourche', `${2 ** tb.d} branches à ce niveau`, 'la même règle, répétée : une fractale']]; }
+    if (tb) { pen([m(tb.x, tb.y), m(tb.ex, tb.ey)], .9, 3); return [tr('lens_branch', tb.d), [tr('lens_branch_1', tb.d), tr('lens_branch_2'), tr('lens_branch_3', 2 ** tb.d), tr('lens_branch_4')]]; }
     if (w[1] > 0 && w[1] < 0.45 && w[0] > -0.5) {
       const X = w[0] * 1000, t1 = 0.62 * Math.sin(X / 42 - T * 1.1), t2 = 0.28 * Math.sin(X / 19 + T * 0.8), t3 = 0.14 * Math.sin(X / 9 - T * 1.7);
       [[.62, 42, -1.1], [.28, 19, .8], [.14, 9, -1.7]].forEach(([am, k, om], j) => {
         const P = []; for (let s = -60; s <= 60; s += 3) P.push([x + s, y - 34 - j * 20 + am * 12 * Math.sin((X + s * 4) / k + om * T)]);
         pen(P, .8, 1.2);
       });
-      return ['une vague', ['h = 0,62·sin(…) + 0,28·sin(…) + 0,14·sin(…)', `  = ${fx(t1, 2)} ${t2 < 0 ? '' : '+'}${fx(t2, 2)} ${t3 < 0 ? '' : '+'}${fx(t3, 2)}`, `  = ${fx(t1 + t2 + t3, 2)}`, 'trois ondes simples, additionnées']];
+      return [tr('lens_wave'), [dn('h = 0.62·sin(…) + 0.28·sin(…) + 0.14·sin(…)'), `  = ${fx(t1, 2)} ${t2 < 0 ? '' : '+'}${fx(t2, 2)} ${t3 < 0 ? '' : '+'}${fx(t3, 2)}`, `  = ${fx(t1 + t2 + t3, 2)}`, tr('lens_wave_4')]];
     }
     if (w[1] < -0.03) {
       const N = Math.round(8 + hash(Math.floor(x / 30), Math.floor(y / 30)) * 9000);
       lensRing([x, y], 14, .8);
-      return ['une étoile', [`sa lumière est partie il y a ${N.toLocaleString('fr-FR')} ans`, 'au cœur : 4 H → He + énergie', 'E = m·c²']];
+      return [tr('lens_star'), [tr('lens_star_1', num(N)), tr('lens_star_2'), 'E = m·c²']];
     }
     return null;
   }
@@ -1624,11 +1638,11 @@ function lensLens(T, V) {
       pen([c, q], .75, 1.2, [4, 3]); lensRing(q, 0.045 * v[1].S, 1);
       [21, 34].forEach(f => [b - f, b + f].forEach(n => { if (n < 1 || n > NS) return; const e = seedPos(n), s = m(e[0], e[1]); pen([q, s], .45, 1); lensRing(s, 0.03 * v[1].S, .6); txt(n > b ? `+${f}` : `−${f}`, s[0], s[1] - 0.05 * v[1].S, 11, 'm', .8, 'center', true); }));
       const deg = b * 137.50776;
-      return [`graine n° ${b}`, [`angle = ${b} × 137,5° = ${fx(deg)}°`, `soit ${fx(deg % 360)}° après ${Math.floor(deg / 360)} tours`, `distance au centre ∝ √${b} = ${fx(Math.sqrt(b), 2)}`, 'voisines : ±21 et ±34, des Fibonacci']];
+      return [tr('lens_seed', b), [tr('lens_seed_1', b, fx(deg)), tr('lens_seed_2', fx(deg % 360), Math.floor(deg / 360)), tr('lens_seed_3', b, fx(Math.sqrt(b), 2)), tr('lens_seed_4')]];
     }
     if (r < 1.6) {
       const k = ((Math.round(Math.atan2(w[1], w[0]) / (TAU / 34)) % 34) + 34) % 34;
-      return [`pétale ${k + 1} / 34`, ['34 : un nombre de Fibonacci', '1, 1, 2, 3, 5, 8, 13, 21, 34, 55…', 'chacun = la somme des deux d’avant']];
+      return [tr('lens_petal', k + 1), [tr('lens_petal_1'), '1, 1, 2, 3, 5, 8, 13, 21, 34, 55…', tr('lens_petal_3')]];
     }
     return null;
   }
@@ -1638,7 +1652,7 @@ function lensLens(T, V) {
     CELLS.forEach(c => { const d = Math.hypot(c.x - w[0], c.y - w[1]); if (d < bd) { bd = d; b = c; } });
     if (!b) return null;
     lensRing(MP(v[2], b.x, b.y), 0.1 * v[2].S, 1);
-    return b.c ? ['le noyau', ['le programme de la plante', 'des milliards de lettres', 'la même copie dans chaque cellule']] : ['une cellule', ['elle se divise : 1 → 2 → 4 → 8', `après 40 divisions : ${fx(2 ** 40 / 1e12)} × 10¹²`, 'chacune emporte tout le code']];
+    return b.c ? [tr('lens_nucleus'), [tr('lens_nucleus_1'), tr('lens_nucleus_2'), tr('lens_nucleus_3')]] : [tr('lens_cell'), [tr('lens_cell_1'), tr('lens_cell_2', fx(2 ** 40 / 1e12)), tr('lens_cell_3')]];
   }
   // l'ADN
   if (T > 63 && T < 71 && v[3].a > .5) {
@@ -1647,9 +1661,9 @@ function lensLens(T, V) {
       const idx = Math.floor((w[0] + 0.6) / 0.03), L = DNA[idx % DNA.length], P = { A: 'T', T: 'A', G: 'C', C: 'G' }[L];
       const cd = CODONS[Math.floor(idx / 3) % CODONS.length], xs = -0.6 + (idx + .5) * 0.03, ph = T * 1.2, lam = 0.24;
       pen([MP(v[3], xs, 0.075 * Math.sin(TAU * xs / lam + ph)), MP(v[3], xs, 0.075 * Math.sin(TAU * xs / lam + ph + Math.PI * 0.8))], .95, 3);
-      return [`${L} ↔ ${P}`, [`${L === 'A' || L === 'T' ? 2 : 3} liaisons hydrogène`, `mot ${cd[0]} → ${AMINO[cd[1]]}`, '4 lettres, lues 3 par 3 : 64 mots', 'une erreur de lecture = une mutation']];
+      return [`${L} ↔ ${P}`, [tr('lens_dna_1', L === 'A' || L === 'T' ? 2 : 3), tr('lens_dna_2', cd[0], AMINO[cd[1]]), tr('lens_dna_3'), tr('lens_dna_4')]];
     }
-    if (Math.hypot(w[0], w[1]) < 1) return ['un chromosome', ["l'ADN d'une cellule : ≈ 2 m", 'replié dans 6 millièmes de mm', '46 chromosomes chez nous']];
+    if (Math.hypot(w[0], w[1]) < 1) return [tr('lens_chrom'), [tr('lens_chrom_1'), tr('lens_chrom_2'), tr('lens_chrom_3')]];
     return null;
   }
   // l'atome : la probabilité, là, sous la souris
@@ -1657,25 +1671,25 @@ function lensLens(T, V) {
     const w = inv(v[4], x, y), X = w[0] / ORB_S, Z = -w[1] / (ORB_S * .96), d = orb3(X, 0, Z) / 95, n = nDet(T);
     let k = 0; for (let i = 0; i < n; i++) { const q = MP(v[4], ORB[i][0], ORB[i][1]); if ((q[0] - x) ** 2 + (q[1] - y) ** 2 < 400) k++; }
     lensRing([x, y], 20, 1);
-    return ['|ψ|² ici', [`densité : ${Math.round(Math.min(1, d) * 100)} % du maximum`, `tirages tombés dans ce cercle : ${k} / ${n}`, `distance au noyau : ${fx(Math.hypot(X, Z))} rayons de Bohr`, 'probable, jamais certain']];
+    return [tr('lens_psi'), [tr('lens_psi_1', Math.round(Math.min(1, d) * 100)), tr('lens_psi_2', k, n), tr('lens_psi_3', fx(Math.hypot(X, Z))), tr('lens_psi_4')]];
   }
   // l'univers
-  if (T > 77 && T < 79.6) return ['t ≈ 10⁻³⁶ s', ['tout tenait dans un point', "puis l'expansion : v = H₀ · d", 'H₀ ≈ 70 km/s par mégaparsec']];
-  if (T > 79.6 && T < 84.4) return ['attracteur de Lorenz', ['dx/dt = 10 · (y − x)', 'dy/dt = x · (28 − z) − y', 'dz/dt = x · y − 8/3 · z', 'des règles simples, un futur imprévisible']];
+  if (T > 77 && T < 79.6) return ['t ≈ 10⁻³⁶ s', [tr('lens_bang_1'), tr('lens_bang_2'), tr('lens_bang_3')]];
+  if (T > 79.6 && T < 84.4) return [tr('lens_lorenz'), ['dx/dt = 10 · (y − x)', 'dy/dt = x · (28 − z) − y', 'dz/dt = x · y − 8/3 · z', tr('lens_lorenz_4')]];
   if (T > 84.4 && T < 89.5) {
     const th = Math.atan2(y - CY, x - CX), r0 = Math.hypot(x - CX, y - CY), P = [];
     for (let q = -9; q <= 3; q += 0.08) { const r = r0 * Math.exp(0.22 * q); if (r < 3 * MM) P.push([CX + Math.cos(th + q) * r, CY + Math.sin(th + q) * r]); }
     pen(P, .7, 1.2, [5, 4]); lensRing([x, y], 8, 1);
-    return ['un bras de la galaxie', ['r = a · e^(0,22 · θ) : spirale logarithmique', `ici θ = ${fx(((th % TAU) + TAU) % TAU, 2)} rad`, '≈ 200 milliards d’étoiles', 'la même spirale que la fleur']];
+    return [tr('lens_gal'), [tr('lens_gal_1'), tr('lens_gal_2', fx(((th % TAU) + TAU) % TAU, 2)), tr('lens_gal_3'), tr('lens_gal_4')]];
   }
   if (T > 89.5 && T < 100.5) {
     const kw = kwOf(T); let b = -1, bd = (0.1 * MM) ** 2;
     NODES.forEach((n, i) => { const p = nodeXY(i, kw), d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = i; } });
     if (b < 0) return null;
     const p = nodeXY(b, kw); lensRing(p, 14, 1); ADJ[b].forEach(([j]) => pen([p, nodeXY(j, kw)], .8, 1.6));
-    if (T < 96.5) return ['un amas de galaxies', [`${ADJ[b].length} filaments le relient`, 'la matière suit la gravité', 'la toile cosmique ressemble à…']];
+    if (T < 96.5) return [tr('lens_cluster'), [tr('lens_cluster_1', ADJ[b].length), tr('lens_cluster_2'), tr('lens_cluster_3')]];
     const ws = ADJ[b].map(([, e]) => EDGES[e][2] * 2);
-    return [`un neurone`, [`${ADJ[b].length} synapses · poids ${ws.map(q => fx(q, 2)).join(' · ')}`, 'Σ poids × signal > seuil → il s’active', '…un cerveau']];
+    return [tr('lens_neuron'), [tr('lens_neuron_1', ADJ[b].length, ws.map(q => fx(q, 2)).join(' · ')), tr('lens_neuron_2'), tr('lens_neuron_3')]];
   }
   // le cerveau
   if (T > 100.5 && T < 113.3 && !(T > 103.2 && T < 108)) {
@@ -1685,26 +1699,26 @@ function lensLens(T, V) {
     const ti = Math.floor(T * 2); let sum = 0; const terms = [];
     nb.forEach(([i], k) => { const q = bmap(B, BIN[i][0], BIN[i][1]), xi = hash(i, ti) , wi = hash(i, 77) * 1.6 - .5; sum += xi * wi; terms.push(`${fx(xi)}×${fx(wi)}`); pen([[x, y], q], .8, 1.2); lensRing(q, 4, .9); });
     lensRing([x, y], 9, 1);
-    return ['un neurone', [`Σ = ${terms.join(' + ')}`.replace(/\+ −/g, '− '), `  = ${fx(sum, 2)} ${sum > .5 ? '> 0,5 → il s’active' : '< 0,5 → il se tait'}`, 'et 86 milliards font pareil, en même temps']];
+    return [tr('lens_neuron'), [`Σ = ${terms.join(' + ')}`.replace(/\+ −/g, '− '), `  = ${fx(sum, 2)} ${sum > .5 ? tr('lens_sum_on') : tr('lens_sum_off')}`, tr('lens_brain_3')]];
   }
   // le miroir
   if (T > 115 && T < 128 && Math.abs(x - PCX) < 0.42 * W && Math.abs(y - PCY) < 0.4 * H) {
-    return x < PCX ? ['moi', ['≈ 37 °C, et il faut que je mange', '≈ 30 000 milliards de cellules', 'je ressens : la faim, le froid, la peur']] : ['une IA', ['≈ 10¹² paramètres : des nombres', 'pas de corps, pas de faim', 'elle calcule. Ressent-elle ?']];
+    return x < PCX ? [tr('lens_me'), [tr('lens_mirror_me_1'), tr('lens_mirror_me_2'), tr('lens_mirror_me_3')]] : [tr('lens_ai'), [tr('lens_mirror_ai_1'), tr('lens_mirror_ai_2'), tr('lens_mirror_ai_3')]];
   }
   // le bouquet
   if (T > 130 && T < M0) {
     let b = null, bd = (0.22 * MM) ** 2; FW.forEach(F => { const d = (F.x * W - x) ** 2 + (F.y * H - y) ** 2; if (T > F.t && d < bd) { bd = d; b = F; } });
     if (!b) return null;
-    return ['une gerbe', ['chaque étincelle : une parabole', 'y = v₀·t − ½·g·t²', `ici t = ${fx(T - b.t, 2)} s`]];
+    return [tr('lens_sheaf'), [tr('lens_sheaf_1'), 'y = v₀·t − ½·g·t²', tr('lens_sheaf_3', fx(T - b.t, 2))]];
   }
-  if (T >= M0 && T < MEND) return ['la vie, en accéléré', ['étoiles → atomes → ADN → fleur → cerveau', '13,8 milliards d’années', 'en 6 secondes']];
+  if (T >= M0 && T < MEND) return [tr('lens_life'), [tr('lens_life_1'), tr('lens_life_2'), tr('lens_life_3')]];
   if (T > MEND + 0.5) {
-    const L = finLayout(T), E = [[L.ac, "l'électron", ['charge : −1,602 × 10⁻¹⁹ C', 'quand il bouge : du courant', '≈ 10⁻¹⁰ m, presque du vide']]];
-    if (T > 143) E.push([cirPt(L, 1 / 3), 'un neurone', ['repos : −70 mV', 'il décharge à +30 mV, en 1 ms', 'des ions qui passent : du courant']]);
-    if (T > 145) E.push([cirPt(L, 2 / 3), 'une IA', ['y = σ(Σ wᵢ·xᵢ + b)', 'des milliards de poids w', 'dans des transistors : ≈ 1 V']]);
+    const L = finLayout(T), E = [[L.ac, tr('lens_electron'), [tr('lens_electron_1'), tr('lens_electron_2'), tr('lens_electron_3')]]];
+    if (T > 143) E.push([cirPt(L, 1 / 3), tr('lens_neuron'), [tr('lens_fneuron_1'), tr('lens_fneuron_2'), tr('lens_fneuron_3')]]);
+    if (T > 145) E.push([cirPt(L, 2 / 3), tr('lens_ai'), ['y = σ(Σ wᵢ·xᵢ + b)', tr('lens_fai_2'), tr('lens_fai_3')]]);
     let b = null, bd = (0.16 * MM) ** 2; E.forEach(e => { const d = (e[0][0] - x) ** 2 + (e[0][1] - y) ** 2; if (d < bd) { bd = d; b = e; } });
     if (b) { lensRing(b[0], 0.08 * MM, 1); return [b[1], b[2]]; }
-    if (T > FC && Math.abs(Math.hypot(x - L.cx, y - L.cy) - L.R) < 0.05 * MM) return ['le courant', ['I = dQ / dt', 'des charges qui circulent', 'la même chose, partout']];
+    if (T > FC && Math.abs(Math.hypot(x - L.cx, y - L.cy) - L.R) < 0.05 * MM) return [tr('lens_current'), ['I = dQ / dt', tr('lens_current_2'), tr('lens_current_3')]];
   }
   return null;
 }
@@ -1737,12 +1751,13 @@ function buildCaps() {
       const maxW = LAND ? Math.min((cp.text.length > 90 ? 0.56 : cp.text.length > 60 ? 0.5 : 0.42) * W, 1000) : W - 40;
       x.font = `600 ${f}px ${DISPLAY}`;
       const lines = []; let cur = '';
-      cp.text.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+      const toks = CJK ? [...cp.text].reduce((o, ch) => { if (o.length && /[、。，．！？：；」』）》,.!?:;)]/.test(ch)) o[o.length - 1] += ch; else o.push(ch); return o; }, []) : cp.text.split(' '), sep = CJK ? '' : ' ';
+      toks.forEach(w => { const t = cur ? cur + sep + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
       if (cur) lines.push(cur);
       const bw = Math.max(...lines.map(l => x.measureText(l).width)), bh = lines.length * L;
       c.width = Math.ceil(maxW + 24); c.height = Math.ceil(bh + 20);
-      x.font = `600 ${f}px ${DISPLAY}`; x.fillStyle = '#000'; x.textBaseline = 'middle'; x.textAlign = 'left';
-      lines.forEach((l, j) => x.fillText(l, 4, 10 + L * (j + 0.5)));
+      x.font = `600 ${f}px ${DISPLAY}`; x.fillStyle = '#000'; x.textBaseline = 'middle'; x.textAlign = RTL ? 'right' : 'left'; x.direction = RTL ? 'rtl' : 'ltr';
+      lines.forEach((l, j) => x.fillText(l, RTL ? 4 + bw : 4, 10 + L * (j + 0.5)));
       const d = x.getImageData(0, 0, c.width, c.height).data;
       let cnt = 0; for (let yy = 0; yy < c.height; yy++) for (let xx = 0; xx < c.width; xx++) if (d[(yy * c.width + xx) * 4 + 3] > 110) cnt++;
       const step = Math.max(1.6, Math.sqrt(cnt / (CPN * 0.97)));
@@ -1792,11 +1807,12 @@ function drawCaps(T) {
   }
   // une fois assemblée, la phrase se fixe : nette, à l'encre
   if (crisp > 0.01) {
-    ctx.font = `600 ${L.f}px ${DISPLAY}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    ctx.font = `600 ${L.f}px ${DISPLAY}`; ctx.textAlign = RTL ? 'right' : 'left'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
     L.lines.forEach((l, j) => {
       const y = L.top + L.L * (j + 0.5);
-      ctx.globalAlpha = .9 * crisp; ctx.strokeStyle = BG; ctx.lineWidth = L.f * 0.2; ctx.strokeText(l, L.x0, y);
-      ctx.globalAlpha = crisp; ctx.fillStyle = FG; ctx.fillText(l, L.x0, y);
+      const lx = RTL ? L.x0 + L.bw : L.x0;
+      ctx.globalAlpha = .9 * crisp; ctx.strokeStyle = BG; ctx.lineWidth = L.f * 0.2; ctx.strokeText(l, lx, y);
+      ctx.globalAlpha = crisp; ctx.fillStyle = FG; ctx.fillText(l, lx, y);
     });
   }
   ctx.globalAlpha = 1;
@@ -1926,7 +1942,7 @@ function updateCaps(T) {
 /* ——— les chapitres ——— */
 const chapEl = document.getElementById('chap');
 CH.forEach(([t, name], i) => {
-  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', `Chapitre ${i + 1} : ${name}`);
+  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', LX.chapter_n.replace('{0}', i + 1).replace('{1}', name));
   b.innerHTML = `<span class="lbl">${name}</span><span class="bar"><i></i></span>`;
   b.addEventListener('click', () => seek(realOf(reduced ? REST[i] : t + 0.01), true));
   chapEl.appendChild(b);
@@ -1950,15 +1966,15 @@ function updateChap(T) {
 /* ——— la boucle ——— */
 let T = reduced ? realOf(8.8) : 0, playing = !reduced, last = performance.now(), prevLogS = 0, slow = 0;
 const endEl = document.getElementById('end'), ppBtn = document.getElementById('pp');
-function setPlaying(p) { playing = p; ppBtn.textContent = p ? 'Pause' : 'Lecture'; jump = true; }
+function setPlaying(p) { playing = p; ppBtn.textContent = p ? LX.pause : LX.play; jump = true; }
 function seek(t, play) { T = Math.max(0, Math.min(END + EXTRA, t)); jump = true; if (play && !reduced) setPlaying(true); }
 ppBtn.addEventListener('click', () => { if (T >= END + EXTRA) seek(0); setPlaying(!playing); });
-if (reduced) ppBtn.textContent = 'Lecture';
+ppBtn.textContent = reduced ? LX.play : LX.pause;
 document.getElementById('again').addEventListener('click', () => { seek(0); setPlaying(!reduced); });
 document.getElementById('rst').addEventListener('click', () => { loopN = 0; live.forEach(el => el.remove()); live.clear(); seek(reduced ? realOf(REST[0]) : 0); if (!reduced) setPlaying(true); });
 document.getElementById('snd').addEventListener('click', e => {
   if (!AC && !initAudio()) return;
-  audioOn = !audioOn; e.currentTarget.setAttribute('aria-pressed', String(audioOn)); e.currentTarget.textContent = 'Son'; e.currentTarget.classList.add('used');
+  audioOn = !audioOn; e.currentTarget.setAttribute('aria-pressed', String(audioOn)); e.currentTarget.textContent = LX.sound; e.currentTarget.classList.add('used');
   if (AC.state === 'suspended') AC.resume();
   master.gain.setTargetAtTime(audioOn ? 0.55 : 0, AC.currentTime, 0.6);
 });
@@ -2005,7 +2021,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { bu
 })();
 
 function render(T) {
-  WSP = null;
+  WSP = null; ctx.direction = RTL ? 'rtl' : 'ltr';
   setNight(Math.max(1 - rv(T, 44.3, 3.4), rv(T, 76, 3) - rv(T, 115, 4), rv(T, 129.6, 1.4)));
   ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
   const v = camera(Math.min(T, 76.9));

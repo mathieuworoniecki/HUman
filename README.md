@@ -6,6 +6,8 @@ Une expérience plein écran à l'encre de Chine qui déroule la réflexion de M
 
 Ouvrir `index.html` dans un navigateur. Aucune dépendance, aucun build.
 
+Dix langues : français, anglais, chinois, hindi, espagnol, arabe, bengali, portugais, russe et japonais. L'expérience prend automatiquement la langue du navigateur (l'anglais sinon). Le sélecteur en haut permet d'en changer, et `index.html#lang=ja` force une langue.
+
 - Lecture automatique, environ 2 min 15
 - Molette ou glisser : avancer et reculer dans le temps
 - Flèches : chapitre suivant ou précédent, espace : pause
@@ -14,3 +16,7 @@ Ouvrir `index.html` dans un navigateur. Aucune dépendance, aucun build.
 - Sous la souris, une loupe montre le calcul caché de ce qu'on survole : l'angle d'une graine, l'onde d'une vague, le vecteur d'un mot, la probabilité de l'électron, la somme d'un neurone
 - Les phrases s'écrivent en particules en haut à gauche, se fixent à l'encre, puis se transforment en la phrase suivante
 - L'expérience boucle, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
+
+## Traductions
+
+Les textes vivent dans `i18n/*.json`. `fr.json` est la référence, et `i18n/GUIDE.md` donne les règles de traduction (longueurs, phrase de la démo IA, formats de nombres). Après une modification, `python3 i18n/build.py` vérifie les fichiers et les injecte dans `index.html`.
