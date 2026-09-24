@@ -11,14 +11,13 @@ Dix langues : français, anglais, chinois, hindi, espagnol, arabe, bengali, port
 - Lecture automatique, environ 2 min 40, puis un écran de fin : une sphère de points tourne dans le ciel, les questions s'y forment en particules et se transforment l'une en l'autre, et cinq lectures brillent comme des étoiles (la loupe les présente)
 - Un clic sur le film : pause ou lecture
 - La barre des chapitres, en bas, se glisse pour avancer ou reculer
-- Molette ou glisser : avancer et reculer dans le temps
 - Flèches : chapitre suivant ou précédent, espace : pause
 - Bouton « Activer le son » : un son calculé (Web Audio) où la vague joue ses trois ondes, les graines chantent leur angle, l'ADN se lit à voix haute et les neurones claquent
 - La souris déforme la matière sans arrêter le film : les graines s'écartent, l'électron la suit, la mer ondule, les neurones s'allument
 - Sous la souris, une loupe montre le calcul caché de ce qu'on survole : l'angle d'une graine, l'onde d'une vague, le vecteur d'un mot, la probabilité de l'électron, la somme d'un neurone
 - Les phrases s'écrivent en particules en haut à gauche, se fixent à l'encre, puis se transforment en la phrase suivante
 - À la fin, on reste : la dernière question demeure dans la sphère qui tourne. « Revoir » relance le film, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
-- Partage : quatre boutons (X, Reddit, Instagram, lien), avec icône et bordure, flottent autour des questions sur un circuit aux coins arrondis qui contourne le texte, reliés à la sphère par un fil de lumière ; au survol, ils s'immobilisent. Après la dernière question, ils se rangent au centre et deviennent les onglets d'un composeur : la plateforme en haut, puis le texte (flèches pour choisir parmi les cinq questions), puis le fond de la carte (la sphère d'étoiles ou une scène du film), et l'aperçu du post en direct (X, Reddit, Instagram en 4:5 ou 9:16, ou l'aperçu du lien). L'action publie, partage l'image ou copie le lien ; « Télécharger » donne la carte pour la joindre soi-même au post.
+- Partage : quatre boutons (X, Reddit, Instagram, lien) flottent autour des questions sur un circuit qui contourne le texte, reliés à la sphère par un fil de lumière. Après la dernière question, ils glissent vers le centre et se fondent dans un cadre simple : la question du début (dans la langue du visiteur) et les quatre mêmes boutons. X et Reddit ouvrent un post prérempli (question, lien, #AI #LLM) ; Instagram, qui n'a pas de lien de partage, reçoit une carte 4:5 prête à publier (partagée directement depuis un téléphone, sinon enregistrée, avec le lien copié) ; le dernier copie le lien, ou ouvre le menu de partage du téléphone.
 - Le logo est vivant : des étoiles naines (blanches, bleues, rouges) en orbite comme les électrons d'un atome, reliées comme des neurones, qui se rassemblent régulièrement en 人 ; au survol, elles forment 人 aussitôt
 - Aperçu Open Graph : `media/og.png` (et `media/og-en.png`). Une fois le site hébergé, remplacer `media/og.png` par son adresse complète dans les balises `og:image` et `twitter:image`
 
