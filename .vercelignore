@@ -1,0 +1,3 @@
+# le site tient dans index.html : on ne déploie pas les vidéos ni les sources de traduction
+media/*.mp4
+i18n/
