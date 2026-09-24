@@ -1,0 +1,36 @@
+name: Deploy static site to Vercel
+
+on:
+  push:
+    branches:
+      - claude/ia-maths-pensee-wrr9l0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: human-vercel-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare static site
+        run: |
+          mkdir -p "$RUNNER_TEMP/human-site"
+          rsync -a --exclude-from=.vercelignore \
+            --exclude=.git --exclude=.github --exclude=.vercel \
+            --exclude=.env --exclude=.env.local \
+            ./ "$RUNNER_TEMP/human-site/"
+      - name: Deploy to Vercel production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx --yes vercel@latest --prod --yes --cwd "$RUNNER_TEMP/human-site" --token "$VERCEL_TOKEN"
