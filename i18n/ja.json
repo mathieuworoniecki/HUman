@@ -502,5 +502,13 @@
     ]
   ],
   "share": "共有",
-  "copied": "リンクをコピーしました"
+  "copied": "リンクをコピーしました",
+  "share_lead": "問いをシェアする",
+  "copy_link": "リンクをコピー",
+  "card_post": "Instagram カード",
+  "card_story": "ストーリー",
+  "card_wide": "横長カード",
+  "card_dl": "ダウンロード",
+  "card_share": "画像をシェア",
+  "close": "閉じる"
 }

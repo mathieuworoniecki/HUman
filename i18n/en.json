@@ -501,5 +501,13 @@
     ]
   ],
   "share": "Share",
-  "copied": "Link copied"
+  "copied": "Link copied",
+  "share_lead": "Share your question",
+  "copy_link": "Copy link",
+  "card_post": "Instagram card",
+  "card_story": "Story",
+  "card_wide": "Landscape card",
+  "card_dl": "Download",
+  "card_share": "Share image",
+  "close": "Close"
 }

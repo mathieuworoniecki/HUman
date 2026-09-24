@@ -501,5 +501,13 @@
     ]
   ],
   "share": "Compartir",
-  "copied": "Enlace copiado"
+  "copied": "Enlace copiado",
+  "share_lead": "Comparte tu pregunta",
+  "copy_link": "Copiar enlace",
+  "card_post": "Tarjeta Instagram",
+  "card_story": "Historia",
+  "card_wide": "Tarjeta horizontal",
+  "card_dl": "Descargar",
+  "card_share": "Compartir imagen",
+  "close": "Cerrar"
 }

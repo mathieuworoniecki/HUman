@@ -502,5 +502,13 @@
     ]
   ],
   "share": "分享",
-  "copied": "链接已复制"
+  "copied": "链接已复制",
+  "share_lead": "分享你的问题",
+  "copy_link": "复制链接",
+  "card_post": "Instagram 卡片",
+  "card_story": "快拍",
+  "card_wide": "横版卡片",
+  "card_dl": "下载",
+  "card_share": "分享图片",
+  "close": "关闭"
 }

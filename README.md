@@ -17,7 +17,10 @@ Dix langues : français, anglais, chinois, hindi, espagnol, arabe, bengali, port
 - La souris déforme la matière sans arrêter le film : les graines s'écartent, l'électron la suit, la mer ondule, les neurones s'allument
 - Sous la souris, une loupe montre le calcul caché de ce qu'on survole : l'angle d'une graine, l'onde d'une vague, le vecteur d'un mot, la probabilité de l'électron, la somme d'un neurone
 - Les phrases s'écrivent en particules en haut à gauche, se fixent à l'encre, puis se transforment en la phrase suivante
-- Les questions de la fin tournent en boucle ; « Revoir » relance le film, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
+- À la fin, on reste : la dernière question demeure dans la sphère qui tourne. « Revoir » relance le film, comme une IA qui régénère : à chaque tour, une nouvelle question est tapée
+- Partage : X, Reddit, LinkedIn, Bluesky, Threads, WhatsApp, Facebook, lien à copier, et des cartes générées à la volée (post Instagram 4:5, story 9:16, paysage 1,91:1) avec la question affichée, à télécharger ou à partager directement depuis un téléphone
+- Le logo est vivant : des étoiles naines (blanches, bleues, rouges) en orbite comme les électrons d'un atome, reliées comme des neurones, qui se rassemblent régulièrement en 人 ; au survol, elles forment 人 aussitôt
+- Aperçu Open Graph : `media/og.png` (et `media/og-en.png`). Une fois le site hébergé, remplacer `media/og.png` par son adresse complète dans les balises `og:image` et `twitter:image`
 
 ## Traductions
 
