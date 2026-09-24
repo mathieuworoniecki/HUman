@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Trigger Vercel deployment
+      - name: Publish and verify
         env:
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
         run: |
@@ -26,10 +26,6 @@ jobs:
             echo "::error::Missing VERCEL_DEPLOY_HOOK_URL secret"
             exit 1
           fi
-          curl --fail --silent --show-error --request POST \
-            "$VERCEL_DEPLOY_HOOK_URL" -o "$RUNNER_TEMP/vercel-hook-response.json"
-      - name: Verify published files
-        run: |
           site_matches() {
             curl --fail --silent --show-error --max-time 10 \
               https://areweai.dev/ -o "$RUNNER_TEMP/index.html" || return 1
@@ -40,9 +36,20 @@ jobs:
               cmp -s "$asset" "$RUNNER_TEMP/asset" || return 1
             done
           }
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            for attempt in $(seq 1 18); do
+              if site_matches; then
+                echo "Vercel Git deployment is live"
+                exit 0
+              fi
+              sleep 5
+            done
+          fi
+          curl --fail --silent --show-error --request POST \
+            "$VERCEL_DEPLOY_HOOK_URL" -o "$RUNNER_TEMP/vercel-hook-response.json"
           for attempt in $(seq 1 60); do
             if site_matches; then
-              echo "Published files match this commit"
+              echo "Deploy Hook published this commit"
               exit 0
             fi
             sleep 5
