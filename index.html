@@ -86,6 +86,7 @@ body{cursor:none}
 <div class="ctrl">
   <button class="btn" id="snd" type="button" aria-pressed="false">Activer le son</button>
   <button class="btn" id="pp" type="button">Pause</button>
+  <button class="btn" id="rst" type="button">Recommencer</button>
 </div>
 
 <div id="caps" aria-hidden="true"></div>
@@ -184,8 +185,17 @@ function blotCanvas(col, seed) {
 }
 const SPI = [0,1,2,3].map(v => blotCanvas(INKC.join(','), 100 + v));
 const SPL = [0,1,2,3].map(v => blotCanvas(LIGHT.join(','), 200 + v));
+let DISP = true, DX = 0, DY = 0;
+function dsp(x, y) {
+  const dx = x - SMX, dy = y - SMY, d2 = dx * dx + dy * dy, R = 0.13 * MM;
+  if (d2 >= R * R) { DX = x; DY = y; return; }
+  const d = Math.sqrt(d2) || 1, f = Math.pow(1 - d / R, 2) * R * 0.45 * MACT;
+  DX = x + dx / d * f; DY = y + dy / d * f;
+}
+const dspP = P => (DISP && MACT > 0.01) ? P.map(p => { dsp(p[0], p[1]); return [DX, DY]; }) : P;
 function spr(x, y, r, a, v, sy) {
   if (a <= 0.004 || r <= 0) return;
+  if (DISP && MACT > 0.01) { dsp(x, y); x = DX; y = DY; }
   const s = r * 4, h = s * (sy || 1);
   if (NGT < 0.999) { ctx.globalAlpha = c01(a * (1 - NGT)); ctx.drawImage(SPI[v & 3], x - s / 2, y - h / 2, s, h); }
   if (NGT > 0.001) { ctx.globalAlpha = c01(a * NGT); ctx.drawImage(SPL[v & 3], x - s / 2, y - h / 2, s, h); }
@@ -214,7 +224,7 @@ function ribbon(P, w, o) {
   o = o || {};
   const al = o.alpha ?? 0.9, prog = o.prog ?? 1;
   if (al <= 0.004 || w < 0.12 || P.length < 2 || prog <= 0) return;
-  const Q = o.raw ? P : dense(P, Math.max(2.5, Math.min(10, w * 0.8)));
+  const Q = dspP(o.raw ? P : dense(P, Math.max(2.5, Math.min(10, w * 0.8))));
   const n = Q.length, L = new Float32Array(n);
   for (let i = 1; i < n; i++) L[i] = L[i - 1] + Math.hypot(Q[i][0] - Q[i - 1][0], Q[i][1] - Q[i - 1][1]);
   const tot = L[n - 1] || 1, cut = tot * Math.min(1, prog);
@@ -254,6 +264,7 @@ function ribbon(P, w, o) {
 }
 function pen(P, a, w, dash, prog) {
   if (a <= 0.004 || P.length < 2) return;
+  P = dspP(P);
   prog = prog ?? 1; if (prog <= 0) return;
   let L = 0; const seg = [];
   for (let i = 1; i < P.length; i++) { const l = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]); seg.push(l); L += l; }
@@ -270,6 +281,7 @@ function pen(P, a, w, dash, prog) {
 }
 function txt(s, x, y, px, f, a, align) {
   if (a <= 0.004 || px > 500 || px < 1) return;
+  if (DISP && MACT > 0.01) { dsp(x, y); x = DX; y = DY; }
   ctx.globalAlpha = c01(a); ctx.fillStyle = FG;
   ctx.font = `${f === 'd' ? 500 : 400} ${px}px ${f === 'd' ? DISPLAY : MONO}`;
   ctx.textAlign = align || 'left'; ctx.textBaseline = 'middle';
@@ -277,6 +289,7 @@ function txt(s, x, y, px, f, a, align) {
 }
 function fillPoly(P, a) {
   if (a <= 0.004) return;
+  P = dspP(P);
   ctx.globalAlpha = c01(a); ctx.fillStyle = BG;
   ctx.beginPath(); P.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill();
   ctx.globalAlpha = 1;
@@ -296,31 +309,20 @@ function circlePts(cx, cy, r, n, wob, seed) {
 }
 
 /* ——— le rivage (niveau 0, unité = hauteur de la scène) ——— */
-const MOON = [0.42, -0.30];
-const MOON_PTS = ensoPts(MOON[0], MOON[1], 0.07, 200, 320, 44, 0.02, 5);
-const TH = { ox: -0.66, oy: 0.122, s: 0.00095 };
-const THINKER = [
-  { p: [[30,396],[110,386],[205,390],[290,398]], w: 30, a: .14, tp: [.25,.3], dry: .7 },
-  { p: [[36,398],[50,350],[88,312],[140,302],[182,314],[204,352],[212,398]], w: 5, a: .75, tp: [.1,.4], dry: .6 },
-  { p: [[142,98],[124,138],[110,192],[112,248],[128,300]], w: 11 },
-  { p: ensoPts(162, 62, 33, 200, 320, 22, 0.03, 3), w: 8, tp: [.06,.5] },
-  { p: [[128,300],[176,292],[224,290],[252,297]], w: 12 },
-  { p: [[252,298],[255,345],[250,392]], w: 9 },
-  { p: [[240,395],[260,397],[280,394]], w: 6 },
-  { p: [[140,312],[188,320],[226,324],[232,362],[226,394]], w: 8, a: .5 },
-  { p: [[146,118],[172,172],[204,232],[234,280]], w: 8 },
-  { p: [[236,282],[233,222],[216,152],[194,108]], w: 8 },
-  { p: [[180,100],[192,97],[200,107],[193,118]], w: 7 }
-];
-const tl = (x, y) => [TH.ox + x * TH.s, TH.oy + y * TH.s];
-THINKER.forEach(st => { st.u = st.p.map(q => tl(q[0], q[1])); });
-const ROCK = [[36,398],[50,350],[88,312],[140,302],[182,314],[204,352],[212,398],[212,420],[36,420]].map(q => tl(q[0], q[1]));
-const EYE = tl(182, 58);
-const BEACH = [[-1.5,0.47],[-0.8,0.462],[-0.3,0.468],[0.1,0.465],[0.3,0.47],[0.3,0.7],[-1.5,0.7]];
-const CLIFF = [[0.26,0.7],[0.3,0.47],[0.36,0.43],[0.45,0.405],[0.62,0.398],[0.85,0.402],[1.5,0.40],[1.5,0.7]];
-const MTN1 = [[-1.2,-0.02],[-0.85,-0.075],[-0.66,-0.1],[-0.5,-0.06],[-0.38,-0.02]];
-const MTN2 = [[-0.45,-0.02],[-0.3,-0.05],[-0.18,-0.035],[-0.06,-0.02]];
-const TB = [0.52, 0.40], TREE = [], TIPS = []; let FORK = null;
+const MOON = [-0.25, -0.26], MOON_R = 0.085;
+const MOON_PTS = ensoPts(MOON[0], MOON[1], MOON_R * 1.32, 200, 320, 44, 0.02, 5);
+// le penseur assis, en silhouette, tourné vers la lune (dessiné face à droite puis retourné)
+const TH = { ox: 0.2, oy: 0.08, s: 0.00095 };
+const tl = (x, y) => [TH.ox + (345 - x) * TH.s, TH.oy + y * TH.s];
+const BODY = [[152,100],[132,122],[116,160],[107,205],[110,250],[122,288],[146,306],[190,302],[236,300],[244,330],[246,372],[252,392],[298,396],[292,382],[266,370],[268,320],[270,272],[258,254],[242,246],[228,210],[212,160],[200,120],[206,106],[190,96],[178,104],[170,120],[160,108]].map(q => tl(q[0], q[1]));
+const HEAD = tl(170, 70), HEAD_R = 31 * TH.s;
+const ROCK = [[30,440],[40,360],[70,322],[115,308],[170,310],[215,330],[240,372],[310,398],[345,440]].map(q => tl(q[0], q[1]));
+const EYE = tl(190, 66);
+const SHORE = [[-0.12,0.7],[-0.08,0.478],[0.05,0.466],[0.2,0.46],[0.6,0.455],[1.9,0.452],[1.9,0.7]];
+const CLIFF = [[-1.9,0.7],[-1.9,0.33],[-1.1,0.325],[-0.85,0.33],[-0.72,0.345],[-0.62,0.37],[-0.55,0.41],[-0.5,0.46],[-0.46,0.7]];
+const MTN = [[-0.2,-0.02],[-0.05,-0.05],[0.08,-0.085],[0.2,-0.06],[0.32,-0.1],[0.48,-0.075],[0.65,-0.045],[0.9,-0.07],[1.2,-0.03],[1.9,-0.02]];
+const FLW = [0.115, 0.30];
+const TB = [-0.78, 0.335], TREE = [], TIPS = []; let FORK = null;
 (function () {
   let id = 0;
   const grow = (x, y, ang, len, w, d) => {
@@ -334,7 +336,7 @@ const TB = [0.52, 0.40], TREE = [], TIPS = []; let FORK = null;
     if (d === 0) FORK = { x: ex, y: ey, kids, w };
     return node;
   };
-  grow(TB[0], TB[1], -Math.PI / 2, 0.12, 0.017, 0);
+  grow(TB[0], TB[1], -Math.PI / 2 + 0.2, 0.11, 0.016, 0);
 })();
 function sway(x, y, th) {
   const a = th * c01((TB[1] - y) / 0.45), dx = x - TB[0], dy = y - TB[1];
@@ -348,7 +350,7 @@ function seaY(x, t, i, s) {
 /* ——— les niveaux de zoom ——— */
 const seedPos = n => { const r = 0.92 * Math.sqrt(n / NS), a = n * GA; return [r * Math.cos(a), r * Math.sin(a)]; };
 const R_LV = [0.028, 0.03, 0.05, 0.02];
-const A_LV = [[0.08, 0.30], seedPos(60), [0, 0], [0, 0]];
+const A_LV = [[0.115, 0.30], seedPos(60), [0, 0], [0, 0]];
 const C0 = [0, 0];
 let SK = [1, 1, 1, 1, 1];
 function computeSK() {
@@ -396,23 +398,59 @@ function camera(T) {
 const MP = (v, x, y) => [CX + (x - v.fx) * v.S, CY + (y - v.fy) * v.S];
 
 /* ——— niveau 0 : le rivage, la nuit ——— */
-const NL = 14;
-const waveP = i => { const q = (i + 1) / NL; return { base: -0.015 + 0.46 * Math.pow(q, 1.6), A: 0.0015 + i * 0.0019, s: 0.25 + 0.75 * q, ts: 0.6 + 0.4 * q }; };
 const glow = on => { ctx.globalCompositeOperation = on && NGT > 0.5 ? 'lighter' : 'source-over'; };
+function closedPts(P, m) { const Q = P.map(p => m(p[0], p[1])); Q.push(Q[0]); return Q; }
+function silhouette(P, a, rim, prog) {
+  if (a <= 0.004) return;
+  if (DISP && MACT > 0.01) P = P.map(p => { dsp(p[0], p[1]); return [DX, DY]; });
+  const D = dense(P, 4);
+  ctx.globalAlpha = c01(a); ctx.fillStyle = BG; ctx.beginPath(); D.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  const sv = DISP; DISP = false; pen(D, rim * a, 1.3, null, prog ?? 1); DISP = sv;
+}
+function seaHatch(m, S, T, a) {
+  const R = 44, mx = MOON[0], buckets = [[], [], [], []], widths = [[], [], [], []];
+  for (let r = 0; r < R; r++) {
+    const q = (r + 0.5) / R, ap = rv(T, 25.8 + r * 0.05, 1.2); if (ap <= 0) continue;
+    const y = -0.018 + 0.5 * Math.pow(q, 1.9), d = 0.15 + 0.85 * q, len = 0.012 + 0.07 * d * d, sp = len * 1.8, span = 3.8;
+    const n = Math.floor(span / sp), drift = T * (0.008 + 0.03 * d) * (r % 2 ? 1 : -1), lw = Math.max(0.6, 0.0022 * S * d);
+    for (let k = 0; k < n; k++) {
+      let x = (((k * sp + hash(r, k) * sp * 0.8 + drift) % span) + span) % span - 1.9;
+      const yy = y + (hash(r, k + 7) - .5) * 0.004 * d + 0.004 * d * Math.sin(x * 8 + T * 1.3 + r);
+      const path = Math.exp(-Math.pow((x - mx) / (0.04 + 0.24 * q), 2));
+      const b = (0.1 + 0.16 * hash(r, k + 3) + 1.3 * path * (0.5 + 0.5 * Math.sin(T * 3 + k * 1.7 + r))) * ap;
+      const bi = Math.min(3, Math.floor(b * 4)); if (b < 0.03) continue;
+      let p1 = m(x - len / 2, yy), p2 = m(x + len / 2, yy + 0.0005 * d);
+      if (DISP && MACT > 0.01) { dsp(p1[0], p1[1]); p1 = [DX, DY]; dsp(p2[0], p2[1]); p2 = [DX, DY]; }
+      buckets[bi].push(p1[0], p1[1], p2[0], p2[1]); widths[bi].push(lw);
+    }
+  }
+  ctx.strokeStyle = FG; ctx.lineCap = 'round';
+  [.16, .32, .58, .92].forEach((al, bi) => {
+    const B = buckets[bi], Wd = widths[bi]; if (!B.length) return;
+    ctx.globalAlpha = al * a; if (bi === 3) glow(true);
+    for (let j = 0; j < B.length; j += 4) { ctx.lineWidth = Wd[j / 4]; ctx.beginPath(); ctx.moveTo(B[j], B[j + 1]); ctx.lineTo(B[j + 2], B[j + 3]); ctx.stroke(); }
+    glow(false);
+  });
+  ctx.globalAlpha = 1;
+}
 function drawCoast(v, T) {
-  const a = v.a; if (a < 0.004 || T < 25) return;
-  const m = (x, y) => MP(v, x, y), S = v.S, mu = (SMX - CX) / S + v.fx, mv = (SMY - CY) / S + v.fy;
+  const a = v.a; if (a < 0.004 || T < 24.4) return;
+  const m = (x, y) => MP(v, x, y), S = v.S;
   const keep = 1 - rv(T, 42.6, 1.4);
   const xs = lerp(-1.3, 1.45, eio((T - 33) / 4.6));
   const seen = x => T < 33 ? 0 : c01((xs - x) / 0.1) * keep;
-  // la lune
+  // le ciel : halo de lune et brume d'horizon
   const mp = rv(T, 24.6, 2.2);
   if (mp > 0) {
     const c = m(MOON[0], MOON[1]);
-    glow(true); spr(c[0], c[1], 0.1 * S, .07 * a * mp, 0); spr(c[0], c[1], 0.045 * S, .14 * a * mp, 1); glow(false);
-    ribbon(MOON_PTS.map(p => m(p[0], p[1])), 0.014 * S, { alpha: .92 * a, prog: mp, taper: [.05,.5], dry: .5, seed: 3 });
+    const g = ctx.createRadialGradient(c[0], c[1], 0, c[0], c[1], 0.9 * S);
+    g.addColorStop(0, `rgba(${LIGHT.join(',')},${(.12 * mp * a * NGT).toFixed(3)})`); g.addColorStop(1, `rgba(${LIGHT.join(',')},0)`);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const h0 = m(0, -0.16), h1 = m(0, -0.02), g2 = ctx.createLinearGradient(0, h0[1], 0, h1[1]);
+    g2.addColorStop(0, `rgba(${LIGHT.join(',')},0)`); g2.addColorStop(1, `rgba(${LIGHT.join(',')},${(.1 * mp * a * NGT).toFixed(3)})`);
+    ctx.fillStyle = g2; ctx.fillRect(0, h0[1], W, h1[1] - h0[1]);
   }
-  // le monde devient du papier millimétré, derrière le regard
+  // le papier millimétré du regard
   const gA = .12 * a * keep;
   if (T > 33 && gA > 0) {
     const xe = Math.min(1.8, xs);
@@ -420,108 +458,105 @@ function drawCoast(v, T) {
     for (let x = -1.7; x <= xe; x += 0.1) pen([m(x, -0.02), m(x, -1.35)], gA, 1);
     for (let x = -1.2; x <= Math.min(1.2, xe) + 1e-6; x += 0.2) { const p = m(x, -0.05); txt(x.toFixed(1).replace('-', '−').replace('.', ','), p[0] + 3, p[1], 10, 'm', .55 * a * seen(x)); }
   }
-  // l'horizon, les montagnes
-  ribbon([m(-1.8, -0.02), m(0, -0.021), m(1.8, -0.02)], 0.003 * S, { alpha: .8 * a, prog: rv(T, 25.8, 2), dry: .4, taper: [.02,.2] });
-  ribbon(MTN1.map(p => m(p[0], p[1])), 0.035 * S, { alpha: .14 * a, prog: rv(T, 28, 2.5), taper: [.3,.3], dry: .7 });
-  ribbon(MTN2.map(p => m(p[0], p[1])), 0.02 * S, { alpha: .1 * a, prog: rv(T, 28.5, 2.2), taper: [.3,.3], dry: .7 });
-  // la mer
-  for (let i = 0; i < NL; i++) {
-    const w = waveP(i), p = rv(T, 26 + i * 0.12, 2.2); if (p <= 0) continue;
-    const pts = [], x1 = -1.8 + 3.6 * p, near = MACT * Math.exp(-Math.pow(w.base - mv, 2) / 0.004);
-    for (let x = -1.8; x <= x1; x += 0.012) { const dx = x - mu; pts.push(m(x, w.base + w.A * seaY(x, T * w.ts, i, w.s) + (near > 0.01 ? near * 0.016 * Math.exp(-dx * dx / 0.006) * Math.sin(dx * 90 - T * 7) : 0))); }
-    ribbon(pts, (0.0005 + i * 0.00034) * S, { alpha: (.2 + .045 * i) * a, raw: true, dry: 0, taper: [.02,.02] });
+  // la lune
+  if (mp > 0) {
+    const c = m(MOON[0], MOON[1]), r = MOON_R * S;
+    glow(true); spr(c[0], c[1], r * 1.6, .1 * a * mp, 0); spr(c[0], c[1], r * 0.9, .25 * a * mp, 1); glow(false);
+    ctx.globalAlpha = .9 * a * mp; ctx.fillStyle = FG; ctx.beginPath(); ctx.arc(c[0], c[1], r, 0, TAU); ctx.fill();
+    ctx.fillStyle = BG;
+    [[-.3, -.25, .28], [.25, .1, .22], [-.1, .35, .18], [.35, -.35, .12], [-.45, .15, .1]].forEach(([dx, dy, rr], k) => { ctx.globalAlpha = (.14 + .05 * k % 2) * a * mp; ctx.beginPath(); ctx.arc(c[0] + dx * r, c[1] + dy * r, rr * r, 0, TAU); ctx.fill(); });
+    ctx.globalAlpha = 1;
+    ribbon(MOON_PTS.map(p => m(p[0], p[1])), 0.012 * S, { alpha: .8 * a, prog: rv(T, 25.2, 2), taper: [.05,.5], dry: .5, seed: 3 });
   }
-  // le reflet de la lune
-  if (T > 26.6) {
-    const ga = rv(T, 26.6, 2) * a; glow(true);
-    for (let k = 0; k < 80; k++) {
-      const kk = Math.floor(T * 5 + hash(k, 1) * 5), yq = hash(k, 2), y = -0.008 + 0.44 * Math.pow(yq, 1.25);
-      const x = MOON[0] + gauss(hash(k, kk * 3 + 1), hash(k, kk * 3 + 2)) * (0.01 + 0.07 * yq), p = m(x, y);
-      spr(p[0], p[1], (0.0012 + 0.003 * yq) * S, ga * (.25 + .65 * hash(k, kk * 3 + 3)), k);
-    }
-    glow(false);
+  // montagnes lointaines
+  const ma = rv(T, 26.4, 1.6) * a;
+  if (ma > 0) {
+    const P = MTN.map(p => m(p[0], p[1])); P.push(m(1.9, -0.02), m(-0.2, -0.02));
+    silhouette(P, ma, .3);
+    ctx.globalAlpha = .05 * ma; ctx.fillStyle = FG; ctx.beginPath(); P.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.fill(); ctx.globalAlpha = 1;
   }
-  // une étoile filante
+  ribbon([m(-1.9, -0.02), m(0, -0.021), m(1.9, -0.02)], 0.0025 * S, { alpha: .75 * a, prog: rv(T, 25.8, 2), dry: .4, taper: [.02,.2] });
+  // la mer, en hachures d'encre, avec le chemin de lune
+  seaHatch(m, S, T, a);
+  // étoile filante
   if (T > 31 && T < 32.3) {
-    const u = (T - 31) / 1.3, P = t => m(-1.1 + 0.9 * t, -0.95 + 0.35 * t), h = P(u);
+    const u = (T - 31) / 1.3, P = t => m(0.4 - 0.9 * t, -0.95 + 0.35 * t), h = P(u);
     pen([P(Math.max(0, u - 0.2)), h], .9 * a * (1 - u), 2); glow(true); spr(h[0], h[1], 3, .9 * (1 - u) * a, 1); glow(false);
   }
-  // la mer échantillonnée par le regard
-  if (T > 33) for (const i of [NL - 1, NL - 4, NL - 8]) {
-    const w = waveP(i);
+  // les vagues échantillonnées par le regard
+  if (T > 33) [0.1, 0.2, 0.32].forEach((base, i) => {
     for (let x = -1.7; x <= xs; x += 0.04) {
       const sa = seen(x) * a; if (sa <= 0) continue;
-      const y = w.base + w.A * seaY(x, T * w.ts, i, w.s), p = m(x, y);
-      pen([m(x, w.base), p], .45 * sa, 1); spr(p[0], p[1], 1.6, .8 * sa, i);
+      const y = base + 0.012 * seaY(x, T * 0.9, i, 0.6), p = m(x, y);
+      pen([m(x, base), p], .5 * sa, 1); spr(p[0], p[1], 1.7, .9 * sa, i);
     }
-  }
-  // la terre et le bonhomme
-  fillPoly(BEACH.map(p => m(p[0], p[1])), rv(T, 28.5, 1.2) * a);
-  fillPoly(CLIFF.map(p => m(p[0], p[1])), rv(T, 28.8, 1.2) * a);
-  ribbon(BEACH.slice(0, 5).map(p => m(p[0], p[1])), 0.004 * S, { alpha: .55 * a, prog: rv(T, 28.5, 2), dry: .6 });
-  ribbon(CLIFF.slice(1, 7).map(p => m(p[0], p[1])), 0.007 * S, { alpha: .85 * a, prog: rv(T, 28.8, 2), dry: .5, taper: [.05,.3] });
-  fillPoly(ROCK.map(p => m(p[0], p[1])), rv(T, 28.6, 1) * a);
-  THINKER.forEach((st, i) => {
-    const p = rv(T, 28.8 + i * 0.3, 0.5); if (p <= 0) return;
-    ribbon(st.u.map(q => m(q[0], q[1])), st.w * TH.s * S, { alpha: (st.a ?? .92) * a, prog: p, taper: st.tp || [.12,.3], dry: st.dry ?? .3, seed: i + 11 });
   });
-  const ep = m(EYE[0], EYE[1]); spr(ep[0], ep[1], Math.max(0.8, 0.0026 * S), .95 * a * rv(T, 32, .4), 1);
-  // le tournesol
-  ribbon([m(0.08,0.47), m(0.074,0.39), m(0.08,0.328)], 0.006 * S, { alpha: .9 * a, prog: rv(T, 30, 1.2), taper: [.05,.1] });
-  ribbon([m(0.078,0.41), m(0.10,0.395), m(0.12,0.40)], 0.012 * S, { alpha: .8 * a, prog: rv(T, 30.8, .8), taper: [.45,.55] });
-  ribbon([m(0.077,0.43), m(0.055,0.415), m(0.035,0.42)], 0.011 * S, { alpha: .8 * a, prog: rv(T, 31.1, .8), taper: [.45,.55] });
-  const hp = rv(T, 31.4, 1.2);
-  if (hp > 0) {
-    for (let k = 0; k < 21; k++) {
-      const an = k * TAU / 21, r1 = 0.026, r2 = 0.046;
-      ribbon([m(0.08 + Math.cos(an) * r1, 0.30 + Math.sin(an) * r1), m(0.08 + Math.cos(an) * r2, 0.30 + Math.sin(an) * r2)], 0.009 * S, { alpha: .5 * a * hp, taper: [.4,.55], dry: 0 });
-    }
-    const hc = m(0.08, 0.30); spr(hc[0], hc[1], 0.017 * S, .95 * a * hp, 2);
-  }
-  // l'arbre pousse, pointes lumineuses
+  // la falaise et l'arbre
+  const ca = rv(T, 27.4, 1.4) * a;
+  silhouette(CLIFF.map(p => m(p[0], p[1])), ca, .75, rv(T, 27.4, 2));
   const th = 0.03 * Math.sin(T * 0.8) + 0.012 * Math.sin(T * 2.1 + 1);
   TREE.forEach(nd => {
-    const g = rv(T, 30.5 + nd.d * 0.55, 0.7); if (g <= 0) return;
+    const g = rv(T, 29.6 + nd.d * 0.55, 0.7); if (g <= 0) return;
     const e = [nd.x + (nd.ex - nd.x) * g, nd.y + (nd.ey - nd.y) * g];
     const P = g < 0.6 ? [[nd.x, nd.y], e] : [[nd.x, nd.y], [nd.mx, nd.my], e];
-    ribbon(P.map(q => { const s2 = sway(q[0], q[1], th); return m(s2[0], s2[1]); }), nd.w * S, { alpha: (.95 - nd.d * .03) * a, taper: [.02,.3], dry: .3 + nd.d * .04, seed: nd.id });
+    ribbon(P.map(q => { const s2 = sway(q[0], q[1], th); return m(s2[0], s2[1]); }), nd.w * S, { alpha: (.92 - nd.d * .03) * a, taper: [.02,.3], dry: .3 + nd.d * .04, seed: nd.id });
     if (g < 1) { const s2 = sway(e[0], e[1], th), p = m(s2[0], s2[1]); glow(true); spr(p[0], p[1], 0.006 * S, .9 * a, nd.id); glow(false); }
   });
-  const la = rv(T, 34.6, 1.5) * a;
+  const la = rv(T, 33.4, 1.5) * a;
   if (la > 0) TIPS.forEach((tp, i) => {
     for (let k = 0; k < 2; k++) {
       const s2 = sway(tp.ex + (hash(i, k) - .5) * 0.02, tp.ey + (hash(i, k + 5) - .5) * 0.016, th), p = m(s2[0], s2[1]);
       spr(p[0], p[1], (0.003 + hash(i, k + 9) * 0.004) * S, la * (.35 + hash(i, k + 3) * .5), i + k);
     }
   });
-  if (T > 36) for (let j = 0; j < 5; j++) {
-    const cyc = 6, tt = T - 36 + j * 1.2, n = Math.floor(tt / cyc), t = tt - n * cyc;
+  if (T > 35) for (let j = 0; j < 5; j++) {
+    const cyc = 6, tt = T - 35 + j * 1.2, n = Math.floor(tt / cyc), t = tt - n * cyc;
     const tp = TIPS[Math.floor(hash(j, n) * TIPS.length)];
-    const tLand = Math.pow(Math.max(0, 0.395 - tp.ey) / 0.02, 1 / 1.3);
-    let y = tp.ey + 0.02 * Math.pow(t, 1.3), fade = 1;
-    if (y > 0.395) { y = 0.395; fade = 1 - c01((t - tLand) / 1.2); }
-    const p = m(tp.ex + 0.02 * Math.min(t, tLand + 0.2) + 0.01 * Math.sin(t * 2 + j), y);
+    const y = tp.ey + 0.02 * Math.pow(t, 1.3), fade = 1 - c01((t - 3.8) / 1.2);
+    const p = m(tp.ex + 0.03 * t + 0.01 * Math.sin(t * 2 + j), y);
     ctx.save(); ctx.translate(p[0], p[1]); ctx.rotate(Math.sin(t * 2.2 + j) * 0.9);
     spr(0, 0, 0.004 * S, .8 * a * fade, j, 0.5); ctx.restore();
   }
+  // le rivage, le tournesol et le penseur en silhouette
+  silhouette(SHORE.map(p => m(p[0], p[1])), rv(T, 27.8, 1.2) * a, .6, rv(T, 27.8, 2));
+  const fa0 = rv(T, 29.2, 1.4) * a;
+  if (fa0 > 0) {
+    ribbon([m(0.12, 0.462), m(0.113, 0.39), m(FLW[0], FLW[1] + 0.028)], 0.006 * S, { alpha: .9 * fa0, taper: [.05,.1] });
+    ribbon([m(0.116, 0.41), m(0.14, 0.395), m(0.16, 0.40)], 0.012 * S, { alpha: .8 * fa0, taper: [.45,.55] });
+    ribbon([m(0.115, 0.43), m(0.092, 0.415), m(0.072, 0.42)], 0.011 * S, { alpha: .8 * fa0, taper: [.45,.55] });
+    for (let k = 0; k < 21; k++) {
+      const an = k * TAU / 21 + 0.04 * Math.sin(T * 1.2 + k), r1 = 0.026, r2 = 0.046;
+      ribbon([m(FLW[0] + Math.cos(an) * r1, FLW[1] + Math.sin(an) * r1), m(FLW[0] + Math.cos(an) * r2, FLW[1] + Math.sin(an) * r2)], 0.009 * S, { alpha: .55 * fa0, taper: [.4,.55], dry: 0 });
+    }
+    const hc = m(FLW[0], FLW[1]); spr(hc[0], hc[1], 0.017 * S, .95 * fa0, 2);
+  }
+  const ta0 = rv(T, 28.4, 2) * a;
+  silhouette(ROCK.map(p => m(p[0], p[1])), ta0, .55, rv(T, 28.4, 2.2));
+  if (ta0 > 0) {
+    silhouette(BODY.map(p => m(p[0], p[1])), ta0, .75, rv(T, 28.8, 2.4));
+    const hc = m(HEAD[0], HEAD[1]); let hx = hc[0], hy = hc[1];
+    if (DISP && MACT > 0.01) { dsp(hx, hy); hx = DX; hy = DY; }
+    ctx.globalAlpha = ta0; ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(hx, hy, HEAD_R * S, 0, TAU); ctx.fill();
+    ctx.globalAlpha = .8 * ta0; ctx.strokeStyle = FG; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.arc(hx, hy, HEAD_R * S, Math.PI * 0.55, Math.PI * 0.55 + TAU * rv(T, 29.6, 1.4)); ctx.stroke(); ctx.globalAlpha = 1;
+  }
   // ce que le regard révèle
   if (T > 33) {
-    const ma = seen(MOON[0]) * a;
-    if (ma > 0) {
-      const c = m(MOON[0], MOON[1]), an = T * 0.8, e = m(MOON[0] + Math.cos(an) * 0.07, MOON[1] + Math.sin(an) * 0.07);
-      pen([c, e], .75 * ma, 1); spr(c[0], c[1], 1.6, ma, 0);
-      const l1 = m(MOON[0] + 0.1, MOON[1] - 0.015), l2 = m(MOON[0] + 0.1, MOON[1] + 0.022);
-      txt('x² + y² = r²', l1[0], l1[1], 14, 'm', .9 * ma); txt('r = 1 737 km', l2[0], l2[1], 11, 'm', .6 * ma);
+    const mma = seen(MOON[0]) * a;
+    if (mma > 0) {
+      const c = m(MOON[0], MOON[1]), an = T * 0.8, e = m(MOON[0] + Math.cos(an) * MOON_R, MOON[1] + Math.sin(an) * MOON_R);
+      pen([c, e], .8 * mma, 1.2);
+      const l1 = m(MOON[0] + 0.15, MOON[1] - 0.015), l2 = m(MOON[0] + 0.15, MOON[1] + 0.022);
+      txt('x² + y² = r²', l1[0], l1[1], 14, 'm', .9 * mma); txt('r = 1 737 km', l2[0], l2[1], 11, 'm', .6 * mma);
     }
-    const ha = seen(EYE[0]) * a;
+    const ha = seen(-0.45) * a;
     if (ha > 0) {
-      pen([m(EYE[0], EYE[1]), m(0.25, -0.02)], .5 * ha, 1, [5, 5], c01((xs - EYE[0]) / 0.75));
-      const lp = m(-0.14, 0.04); txt('horizon : d ≈ 3,57 √h ≈ 11 km', lp[0], lp[1], 13, 'm', .85 * seen(-0.14) * a, 'center');
+      pen([m(EYE[0], EYE[1]), m(-0.45, -0.02)], .55 * ha, 1, [5, 5], c01((xs + 0.45) / 0.9));
+      const lp = m(-0.08, 0.05); txt('horizon : d ≈ 3,57 √h ≈ 11 km', lp[0], lp[1], 13, 'm', .85 * seen(-0.08) * a, 'center');
     }
-    const fa = seen(0.08) * a;
-    if (fa > 0) { pen([m(0.105, 0.315), m(0.15, 0.36)], .6 * fa, 1); const lp = m(0.152, 0.36); txt('137,5°', lp[0] + 5, lp[1] + 2, 13, 'm', .9 * fa); }
+    const fa = seen(FLW[0]) * a;
+    if (fa > 0) { pen([m(FLW[0] - 0.03, FLW[1] - 0.025), m(FLW[0] - 0.08, FLW[1] - 0.08)], .6 * fa, 1); const lp = m(FLW[0] - 0.085, FLW[1] - 0.085); txt('137,5°', lp[0] - 4, lp[1], 13, 'm', .9 * fa, 'right'); }
     const ta = seen(TB[0] - 0.12) * a;
-    if (ta > 0) {
+    if (ta > 0 && FORK) {
       TREE.forEach(nd => {
         if (nd.d > 2 || !nd.kids) return;
         const F = sway(nd.ex, nd.ey, th), Fm = m(F[0], F[1]), a0 = nd.kids[0].ang + th, a1 = nd.kids[1].ang + th;
@@ -532,23 +567,25 @@ function drawCoast(v, T) {
       txt(`θ ≈ ${Math.round((k2.ang - k1.ang) * 90 / Math.PI)}°`, Fm[0] + 0.035 * S, Fm[1] + 8, 13, 'm', .85 * ta);
       const km = sway((k1.x + k1.ex) / 2, (k1.y + k1.ey) / 2, th), kp = m(km[0], km[1]);
       txt('× 0,72', kp[0] - 12, kp[1], 13, 'm', .85 * ta, 'right');
-      const rp = m(TB[0], -0.12), rp2 = m(TB[0], -0.085);
+      const rp = m(TB[0] + 0.05, -0.12), rp2 = m(TB[0] + 0.05, -0.085);
       txt('F → F [+F] [−F]', rp[0], rp[1], 15, 'm', .9 * ta, 'center');
       txt('une règle · répétée 7 fois', rp2[0], rp2[1], 11, 'm', .6 * ta, 'center');
     }
   }
-  // Fourier : la vague se décompose puis se recompose
+  // Fourier : une vague se décompose puis se recompose
   const fa2 = rv(T, 38.3, .6) * (1 - rv(T, 42.6, .8)) * a;
   if (fa2 > 0) {
-    const i = NL - 1, w = waveP(i), peel = rv(T, 38.5, 1.3) * (1 - rv(T, 41.6, 1.2)), t = T * w.ts;
+    const base = 0.3, peel = rv(T, 38.5, 1.3) * (1 - rv(T, 41.6, 1.2)), t = T * 0.9, i = 3;
     const comps = [[0.62, X => X / 42 - t * 1.1 + i], [0.28, X => X / 19 + t * 0.8 + i * 2], [0.14, X => X / 9 - t * 1.7 + i * 3]];
+    const sum = []; for (let x = -1.9; x <= 1.9; x += 0.012) sum.push(m(x, base + 0.02 * comps.reduce((s2, [w, g]) => s2 + w * Math.sin(g(x * 1000 / 0.7)), 0)));
+    ribbon(sum, 0.0022 * S, { alpha: fa2 * (1 - .6 * peel), raw: true, dry: 0, taper: [.02,.02] });
     comps.forEach(([wt, g], j) => {
-      const off = (0.075 + j * 0.055) * peel, amp = w.A * wt * lerp(1, 2.4, peel), P = [];
-      for (let x = -1.8; x <= 1.8; x += 0.012) P.push(m(x, w.base - off + amp * Math.sin(g(x * 1000 / w.s))));
-      ribbon(P, 0.0018 * S, { alpha: fa2 * (.35 + .6 * peel), raw: true, dry: 0, taper: [.02,.02] });
-      const lp = m(-0.32, w.base - off - 0.018); txt(`onde ${j + 1}`, lp[0], lp[1], 12, 'm', .85 * fa2 * peel);
+      const off = (0.08 + j * 0.055) * peel, amp = 0.02 * wt * lerp(1, 2.4, peel), P = [];
+      for (let x = -1.9; x <= 1.9; x += 0.012) P.push(m(x, base - off + amp * Math.sin(g(x * 1000 / 0.7))));
+      ribbon(P, 0.0018 * S, { alpha: fa2 * .9 * peel, raw: true, dry: 0, taper: [.02,.02] });
+      const lp = m(-0.62, base - off - 0.018); txt(`onde ${j + 1}`, lp[0], lp[1], 12, 'm', .85 * fa2 * peel);
     });
-    const lp = m(-0.32, w.base - 0.022); txt('= la vague', lp[0], lp[1], 12, 'm', .85 * fa2 * rv(T, 41.8, .8));
+    const lp = m(-0.62, base - 0.025); txt('= la vague', lp[0], lp[1], 12, 'm', .85 * fa2 * (1 - peel) * rv(T, 39, .5));
   }
   // la ligne du regard
   if (T > 33 && T < 38) {
@@ -558,7 +595,6 @@ function drawCoast(v, T) {
     for (let k = 0; k < 22; k++) { const y = (k * 47 + T * 140) % H; txt(String(Math.floor(hash(k, Math.floor(T * 10)) * 1e6)).padStart(6, '0'), X + 8, y, 10, 'm', .45 * sa); }
   }
 }
-
 
 /* ——— niveau 1 : la fleur ——— */
 function drawFlower(v, T) {
@@ -1232,6 +1268,7 @@ function seek(t, play) { T = Math.max(0, Math.min(END, t)); jump = true; if (pla
 ppBtn.addEventListener('click', () => { if (T >= END) seek(0); setPlaying(!playing); });
 if (reduced) ppBtn.textContent = 'Lecture';
 document.getElementById('again').addEventListener('click', () => { seek(0); setPlaying(!reduced); });
+document.getElementById('rst').addEventListener('click', () => { loopN = 0; live.forEach(el => el.remove()); live.clear(); seek(reduced ? REST[0] : 0); if (!reduced) setPlaying(true); });
 document.getElementById('snd').addEventListener('click', e => {
   if (!AC && !initAudio()) return;
   audioOn = !audioOn; e.currentTarget.setAttribute('aria-pressed', String(audioOn)); e.currentTarget.textContent = 'Son'; e.currentTarget.classList.add('used');
@@ -1288,10 +1325,10 @@ function render(T) {
   if (T < 79) { drawCoast(v[0], T); drawFlower(v[1], T); drawSeed(v[2], T); drawNucleus(v[3], T); drawAtom(v[4], T); }
   drawPrompt(T);
   drawSpace(T);
-  drawParticles(T, V);
+  DISP = false; drawParticles(T, V); DISP = true;
   if (T < 62) drawFlowerOverlay(v[1], T);
   drawWordSpace(T, V.c3);
-  mouseStep(); drawCursor();
+  mouseStep(); DISP = false; drawCursor(); DISP = true;
   const logS = Math.log(v[0].S), speed = Math.abs(logS - prevLogS); prevLogS = logS;
   let k = reduced || jump ? 1 : Math.max(0.28, 0.62 - speed * 9);
   if (!reduced && !jump) {
