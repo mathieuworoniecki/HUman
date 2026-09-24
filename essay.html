@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Is the world one giant algorithm? · HUman</title>
+<meta name="description" content="The full reflection behind HUman, by Mathieu: if the world is math, and we're part of it, are we a kind of AI?">
+<link rel="canonical" href="https://areweai.dev/essay">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://areweai.dev/essay">
+<meta property="og:site_name" content="HUman">
+<meta property="og:title" content="Is the world one giant algorithm?">
+<meta property="og:description" content="And if we're part of it, are we just math too? The reflection behind HUman.">
+<meta property="og:image" content="https://areweai.dev/media/og-en.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Is the world one giant algorithm?">
+<meta name="twitter:description" content="And if we're part of it, are we just math too? The reflection behind HUman.">
+<meta name="twitter:image" content="https://areweai.dev/media/og-en.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><g fill='none' stroke='%239db4ff' stroke-opacity='.55' stroke-width='2'><ellipse cx='32' cy='32' rx='27' ry='10' transform='rotate(-30 32 32)'/><ellipse cx='32' cy='32' rx='27' ry='10' transform='rotate(30 32 32)'/></g><circle cx='32' cy='32' r='7' fill='%23f8f7ff'/><circle cx='52' cy='21' r='5' fill='%239db4ff'/><circle cx='13' cy='42' r='4.5' fill='%23ff7a5c'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:rgb(234,232,226);
+  --fg:rgb(20,19,18);
+  --soft:color-mix(in srgb,var(--fg) 62%,var(--bg));
+  --line:color-mix(in srgb,var(--fg) 16%,transparent);
+  --accent:rgb(38,78,214);
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:rgb(12,11,10);--fg:rgb(233,230,222);--accent:rgb(157,180,255)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:rgb(12,11,10);--fg:rgb(233,230,222);--accent:rgb(157,180,255)}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--display);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+a{color:inherit}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.45;mix-blend-mode:multiply;background-size:256px 256px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #grain{mix-blend-mode:screen;opacity:.18}}
+#bar{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:left;transform:scaleX(0);background:var(--fg);opacity:.7;z-index:20}
+header.top{position:fixed;left:0;right:0;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(16px,3vw,36px) 14px;background:linear-gradient(var(--bg) 40%,color-mix(in srgb,var(--bg) 0%,transparent));}
+.brand{display:flex;align-items:baseline;gap:.7rem;text-decoration:none}
+.brand b{font:800 1.15rem/1 var(--display)}.brand b i{font-weight:500}
+.brand small{font:500 .62rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+.pill{display:inline-flex;align-items:center;gap:.5rem;font:500 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none;border:1px solid var(--fg);border-radius:999px;padding:.6rem 1rem;opacity:.8;transition:opacity .2s,background .2s,color .2s}
+.pill:hover,.pill:focus-visible{opacity:1;background:var(--fg);color:var(--bg)}
+.hero{position:relative;height:min(78vh,760px);min-height:460px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:0 20px 5vh;z-index:1}
+#hc{position:absolute;inset:0;width:100%;height:100%}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dek{position:relative;max-width:36rem;text-align:center;margin:0;font:500 clamp(1.05rem,1.6vw,1.3rem)/1.5 var(--display);color:var(--soft)}
+.meta{position:relative;margin-top:1.4rem;font:500 .64rem/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;opacity:.55;text-align:center}
+.cue{display:block;margin:1.2rem auto 0;width:1px;height:42px;background:linear-gradient(var(--fg),transparent);opacity:.5;animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
+main{position:relative;z-index:1;max-width:38rem;margin:0 auto;padding:6vh 22px 4vh}
+.ch{display:flex;align-items:center;gap:.9rem;margin:4.6rem 0 1.6rem;font:500 .66rem/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--soft)}
+.ch span{display:inline-grid;place-items:center;min-width:2.1rem;height:2.1rem;padding:0 .4rem;border:1px solid var(--line);border-radius:999px;color:var(--fg)}
+.ch::after{content:"";flex:1;height:1px;background:var(--line)}
+main p{margin:0 0 1.35rem;font:500 clamp(1.08rem,1.25vw,1.2rem)/1.82 var(--display);text-wrap:pretty}
+main p.lead::first-letter{float:left;font:800 4.4rem/.82 var(--display);margin:.42rem .6rem 0 0}
+.num{font-family:var(--mono);font-size:.86em;letter-spacing:.02em}
+blockquote{margin:2.8rem 0;padding:0;text-align:center;font:700 clamp(1.45rem,2.6vw,1.95rem)/1.3 var(--display);letter-spacing:-.005em}
+blockquote::before,blockquote::after{content:"✦";display:block;font-size:.7rem;letter-spacing:0;color:var(--accent);opacity:.8;margin:0 auto 1.1rem}
+blockquote::after{margin:1.1rem auto 0}
+.big{margin:4.5rem -4vw 1rem!important;text-align:center;font:800 clamp(1.9rem,4.4vw,3.2rem)/1.14 var(--display)!important;letter-spacing:-.01em;text-wrap:balance}
+.you{margin:5rem 0 0;padding:2.2rem 2rem;border:1px solid var(--line);border-radius:22px;background:color-mix(in srgb,var(--fg) 3%,transparent)}
+.you h2{margin:0 0 1.2rem;font:800 1.9rem/1 var(--display)}
+.you ul{margin:0;padding:0;list-style:none}
+.you li{position:relative;padding-left:1.6rem;margin:0 0 1rem;font:500 1.12rem/1.6 var(--display)}
+.you li::before{content:"✦";position:absolute;left:0;top:.1rem;font-size:.75rem;color:var(--accent)}
+.end{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2rem;padding:5rem 20px calc(4rem + env(safe-area-inset-bottom,0px))}
+.end .pill{font-size:.72rem;padding:.9rem 1.4rem}
+.sig{font:500 .64rem/1.6 var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.55;text-align:center}
+#gh{position:relative;display:inline-flex;align-items:center;gap:.5rem;padding:.42rem .8rem .42rem .55rem;border-radius:999px;background:color-mix(in srgb,var(--bg) 50%,transparent);color:var(--fg);font:500 .62rem/1 var(--mono);letter-spacing:.06em;text-decoration:none;opacity:.85;transition:opacity .25s}
+#gh:hover,#gh:focus-visible{opacity:1}
+#gh svg{width:.95rem;height:.95rem;fill:currentColor;opacity:0}
+#gh canvas{position:absolute;left:-16px;top:-16px;width:calc(100% + 32px);height:calc(100% + 32px);pointer-events:none}
+#gh span{position:relative}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.cue{animation:none}html{scroll-behavior:auto}}
+@media (max-width:560px){.brand small{display:none}.ch{margin-top:3.6rem}.big{margin-left:0!important;margin-right:0!important}.you{padding:1.6rem 1.3rem}}
+</style>
+</head>
+<body>
+<div id="grain"></div>
+<div id="bar"></div>
+<header class="top">
+  <a class="brand" href="./"><b>HU<i>man</i></b><small>a reflection by Mathieu</small></a>
+  <a class="pill" href="./">Replay the experience</a>
+</header>
+
+<section class="hero">
+  <canvas id="hc" aria-hidden="true"></canvas>
+  <h1 class="sr">Is the world one giant algorithm?</h1>
+  <p class="dek">And if we're part of it, are we just math too? Kind of AIs?</p>
+  <p class="meta">A reflection by Mathieu · 6 min read</p>
+  <span class="cue" aria-hidden="true"></span>
+</section>
+
+<main>
+<p class="lead rv">Who is actually thinking when I think? That question has been stuck in my head for months, so I ended up turning it into the animated piece you can explore on this site. Here's the thinking behind it.</p>
+
+<p class="ch rv"><span>I</span>The AI</p>
+<p class="rv">It started when I tried to understand how AI actually works. When you look at the base of the base, it's just math. Words get turned into numbers (vectors), the model calculates the probability of every possible next word, and then it picks one. Not always the most likely one: there's some randomness in it. There's memory and a lot of advanced machinery on top to follow the context, but the core is math and probabilities.</p>
+
+<p class="ch rv"><span>II</span>The world</p>
+<p class="rv">Then I started looking around me, and I kept seeing the same thing. A tree is pretty much one rule repeated: split in two, a bit shorter and thinner each time, same angle. Waves are simple waves added together. Sunflower seeds grow at <span class="num">137.5°</span> from each other, and that's why you see spirals in them. A rock falling off a cliff follows a parabola; you can calculate where it lands before it even drops. Everything seems to have a mathematical cause.</p>
+
+<p class="ch rv"><span>III</span>Chance</p>
+<p class="rv">So I thought: okay, if we had all the data about everything, we could predict everything. But the more I read, the less it worked like that. With something like the weather, a tiny error at the start ends up changing everything later (the butterfly effect), so you'd need infinitely precise data. And at the atomic level, nature seems to be genuinely random.</p>
+<blockquote class="rv">The world might be calculable without being predictable.</blockquote>
+<p class="rv">More probabilistic than anything. Which is funny, because that's also how an AI picks its words.</p>
+
+<p class="ch rv"><span>IV</span>The brain</p>
+<p class="rv">Then I turned the question on myself. A thought is electrical signals moving between billions of neurons, nothing magic about it. Some neuroscientists even describe the brain as a prediction machine, constantly guessing what comes next. And DNA is literally code: four letters, read three by three, with a start signal and a stop signal. It's a bit like the starting instructions of a life.</p>
+
+<p class="ch rv"><span>V</span>The mirror</p>
+<p class="rv">But when I push the comparison further, I don't think we're really like an LLM. An LLM starts from language, and we don't. A baby is scared, hungry and curious long before it can talk, and most of the brain is busy moving the body and sensing things. Language came last.</p>
+<p class="rv">Memory is different too. Every memory physically changes the brain, so we're basically retraining all the time, while an AI's weights stay frozen after training. And DNA is far too small to describe a whole brain; it's more like the recipe to grow one. What we learn in our lives doesn't go into our children's DNA anyway. What gets passed on and improved every generation is culture.</p>
+<blockquote class="rv">If anything is humanity's prompt, it's probably culture.</blockquote>
+
+<p class="ch rv"><span>VI</span>Alive</p>
+<p class="rv">Same with the question of being alive. I used to think it was one or the other: either I'm a calculation, or I'm alive. But I don't see why it couldn't be both. Being alive is mostly about keeping yourself going: eating, healing, not wanting to die. An AI doesn't do that. Unplug it and nothing in it fights back. We do. And we do it on about <span class="num">20</span> watts, when AI needs huge datacenters, which is kind of insane when you think about it.</p>
+
+<p class="ch rv"><span>VII</span>The origin</p>
+<p class="rv">As for whether something, or someone, set all of this in motion, I honestly don't know. Evolution works a bit like training an AI, trial and error over billions of years, so it doesn't need anyone behind it. But that doesn't prove there's nobody either.</p>
+
+<p class="ch rv"><span>VIII</span>Where I've landed</p>
+<p class="rv">So right now, I think I might be a calculation. A probabilistic one, a bit like an AI, just with a body that keeps itself alive and a brain that rewires itself all the time. The part I really can't explain is why all of that feels like something from the inside.</p>
+<p class="big rv">If everything is math, why does it feel like anything to be&nbsp;me?</p>
+
+<section class="you rv">
+  <h2>And you?</h2>
+  <ul>
+    <li>Do you think the universe actually <em>is</em> math, or is math just a really good way to describe it?</li>
+    <li>If someone proved tomorrow that you're 100% calculable, would that change anything for you?</li>
+  </ul>
+</section>
+</main>
+
+<footer class="end">
+  <a class="pill" href="./">Replay the experience →</a>
+  <a id="gh" href="https://github.com/mathieuworoniecki" target="_blank" rel="noopener" aria-label="GitHub · mathieuworoniecki"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>mathieuworoniecki</span></a>
+  <p class="sig">A reflection by Mathieu<br>brought to life with Claude</p>
+</footer>
+
+<script>
+(function () {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // le grain du papier, comme sur le site
+  { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), d = x.createImageData(256, 256);
+    for (let i = 0; i < d.data.length; i += 4) { const v = 128 + (Math.random() - .5) * 90; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 22; }
+    x.putImageData(d, 0, 0); document.getElementById('grain').style.backgroundImage = `url(${c.toDataURL()})`; }
+  // la barre de lecture
+  const bar = document.getElementById('bar');
+  const onScroll = () => { const h = document.documentElement.scrollHeight - innerHeight; bar.style.transform = `scaleX(${h > 0 ? Math.min(1, scrollY / h) : 0})`; };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  // les paragraphes apparaissent quand on arrive dessus
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+  // le titre, écrit en particules : elles s'assemblent, puis la phrase se fixe à l'encre
+  const cv = document.getElementById('hc'), g = cv.getContext('2d'), TITLE = 'Is the world one giant algorithm?';
+  const hh = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  const STAR = [[157, 180, 255], [255, 206, 158], [255, 122, 92], [202, 216, 255]];
+  let W, H, dpr, P = [], lines = [], fs = 40, top = 0, t0 = 0, mx = -1e4, my = -1e4, vis = true;
+  const col = () => getComputedStyle(document.documentElement).getPropertyValue('--fg').trim();
+  const dark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
+  function build() {
+    const r = cv.getBoundingClientRect(); W = r.width; H = r.height; dpr = Math.min(2, devicePixelRatio || 1);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    fs = Math.max(36, Math.min(86, W * 0.068)); const maxW = Math.min(W * 0.88, 980), L = fs * 1.08;
+    const o = document.createElement('canvas'), x = o.getContext('2d'); x.font = `800 ${fs}px "Shippori Mincho B1", Georgia, serif`;
+    lines = []; let cur = ''; TITLE.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur);
+    const dek = document.querySelector('.dek').getBoundingClientRect().top - r.top;
+    top = Math.max(96, dek - 40 - lines.length * L);
+    o.width = Math.ceil(W); o.height = Math.ceil(H); x.font = `800 ${fs}px "Shippori Mincho B1", Georgia, serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#000';
+    lines.forEach((l, j) => x.fillText(l, W / 2, top + L * (j + .5)));
+    const d = x.getImageData(0, 0, o.width, o.height).data, pts = []; let n = 0;
+    for (let y = 0; y < o.height; y += 2) for (let xx = 0; xx < o.width; xx += 2) if (d[(y * o.width + xx) * 4 + 3] > 120) n++;
+    const step = Math.max(1.6, Math.sqrt(n * 4 / 3200));
+    for (let y = 0; y < o.height; y += step) for (let xx = 0; xx < o.width; xx += step) { const yi = y | 0, xi = xx | 0; if (d[(yi * o.width + xi) * 4 + 3] > 120) pts.push([xx, y]); }
+    P = pts.map((q, i) => ({ hx: q[0], hy: q[1], x: W / 2 + (hh(i, 1) - .5) * W * 1.1, y: top + (hh(i, 2) - .5) * H * .9, vx: 0, vy: 0, d: hh(i, 3) * .7, c: hh(i, 4) < .07 ? (hh(i, 5) * 4) | 0 : -1, s: step * .52 }));
+    t0 = performance.now();
+  }
+  addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, { passive: true });
+  new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(cv);
+  let sig = '';
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const k = `${innerWidth}x${cv.getBoundingClientRect().height | 0}`; if (k !== sig) { sig = k; build(); }
+    if (!vis || document.hidden) return;
+    const t = still ? 9 : (now - t0) / 1000, fg = col(), dk = dark(), L = fs * 1.08;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    // l'encre se fixe une fois les points arrivés
+    const crisp = Math.min(1, Math.max(0, (t - 2.1) / .9));
+    if (crisp > 0) { g.font = `800 ${fs}px "Shippori Mincho B1", Georgia, serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = fg; g.globalAlpha = crisp * .94; lines.forEach((l, j) => g.fillText(l, W / 2, top + L * (j + .5))); }
+    for (const p of P) {
+      const e = Math.min(1, Math.max(0, (t - p.d) / 1.5)), k = e * e * (3 - 2 * e);
+      if (k < 1) { p.x += (p.hx - p.x) * (0.02 + 0.1 * k); p.y += (p.hy - p.y) * (0.02 + 0.1 * k); }
+      else { p.vx += (p.hx - p.x) * .06; p.vy += (p.hy - p.y) * .06; }
+      const dx = p.x - mx, dy = p.y - my, dd = Math.hypot(dx, dy);
+      if (!still && dd < 90 && dd > .01) { const f = Math.pow(1 - dd / 90, 2) * 3; p.vx += dx / dd * f; p.vy += dy / dd * f; }
+      p.vx *= .84; p.vy *= .84; p.x += p.vx; p.y += p.vy;
+      const off = Math.hypot(p.x - p.hx, p.y - p.hy), a = (1 - crisp * .78) + Math.min(.8, off / 20);
+      if (p.c >= 0) { g.globalAlpha = Math.min(1, a); g.fillStyle = `rgb(${(dk ? STAR : [[38, 78, 214], [196, 120, 40], [206, 58, 40], [70, 110, 220]])[p.c].join(',')})`; }
+      else { g.globalAlpha = Math.min(1, a * .9); g.fillStyle = fg; }
+      g.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
+    }
+    g.globalAlpha = 1;
+  }
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => requestAnimationFrame(frame));
+})();
+/* ——— le badge GitHub : la pilule et le logo dessinés en étoiles, qui s'écartent sous la souris et s'illuminent ——— */
+(function () {
+  const el = document.getElementById('gh'); if (!el) return;
+  const cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); el.prepend(cv);
+  const g = cv.getContext('2d'), PAD = 16, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hh = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  const STAR = [[248, 247, 255], [157, 180, 255], [202, 216, 255], [255, 244, 234], [255, 206, 158], [255, 122, 92]];
+  const INK = [[20, 19, 18], [38, 78, 214], [70, 110, 220], [60, 55, 50], [196, 120, 40], [206, 58, 40]];
+  const pickC = u => u < .4 ? 0 : u < .62 ? 1 : u < .76 ? 2 : u < .86 ? 3 : u < .94 ? 4 : 5;
+  const mk = (col, a) => { const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'), r = x.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, `rgba(${col},${a})`); r.addColorStop(.2, `rgba(${col},${a * .45})`); r.addColorStop(1, `rgba(${col},0)`); x.fillStyle = r; x.fillRect(0, 0, 32, 32); return c; };
+  const HN = STAR.map(c => mk(c.join(','), 1)), HD = INK.map(c => mk(c.join(','), .5));
+  const MARK = new Path2D('M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z');
+  let P = [], W = 0, H = 0, dpr = 1, hov = 0, hovT = 0, mx = -1e4, my = -1e4, t0 = performance.now(), sig = '';
+  // la forme : le contour de la pilule, puis le logo, échantillonnés en points
+  function build() {
+    const r = el.getBoundingClientRect(); W = r.width; H = r.height; dpr = Math.min(2.5, devicePixelRatio || 1);
+    cv.width = Math.round((W + 2 * PAD) * dpr); cv.height = Math.round((H + 2 * PAD) * dpr);
+    const old = P, pts = [], rr = H / 2, per = 2 * (W - 2 * rr) + 2 * Math.PI * rr, n = Math.round(per / 4.2);
+    for (let k = 0; k < n; k++) {
+      let d = k / n * per, x, y; const L = W - 2 * rr;
+      if (d < L) { x = rr + d; y = 0; } else if ((d -= L) < Math.PI * rr) { const a = -Math.PI / 2 + d / rr; x = W - rr + Math.cos(a) * rr; y = rr + Math.sin(a) * rr; }
+      else if ((d -= Math.PI * rr) < L) { x = W - rr - d; y = H; } else { d -= L; const a = Math.PI / 2 + d / rr; x = rr + Math.cos(a) * rr; y = rr + Math.sin(a) * rr; }
+      pts.push([x, y, 0, k / n]);
+    }
+    const svg = el.querySelector('svg'), sb = svg ? svg.getBoundingClientRect() : { left: r.left + 10, top: r.top + H / 2 - 8, width: 16 };
+    const s = sb.width / 16, ox = sb.left - r.left, oy = sb.top - r.top, tmp = document.createElement('canvas').getContext('2d');
+    // le logo en constellation : un semis irrégulier, plus dense sur les bords pour que la silhouette se lise
+    for (let j = 0, n = 0; j < 2600 && n < 95; j++) {
+      const x = hh(j, 21) * 16, y = hh(j, 22) * 16; if (!tmp.isPointInPath(MARK, x, y)) continue;
+      const edge = !tmp.isPointInPath(MARK, x + .9, y) || !tmp.isPointInPath(MARK, x - .9, y) || !tmp.isPointInPath(MARK, x, y + .9) || !tmp.isPointInPath(MARK, x, y - .9);
+      if (!edge && hh(j, 23) > .35) continue;
+      if (pts.some(q => q[2] && Math.hypot(q[0] - (ox + x * s), q[1] - (oy + y * s)) < (edge ? 1.05 : 1.6) * s)) continue;
+      pts.push([ox + x * s, oy + y * s, 1, 0]); n++;
+    }
+    P = pts.map((q, i) => {
+      const o = old[i], u = hh(i, 3);
+      return { hx: q[0], hy: q[1], m: q[2], a: q[3], c: q[2] ? pickC(hh(i, 5) * .7) : pickC(u), s: q[2] ? 0.55 + hh(i, 6) * 0.3 : 0.7 + hh(i, 7) * 0.7, tw: hh(i, 8),
+        x: o ? o.x : still ? q[0] : W / 2 + (hh(i, 9) - .5) * (W + 120), y: o ? o.y : still ? q[1] : H / 2 + (hh(i, 10) - .5) * 110, vx: 0, vy: 0 };
+    });
+  }
+  const night = () => typeof NGT === 'number' ? NGT > .5 : matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light' || document.documentElement.dataset.theme === 'dark';
+  el.addEventListener('pointerenter', () => { hovT = 1; }); el.addEventListener('pointerleave', () => { hovT = 0; });
+  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+  addEventListener('pointerleave', () => { mx = my = -1e4; });
+  // au toucher : une petite gerbe avant de partir
+  el.addEventListener('pointerdown', e => { const r = el.getBoundingClientRect(); P.forEach(p => { const dx = p.x - (e.clientX - r.left), dy = p.y - (e.clientY - r.top), d = Math.hypot(dx, dy) + 1; p.vx += dx / d * 5; p.vy += dy / d * 5; }); });
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (document.hidden || !el.getClientRects().length) return;
+    const r = el.getBoundingClientRect(), k = `${r.width | 0}x${r.height | 0}`;
+    if (k !== sig) { sig = k; build(); }
+    const t = (now - t0) / 1000, nt = night(), ph = still ? 0 : (t / 6) % 1;
+    hov += (hovT - hov) * 0.1;
+    const lx = mx - r.left, ly = my - r.top, R = 54 + 10 * hov;
+    for (const p of P) {
+      // le ressort vers sa place, la souris qui repousse
+      p.vx += (p.hx - p.x) * 0.055; p.vy += (p.hy - p.y) * 0.055;
+      const dx = p.x - lx, dy = p.y - ly, d = Math.hypot(dx, dy);
+      if (!still && d < R && d > 0.01) { const f = Math.pow(1 - d / R, 2) * (p.m ? 0.8 : 1.5); p.vx += dx / d * f; p.vy += dy / d * f; }
+      p.vx *= 0.82; p.vy *= 0.82; p.x += p.vx; p.y += p.vy;
+    }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W + 2 * PAD, H + 2 * PAD); g.translate(PAD, PAD);
+    // un fil ténu relie les étoiles du contour
+    g.lineWidth = 0.6; g.beginPath(); let first = true;
+    for (const p of P) { if (p.m) break; if (first) { g.moveTo(p.x, p.y); first = false; } else g.lineTo(p.x, p.y); }
+    g.closePath(); g.strokeStyle = nt ? `rgba(200,212,255,${(0.16 + 0.22 * hov).toFixed(3)})` : `rgba(20,19,18,${(0.14 + 0.2 * hov).toFixed(3)})`; g.stroke();
+    g.globalCompositeOperation = nt ? 'lighter' : 'source-over';
+    for (const p of P) {
+      const tw = 0.72 + 0.28 * Math.sin(t * (2 + p.tw * 3) + p.tw * 20);
+      let wave = 0; if (!p.m) { let dd = Math.abs(p.a - ph); dd = Math.min(dd, 1 - dd); wave = Math.max(0, 1 - dd / 0.06); }
+      const lit = 1 + 0.9 * hov + 1.4 * wave, sz = p.s * (1 + 0.35 * hov + 0.6 * wave);
+      const hs = sz * (p.m ? 3.4 : 5.4) * tw * (0.8 + 0.4 * hov);
+      g.globalAlpha = Math.min(1, (nt ? 0.5 : 0.55) * lit * 0.6);
+      g.drawImage((nt ? HN : HD)[p.c], p.x - hs / 2, p.y - hs / 2, hs, hs);
+      g.globalAlpha = Math.min(1, (0.6 + 0.4 * tw) * (0.75 + 0.25 * lit));
+      g.fillStyle = `rgb(${(nt ? STAR : INK)[p.c].join(',')})`; g.beginPath(); g.arc(p.x, p.y, Math.max(0.42, sz * 0.5), 0, 6.2832); g.fill();
+    }
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(frame);
+})();
+
+</script>
+</body>
+</html>
