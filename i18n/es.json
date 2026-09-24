@@ -509,5 +509,8 @@
   "card_wide": "Tarjeta horizontal",
   "card_dl": "Descargar",
   "card_share": "Compartir imagen",
-  "close": "Cerrar"
+  "close": "Cerrar",
+  "card_bg": "Fondo de la tarjeta",
+  "q_prev": "Pregunta anterior",
+  "q_next": "Pregunta siguiente"
 }

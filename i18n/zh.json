@@ -510,5 +510,8 @@
   "card_wide": "横版卡片",
   "card_dl": "下载",
   "card_share": "分享图片",
-  "close": "关闭"
+  "close": "关闭",
+  "card_bg": "卡片背景",
+  "q_prev": "上一个问题",
+  "q_next": "下一个问题"
 }

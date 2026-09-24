@@ -509,5 +509,8 @@
   "card_wide": "Carte paysage",
   "card_dl": "Télécharger",
   "card_share": "Partager l'image",
-  "close": "Fermer"
+  "close": "Fermer",
+  "card_bg": "Fond de la carte",
+  "q_prev": "Question précédente",
+  "q_next": "Question suivante"
 }

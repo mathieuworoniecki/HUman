@@ -510,5 +510,8 @@
   "card_wide": "横長カード",
   "card_dl": "ダウンロード",
   "card_share": "画像をシェア",
-  "close": "閉じる"
+  "close": "閉じる",
+  "card_bg": "カードの背景",
+  "q_prev": "前の問い",
+  "q_next": "次の問い"
 }

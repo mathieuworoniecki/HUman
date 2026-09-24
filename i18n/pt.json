@@ -509,5 +509,8 @@
   "card_wide": "Card paisagem",
   "card_dl": "Baixar",
   "card_share": "Compartilhar imagem",
-  "close": "Fechar"
+  "close": "Fechar",
+  "card_bg": "Fundo do card",
+  "q_prev": "Pergunta anterior",
+  "q_next": "Próxima pergunta"
 }

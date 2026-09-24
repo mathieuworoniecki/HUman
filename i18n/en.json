@@ -509,5 +509,8 @@
   "card_wide": "Landscape card",
   "card_dl": "Download",
   "card_share": "Share image",
-  "close": "Close"
+  "close": "Close",
+  "card_bg": "Card background",
+  "q_prev": "Previous question",
+  "q_next": "Next question"
 }
