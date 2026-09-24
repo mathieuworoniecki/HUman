@@ -18,19 +18,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Prepare static site
-        run: |
-          mkdir -p "$RUNNER_TEMP/human-site"
-          rsync -a --exclude-from=.vercelignore \
-            --exclude=.git --exclude=.github --exclude=.vercel \
-            --exclude=.env --exclude=.env.local \
-            ./ "$RUNNER_TEMP/human-site/"
-      - name: Deploy to Vercel production
+      - name: Trigger Vercel deployment
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: npx --yes vercel@latest --prod --yes --cwd "$RUNNER_TEMP/human-site" --token "$VERCEL_TOKEN"
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            echo "::error::Missing VERCEL_DEPLOY_HOOK_URL secret"
+            exit 1
+          fi
+          curl --fail --silent --show-error --request POST \
+            "$VERCEL_DEPLOY_HOOK_URL" -o "$RUNNER_TEMP/vercel-hook-response.json"
+      - name: Verify published files
+        run: |
+          site_matches() {
+            curl --fail --silent --show-error --max-time 10 \
+              https://areweai.dev/ -o "$RUNNER_TEMP/index.html" || return 1
+            cmp -s index.html "$RUNNER_TEMP/index.html" || return 1
+            for asset in media/og.png media/og-en.png; do
+              curl --fail --silent --show-error --max-time 10 \
+                "https://areweai.dev/$asset" -o "$RUNNER_TEMP/asset" || return 1
+              cmp -s "$asset" "$RUNNER_TEMP/asset" || return 1
+            done
+          }
+          for attempt in $(seq 1 60); do
+            if site_matches; then
+              echo "Published files match this commit"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Production files did not match this commit within five minutes"
+          exit 1
