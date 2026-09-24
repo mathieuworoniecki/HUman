@@ -167,10 +167,12 @@ const PAPER = [234,232,226], NIGHT = [12,11,10], INKC = [20,19,18], LIGHT = [233
 let FG = 'rgb(20,19,18)', BG = 'rgb(234,232,226)', NGT = -1;
 const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 const root = document.documentElement;
+let BGR = PAPER.join(',');
+const BGA = a => `rgba(${BGR},${a})`;
 function setNight(n) {
   if (Math.abs(n - NGT) < 0.002) return;
   NGT = n;
-  FG = `rgb(${mix(INKC, LIGHT, n)})`; BG = `rgb(${mix(PAPER, NIGHT, n)})`;
+  FG = `rgb(${mix(INKC, LIGHT, n)})`; BG = `rgb(${mix(PAPER, NIGHT, n)})`; BGR = mix(PAPER, NIGHT, n);
   root.style.setProperty('--fg', FG); root.style.setProperty('--bg', BG);
   root.style.colorScheme = n > .5 ? 'dark' : 'light';
 }
@@ -738,12 +740,87 @@ function drawNucleus(v, T) {
   }
 }
 
-/* ——— niveau 4 : l'atome ——— */
+/* ——— niveau 4 : l'atome. La forme se calcule, chaque point se tire au sort ——— */
+// orbitale 3d(z²) de l'hydrogène : |ψ|² ∝ r⁴·e^(−2r/3)·(3cos²θ − 1)², en rayons de Bohr
+const ORB_S = 0.052, ORB = [], ORBR = [];
+const orb3 = (x, y, z) => { const r2 = x * x + y * y + z * z, r = Math.sqrt(r2); if (r < .01) return 0; const an = 3 * z * z / r2 - 1; return r2 * r2 * Math.exp(-2 * r / 3) * an * an; };
+const orbP = (x, y, z) => [x * ORB_S, (-z * .96 + y * .28) * ORB_S];
+for (let k = 0; ORB.length < NPMAX && k < 900000; k++) {
+  const x = (hash(k, 701) - .5) * 40, y = (hash(k, 702) - .5) * 40, z = (hash(k, 703) - .5) * 40;
+  if (hash(k, 704) * 96 < orb3(x, y, z)) { ORB.push(orbP(x, y, z)); ORBR.push(Math.hypot(x, y, z)); }
+}
+const HB = 12, HR = 1.9;
+const HTH = []; { let s = 0; for (let b = 0; b < HB; b++) { let v = 0; for (let q = 0; q < 10; q++) { const r = (b + (q + .5) / 10) * HR; v += Math.pow(r, 6) * Math.exp(-2 * r / 3); } HTH.push(v); s += v; } HTH.forEach((v, b) => { HTH[b] = v / s; }); }
+const HPRE = new Uint16Array((NPMAX + 1) * HB);
+for (let i = 0; i < NPMAX; i++) for (let b = 0; b < HB; b++) HPRE[(i + 1) * HB + b] = HPRE[i * HB + b] + (Math.min(HB - 1, Math.floor(ORBR[i % ORBR.length] / HR)) === b ? 1 : 0);
+const WASH = (() => {
+  const n = 160, G = new Float32Array(n * n), c = document.createElement('canvas'); c.width = c.height = n;
+  for (let k = 0, got = 0; got < 26000 && k < 1600000; k++) {
+    const x = (Math.random() - .5) * 40, y = (Math.random() - .5) * 40, z = (Math.random() - .5) * 40;
+    if (Math.random() * 96 >= orb3(x, y, z)) continue;
+    got++; const p = orbP(x, y, z), i = Math.floor((p[0] + 1) / 2 * n), j = Math.floor((p[1] + 1) / 2 * n);
+    if (i >= 0 && i < n && j >= 0 && j < n) G[j * n + i]++;
+  }
+  for (let pass = 0; pass < 3; pass++) for (const dir of [1, n]) { const C = G.slice(); for (let q = n; q < n * n - n; q++) G[q] = (C[q - dir] + C[q] * 2 + C[q + dir]) / 4; }
+  let mx = 0; G.forEach(v => { if (v > mx) mx = v; });
+  const x = c.getContext('2d'), im = x.createImageData(n, n);
+  for (let q = 0; q < n * n; q++) { im.data[q * 4] = INKC[0]; im.data[q * 4 + 1] = INKC[1]; im.data[q * 4 + 2] = INKC[2]; im.data[q * 4 + 3] = 255 * Math.pow(G[q] / mx, .7); }
+  x.putImageData(im, 0, 0); return c;
+})();
+const AT0 = 72.9, ASP = 0.32, AT6 = AT0 + 6 * ASP, AD = 1.6;
+const atd = i => i < 6 ? AT0 + i * ASP : AT6 + AD * Math.sqrt((i - 5) / (NP - 6));
+const nDet = T => T < AT0 ? 0 : T < AT6 ? Math.min(6, Math.floor((T - AT0) / ASP) + 1) : Math.min(NP, 6 + Math.floor((NP - 6) * Math.pow(Math.min(1, (T - AT6) / AD), 2)));
+const fr2 = v => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(1).replace('.', ',');
+function atomPanel(T, a) {
+  const n = nDet(T), pw = LAND ? Math.min(340, W * 0.27) : Math.min(340, W - 40), ph = 212;
+  const x0 = LAND ? Math.max(40, W * 0.05) : (W - pw) / 2, y0 = LAND ? Math.max(H * 0.4, 230) : Math.min(H - ph - 96, CY + 0.4 * MM);
+  const sv = DISP; DISP = false;
+  ctx.globalAlpha = .86 * a; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, ph);
+  ctx.globalAlpha = .3 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, ph - 1); ctx.globalAlpha = 1;
+  txt("où sera l'électron ?", x0 + 18, y0 + 20, 11, 'm', .6 * a);
+  txt(`tirages : ${n.toLocaleString('fr-FR')}`, x0 + 18, y0 + 46, 19, 'd', .95 * a);
+  const bx = x0 + 18, bw = pw - 36, by = y0 + 150, bh = 84, cw = bw / HB, top = Math.max(...HTH) * 1.25;
+  for (let b = 0; b < HB; b++) {
+    const f = n ? (HPRE[n * HB + b] - HPRE[b]) / n : 0, h = Math.min(1, f / top) * bh;
+    ctx.globalAlpha = .75 * a; ctx.fillStyle = FG; ctx.fillRect(bx + b * cw + 2, by - h, cw - 4, h);
+  }
+  ctx.globalAlpha = 1;
+  const ca = a * rv(T, AT6 - .4, .8), C = [];
+  for (let b = 0; b <= HB * 4; b++) { const u = b / 4, i = Math.min(HB - 1, Math.floor(u)), j = Math.min(HB - 1, i + 1), f = u - i - .5, v = f < 0 ? lerp(HTH[Math.max(0, i - 1)], HTH[i], f + 1) : lerp(HTH[i], HTH[j], f); C.push([bx + u * cw, by - v / top * bh]); }
+  pen(C, .9 * ca, 1.6, [5, 3]);
+  pen([[bx, by + .5], [bx + bw, by + .5]], .5 * a, 1);
+  txt('distance au noyau →', bx + bw, by + 13, 10, 'm', .55 * a, 'right');
+  txt('┄ le calcul : |ψ|²', bx + bw, y0 + 60, 11, 'm', .85 * ca, 'right');
+  const msg = n <= 6 ? 'chaque tirage : imprévisible' : n < NP * .25 ? '…mais leur somme dessine une forme' : 'le hasard suit le calcul, exactement';
+  txt(msg, x0 + 18, y0 + ph - 18, 12, 'm', .9 * a);
+  DISP = sv;
+  return [x0, y0, pw, ph];
+}
 function drawAtom(v, T) {
   const a = v.a * (1 - rv(T, 76.5, 1.5)); if (a < 0.004) return;
   const m = (x, y) => MP(v, x, y), S = v.S;
-  for (let k = 0; k < 14; k++) { const p = m((hash(k, 31) - .5) * 0.09, (hash(k, 32) - .5) * 0.09); spr(p[0], p[1], 0.018 * S, .9 * a, k); }
-  const lp = m(0, 0.98); txt("l'électron : une probabilité, pas une place", lp[0], lp[1], 13, 'm', .75 * rv(T, 73.5, 1) * a, 'center');
+  // la forme exacte, au lavis : ce que le calcul prévoit
+  const wa = a * (.14 + .22 * rv(T, AT6, 1.2)) * (1 - NGT);
+  if (wa > 0.004 && S < 8 * MM) { const p = m(-1, -1); ctx.globalAlpha = wa; ctx.drawImage(WASH, p[0], p[1], 2 * S, 2 * S); ctx.globalAlpha = 1; }
+  { const r = 0.011 * S; ctx.lineWidth = Math.max(.8, r * .25); ctx.strokeStyle = FG; ctx.fillStyle = FG;
+    for (let k = 0; k < 9; k++) { const an = k * 2.4, d = k ? r * (k < 4 ? 1.1 : 1.9) : 0, p = m(0, 0); ctx.globalAlpha = .9 * a; ctx.beginPath(); ctx.arc(p[0] + Math.cos(an) * d, p[1] + Math.sin(an) * d, r, 0, TAU); if (k % 2) ctx.stroke(); else ctx.fill(); }
+    ctx.globalAlpha = 1; }
+  const la = a * rv(T, AT0 - .3, .5); if (la <= 0.01 || S > 3 * MM) return;
+  // les premiers tirages, un par un
+  for (let i = 0; i < 6; i++) {
+    const age = T - atd(i); if (age < 0 || age > 2.4) continue;
+    const q = m(ORB[i][0], ORB[i][1]), e = 1 - age / 2.4;
+    ctx.globalAlpha = .8 * la * e; ctx.strokeStyle = FG; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(q[0], q[1], 5 + 34 * (1 - Math.exp(-age * 3)), 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
+    const sv = DISP; DISP = false;
+    txt(`tirage n° ${i + 1}`, q[0] + 14, q[1] - 16, 13, 'd', la * Math.min(1, e * 2), 'left', true);
+    txt(`x ${fr2(ORB[i][0] / ORB_S)} · y ${fr2(-ORB[i][1] / ORB_S)}`, q[0] + 14, q[1] + 2, 11, 'm', .8 * la * Math.min(1, e * 2), 'left', true);
+    DISP = sv;
+  }
+  const lb = la * rv(T, AT6 + .2, .8), tip = m(0.2, -0.62), lp = m(0.42, -0.8);
+  pen([lp, tip], .6 * lb, 1); txt('la forme : calculée', lp[0] + 6, lp[1] - 8, 13, 'm', .85 * lb, 'left', true);
+  const np = m(0.04, 0.02), nl = m(0.3, 0.14);
+  pen([nl, np], .5 * la, 1); txt('noyau', nl[0] + 6, nl[1] + 6, 12, 'm', .7 * la, 'left', true);
+  atomPanel(T, la);
 }
 
 /* ——— l'espace : réseau cosmique, neurones, visages, ensō ——— */
@@ -791,7 +868,7 @@ for (let k = 0; FOLDS.length < 16 && k < 600; k++) {
   for (let s = 0; s < 9; s++) { an += (hash(k, s + 320) - .5) * 1.6; const nx = x + Math.cos(an) * 0.035, ny = y + Math.sin(an) * 0.035; if (!inPoly(nx, ny, BRAIN) || !inPoly(nx + 0.03, ny, BRAIN) || !inPoly(nx - 0.03, ny, BRAIN)) break; x = nx; y = ny; P.push([x, y]); }
   if (P.length > 4) FOLDS.push(P);
 }
-function brainBox() { return { cx: LAND ? W * 0.47 : W / 2, cy: LAND ? H * 0.56 : H * 0.36, bw: LAND ? Math.min(0.36 * W, 0.95 * H) : 0.86 * W }; }
+function brainBox() { return { cx: LAND ? W * 0.47 : W / 2, cy: LAND ? H * 0.58 : H * 0.42, bw: LAND ? Math.min(0.36 * W, 0.95 * H) : 0.86 * W }; }
 const bmap = (B, x, y) => [B.cx + (x - 0.5) * B.bw, B.cy + (y - 0.35) * B.bw];
 const brainDim = T => 1 - 0.82 * rv(T, 103.4, .8) * (1 - rv(T, 107.8, .8));
 function probPanel(x0, y0, pw, head, line, rows, hot, grow, msg, pa) {
@@ -828,13 +905,13 @@ function drawBrain(T) {
   glow(true);
   for (let k = 0; k < 12; k++) { const F = FOLDS[k % FOLDS.length]; if (!F) break; const u = (T * 0.6 + k * 0.37) % 1, p = along(F.map(q => m(q[0], q[1])), u); spr(p[0], p[1], 3, .9 * al * Math.sin(Math.PI * u), k); }
   glow(false);
-  txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : 92, 12, 'm', .7 * ba * rv(T, 101.5, 1) * (1 - rv(T, 103, .6) * (1 - rv(T, 108, .6))), 'right');
+  txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : H - 92, 12, 'm', .7 * ba * rv(T, 101.5, 1) * (1 - rv(T, 103, .6) * (1 - rv(T, 108, .6))), 'right');
 }
 function drawNeuronDemo(T) {
   const da = rv(T, 103.3, .8) * (1 - rv(T, 107.9, .6));
   if (da <= 0) return;
-  const U = LAND ? Math.min(W * 0.16, H * 0.28) : W * 0.3;
-  const LX = LAND ? W * 0.3 : W / 2, RX = LAND ? W * 0.72 : W / 2, LY = LAND ? H * 0.64 : H * 0.27, RY = LAND ? H * 0.64 : H * 0.56;
+  const U = LAND ? Math.min(W * 0.15, H * 0.26) : W * 0.3;
+  const LX = LAND ? W * 0.3 : W / 2, RX = LAND ? W * 0.72 : W / 2, LY = LAND ? H * 0.68 : H * 0.45, RY = LAND ? H * 0.68 : H * 0.73;
   const c = ((T - 103.6) % 2.0 + 2.0) % 2.0, inP = c01(c / 0.8), sums = [.8, .3, .6], wts = [.9, .4, -.2];
   const charge = c < 0.8 ? 0 : c < 1.1 ? (c - 0.8) / 0.3 : 1, fire = c >= 1.1 && c < 1.9;
   // le neurone biologique
@@ -883,10 +960,10 @@ function drawBrainPredict(T) {
   if (pa <= 0) return;
   const rows = [['lait', .78], ['café', .09], ['thé', .07], ['sang', .02]];
   const grow = rv(T, 109.2, .6), hot = T >= 110.2 ? 0 : -1, seen = T >= 111;
-  const msg = seen ? 'le mot arrive : « lait ». Prévu, aucune surprise.' : T >= 110.2 ? 'prédiction : lait' : 'ton cerveau prédit…';
-  const pw = Math.min(380, W * 0.86), x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - 244 - 150 : H * 0.56;
+  const msg = seen ? (LAND ? 'le mot arrive : « lait ». Prévu, aucune surprise.' : '« lait » : prévu, aucune surprise.') : T >= 110.2 ? 'prédiction : lait' : 'ton cerveau prédit…';
+  const pw = Math.min(380, W * 0.86), x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - 244 - 150 : H - 244 - 84;
   probPanel(x0, y0, pw, 'ce que ton cerveau prédit', 'Le chat boit du ___', rows, hot, grow, msg, pa);
-  const s = 'Le chat boit du'.slice(0, Math.floor(c01((T - 108.5) / 0.8) * 15)), px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : 118;
+  const s = 'Le chat boit du'.slice(0, Math.floor(c01((T - 108.5) / 0.8) * 15)), px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : y0 - 26;
   ctx.font = `500 ${px}px ${DISPLAY}`;
   const w1 = ctx.measureText(s).width, extra = seen ? ' lait' : '', w2 = extra ? ctx.measureText(extra).width : 0, xs = W / 2 - (w1 + w2) / 2;
   const sv = DISP; DISP = false;
@@ -955,7 +1032,7 @@ function drawSpace(T) {
       }
     }
     const la = rv(T, 98, 1.5) * (1 - rv(T, 100, 1));
-    txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : 92, 12, 'm', .7 * la, 'right');
+    txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : H - 92, 12, 'm', .7 * la, 'right');
   }
   if (T > 113.5 && T < 130) {
     const pa = rv(T, 115, 1) * (1 - rv(T, 127, 1.5));
@@ -1029,7 +1106,7 @@ function drawFinale(T) {
     const a = rv(T, 141.8 + k * 0.6, .6); if (a <= 0) return;
     let x0, y0;
     if (LAND) { const tot = 3 * cw + 2 * gap; x0 = CX - tot / 2 + k * (cw + gap); y0 = H - chh - 70; }
-    else { x0 = (W - cw) / 2; y0 = 70 + k * (chh + 8); }
+    else { x0 = (W - cw) / 2; y0 = H - 92 - (3 - k) * (chh + 8); }
     ctx.globalAlpha = .86 * a; ctx.fillStyle = BG; ctx.fillRect(x0, y0, cw, chh);
     ctx.globalAlpha = .35 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, cw - 1, chh - 1); ctx.globalAlpha = 1;
     cardIcon(k, x0 + 30, y0 + chh / 2, a);
@@ -1207,11 +1284,10 @@ function shape(name, i, T, V, o) {
       const q = MP(vA, x, y); o.x = q[0]; o.y = q[1]; o.s = 1.5; o.a = .95; return;
     }
     case 'atom': {
-      const k = Math.floor(T * 8 + PA[i] * 8), u1 = hash(i, k * 5 + 1), u2 = hash(i, k * 5 + 2), u3 = hash(i, k * 5 + 3), u4 = hash(i, k * 5 + 4);
-      let x, y;
-      if (u1 < 0.7) { const al = (u2 < .5 ? -1 : 1) * (0.2 + 0.62 * Math.pow(u3, 0.6)); x = (u4 - .5) * 2 * 0.34 * Math.sin(Math.PI * c01((Math.abs(al) - 0.2) / 0.62)); y = al; }
-      else { const an = u2 * TAU, rr = 0.36 + (u3 - .5) * 0.12; x = Math.cos(an) * rr; y = Math.sin(an) * rr * 0.22; }
-      const q = MP(V.v[4], x, y); o.x = q[0]; o.y = q[1]; o.s = 1.3; o.a = .85 * V.v[4].a; return;
+      const age = T - atd(i), v4 = V.v[4];
+      if (age < 0) { o.x = CX; o.y = CY; o.s = 0; o.a = 0; return; }
+      const P = ORB[i % ORB.length], q = MP(v4, P[0], P[1]);
+      o.x = q[0]; o.y = q[1]; o.s = 1.2 + (i < 6 ? 7 : 2.2) * Math.exp(-age * 6); o.a = .9 * v4.a; return;
     }
     case 'bang': {
       o.x = W / 2 + (PA[i] - .5) * 1.3 * W; o.y = H / 2 + (PB[i] - .5) * 1.3 * H; o.s = 0.5 + Math.pow(PC[i], 4) * 2.6;
@@ -1301,7 +1377,7 @@ function drawWordSpace(T, C) {
   if (!C || T < 9.6 || T > 25) return;
   const la = rv(T, 10.4, 1.4) * (1 - rv(T, 23.4, 1.2));
   if (la <= 0) return;
-  const pos = WC.map(c => { const q = p3(c[0], c[1], c[2], C); return [q[0], q[1], q[2]]; });
+  const pos = WC.map(c => { const q = p3(c[0], c[1], c[2], C); return [q[0], q[1], q[2]]; }); WSP = pos;
   const dm = rv(T, 22.6, 1), sp = stepAt(T), n = STEPS.length, cur = sp.ph >= 0 && sp.j < n ? sp.j : -1, ph = sp.ph;
   let locked = 0; for (let j = 0; j < n; j++) if (T >= stepStart(j) + LK * stepDur(j)) locked++;
   const lk = cur >= 0 && ph >= LK, rl = cur >= 0 && ph >= 0.3 && !lk ? rollAt(T, cur) : -1, grow = c01(ph / 0.25);
@@ -1344,7 +1420,7 @@ function drawWordSpace(T, C) {
   // le panneau : le calcul, lisible
   if (cur >= 0) {
     const st = STEPS[cur], pk = PICK[cur], pw = Math.min(360, W * 0.86), rowH = 30, phh = 58 + st.length * rowH + 30;
-    const x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - phh - 150 : H * 0.5, pa = la * rv(T, S0T - 0.4, 0.4);
+    const x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - phh - 150 : H - phh - 130, pa = la * rv(T, S0T - 0.4, 0.4);
     ctx.globalAlpha = .84 * pa; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, phh);
     ctx.globalAlpha = .3 * pa; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, phh - 1); ctx.globalAlpha = 1;
     const sv = DISP; DISP = false;
@@ -1366,7 +1442,7 @@ function drawWordSpace(T, C) {
   const sa = la * rv(T, S0T - 0.6, .6);
   if (sa > 0) {
     const s = SENT.slice(0, locked + 1).join(' '), extra = rl >= 0 ? ' ' + STEPS[cur][rl][0] : '';
-    const px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : 118;
+    const px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : H - 96;
     ctx.font = `500 ${px}px ${DISPLAY}`;
     const w1 = ctx.measureText(s).width, w2 = extra ? ctx.measureText(extra).width : 0, x0 = W / 2 - (w1 + w2) / 2;
     const sv = DISP; DISP = false;
@@ -1375,6 +1451,164 @@ function drawWordSpace(T, C) {
     else if (Math.floor(T * 3) % 2 === 0 && locked < n) { ctx.globalAlpha = .8 * sa; ctx.fillStyle = FG; ctx.fillRect(x0 + w1 + 6, y - px * .45, 3, px * .9); ctx.globalAlpha = 1; }
     DISP = sv;
   }
+}
+
+/* ——— la loupe : sous la souris, le calcul caché de ce qu'on regarde ——— */
+let WSP = null;
+const fx = (v, d) => v.toFixed(d === undefined ? 1 : d).replace('.', ',').replace('-', '−');
+const inv = (v, x, y) => [v.fx + (x - CX) / v.S, v.fy + (y - CY) / v.S];
+const AMINO = { Met: 'méthionine', Ala: 'alanine', Ile: 'isoleucine', Val: 'valine', Lys: 'lysine', Gly: 'glycine', Arg: 'arginine', Phe: 'phénylalanine', stop: 'fin de la phrase' };
+const DNA = CODONS.map(c => c[0]).join('');
+function lensRing(p, r, a) { ctx.globalAlpha = .85 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; }
+function lensBox(head, lines, a) {
+  ctx.font = `400 12px ${MONO}`; let w = 0; lines.forEach(l => { w = Math.max(w, ctx.measureText(l).width); });
+  ctx.font = `600 17px ${DISPLAY}`; w = Math.max(w, ctx.measureText(head).width);
+  const bw = w + 30, bh = 42 + lines.length * 18;
+  let bx = SMX + 26, by = SMY + 22; if (bx + bw > W - 12) bx = SMX - 26 - bw; if (by + bh > H - 56) by = SMY - 22 - bh;
+  ctx.globalAlpha = .9 * a; ctx.fillStyle = BG; ctx.fillRect(bx, by, bw, bh);
+  ctx.globalAlpha = .4 * a; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(bx + .5, by + .5, bw - 1, bh - 1);
+  ctx.globalAlpha = .5 * a; ctx.beginPath(); ctx.moveTo(SMX, SMY); ctx.lineTo(bx < SMX ? bx + bw : bx, by < SMY ? by + bh : by); ctx.stroke(); ctx.globalAlpha = 1;
+  ctx.font = `600 17px ${DISPLAY}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = FG; ctx.globalAlpha = a; ctx.fillText(head, bx + 15, by + 20);
+  ctx.font = `400 12px ${MONO}`; lines.forEach((l, i) => { ctx.globalAlpha = .85 * a; ctx.fillText(l, bx + 15, by + 44 + i * 18); });
+  ctx.globalAlpha = 1;
+}
+function lensLens(T, V) {
+  const x = SMX, y = SMY, v = V.v;
+  // l'ouverture : le titre n'est que des points
+  if (T > 6 && T < 9.6 && TPTS.length) {
+    let b = -1, bd = 1e9; TPTS.forEach((p, i) => { const d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = i; } });
+    if (bd < 900) { const p = TPTS[b]; lensRing(p, 8, 1); return ['un point parmi ' + TPTS.length.toLocaleString('fr-FR'), [`x = ${Math.round(p[0])} · y = ${Math.round(p[1])}`, 'une lettre = des points', 'un point = deux nombres']]; }
+    return null;
+  }
+  // l'IA : un mot = un vecteur, le sens = la proximité
+  if (T > 9.6 && T < 23.4 && WSP) {
+    let b = -1, bd = (0.12 * MM) ** 2;
+    WSP.forEach((p, k) => { if (p[2] < 0.3) return; const d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = k; } });
+    if (b < 0) return null;
+    const A = WC[b], nA = Math.hypot(...A);
+    const nb = WC.map((B, k) => [k, (A[0] * B[0] + A[1] * B[1] + A[2] * B[2]) / (nA * Math.hypot(...B))]).filter(e => e[0] !== b).sort((p, q) => q[1] - p[1]).slice(0, 2);
+    lensRing(WSP[b], 10, 1);
+    nb.forEach(([k]) => { const q = WSP[k]; if (q[2] > 0.3) { pen([WSP[b], q], .7, 1.2, [4, 3]); lensRing(q, 6, .8); } });
+    return [`« ${WS[b]} »`, [`vecteur ${vec(WS[b])}`, ...nb.map(([k, c]) => `proche de « ${WS[k]} » · cos = ${fx(c, 2)}`), 'le sens = une direction']];
+  }
+  // le rivage
+  if (T > 24.4 && T < 43 && v[0].a > .5) {
+    const w = inv(v[0], x, y), m = (p, q) => MP(v[0], p, q);
+    if (Math.hypot(w[0] - MOON[0], w[1] - MOON[1]) < MOON_R * 1.5) { lensRing(m(MOON[0], MOON[1]), MOON_R * 1.25 * v[0].S, 1); return ['la Lune', ['distance : 384 400 km', 'F = G · m₁ · m₂ / r²', 'elle tire la mer : deux marées par jour']]; }
+    if (Math.hypot(w[0] - HEAD[0], w[1] - HEAD[1]) < 0.05 || inPoly(w[0], w[1], BODY)) { lensRing(m(HEAD[0], HEAD[1]), 0.045 * v[0].S, 1); return ['moi', ['≈ 86 milliards de neurones', '≈ 20 W : une ampoule', 'je regarde, je prédis, je calcule']]; }
+    let tb = null, td = 0.03; TREE.forEach(n => { const d = Math.hypot(w[0] - n.mx, w[1] - n.my); if (d < td) { td = d; tb = n; } });
+    if (tb) { pen([m(tb.x, tb.y), m(tb.ex, tb.ey)], .9, 3); return [`branche · niveau ${tb.d}`, [`longueur = tronc × 0,72^${tb.d}`, 'angle ≈ ±24° à chaque fourche', `${2 ** tb.d} branches à ce niveau`, 'la même règle, répétée : une fractale']]; }
+    if (w[1] > 0 && w[1] < 0.45 && w[0] > -0.5) {
+      const X = w[0] * 1000, t1 = 0.62 * Math.sin(X / 42 - T * 1.1), t2 = 0.28 * Math.sin(X / 19 + T * 0.8), t3 = 0.14 * Math.sin(X / 9 - T * 1.7);
+      [[.62, 42, -1.1], [.28, 19, .8], [.14, 9, -1.7]].forEach(([am, k, om], j) => {
+        const P = []; for (let s = -60; s <= 60; s += 3) P.push([x + s, y - 34 - j * 20 + am * 12 * Math.sin((X + s * 4) / k + om * T)]);
+        pen(P, .8, 1.2);
+      });
+      return ['une vague', ['h = 0,62·sin(…) + 0,28·sin(…) + 0,14·sin(…)', `  = ${fx(t1, 2)} ${t2 < 0 ? '' : '+'}${fx(t2, 2)} ${t3 < 0 ? '' : '+'}${fx(t3, 2)}`, `  = ${fx(t1 + t2 + t3, 2)}`, 'trois ondes simples, additionnées']];
+    }
+    if (w[1] < -0.03) {
+      const N = Math.round(8 + hash(Math.floor(x / 30), Math.floor(y / 30)) * 9000);
+      lensRing([x, y], 14, .8);
+      return ['une étoile', [`sa lumière est partie il y a ${N.toLocaleString('fr-FR')} ans`, 'au cœur : 4 H → He + énergie', 'E = m·c²']];
+    }
+    return null;
+  }
+  // la fleur
+  if (T > 46 && T < 58.5 && v[1].a > .5) {
+    const w = inv(v[1], x, y), r = Math.hypot(w[0], w[1]), m = (p, q) => MP(v[1], p, q);
+    if (r < 0.95) {
+      let b = 1, bd = 1e9; for (let n = 1; n <= NS; n++) { const p = seedPos(n), d = (p[0] - w[0]) ** 2 + (p[1] - w[1]) ** 2; if (d < bd) { bd = d; b = n; } }
+      const p = seedPos(b), c = m(0, 0), q = m(p[0], p[1]);
+      pen([c, q], .75, 1.2, [4, 3]); lensRing(q, 0.045 * v[1].S, 1);
+      [21, 34].forEach(f => [b - f, b + f].forEach(n => { if (n < 1 || n > NS) return; const e = seedPos(n), s = m(e[0], e[1]); pen([q, s], .45, 1); lensRing(s, 0.03 * v[1].S, .6); txt(n > b ? `+${f}` : `−${f}`, s[0], s[1] - 0.05 * v[1].S, 11, 'm', .8, 'center', true); }));
+      const deg = b * 137.50776;
+      return [`graine n° ${b}`, [`angle = ${b} × 137,5° = ${fx(deg)}°`, `soit ${fx(deg % 360)}° après ${Math.floor(deg / 360)} tours`, `distance au centre ∝ √${b} = ${fx(Math.sqrt(b), 2)}`, 'voisines : ±21 et ±34, des Fibonacci']];
+    }
+    if (r < 1.6) {
+      const k = ((Math.round(Math.atan2(w[1], w[0]) / (TAU / 34)) % 34) + 34) % 34;
+      return [`pétale ${k + 1} / 34`, ['34 : un nombre de Fibonacci', '1, 1, 2, 3, 5, 8, 13, 21, 34, 55…', 'chacun = la somme des deux d’avant']];
+    }
+    return null;
+  }
+  // la graine, ses cellules
+  if (T > 59 && T < 63 && v[2].a > .5) {
+    const w = inv(v[2], x, y); let b = null, bd = 0.1;
+    CELLS.forEach(c => { const d = Math.hypot(c.x - w[0], c.y - w[1]); if (d < bd) { bd = d; b = c; } });
+    if (!b) return null;
+    lensRing(MP(v[2], b.x, b.y), 0.1 * v[2].S, 1);
+    return b.c ? ['le noyau', ['le programme de la plante', 'des milliards de lettres', 'la même copie dans chaque cellule']] : ['une cellule', ['elle se divise : 1 → 2 → 4 → 8', `après 40 divisions : ${fx(2 ** 40 / 1e12)} × 10¹²`, 'chacune emporte tout le code']];
+  }
+  // l'ADN
+  if (T > 63 && T < 71 && v[3].a > .5) {
+    const w = inv(v[3], x, y);
+    if (Math.abs(w[0]) < 0.6 && Math.abs(w[1]) < 0.13) {
+      const idx = Math.floor((w[0] + 0.6) / 0.03), L = DNA[idx % DNA.length], P = { A: 'T', T: 'A', G: 'C', C: 'G' }[L];
+      const cd = CODONS[Math.floor(idx / 3) % CODONS.length], xs = -0.6 + (idx + .5) * 0.03, ph = T * 1.2, lam = 0.24;
+      pen([MP(v[3], xs, 0.075 * Math.sin(TAU * xs / lam + ph)), MP(v[3], xs, 0.075 * Math.sin(TAU * xs / lam + ph + Math.PI * 0.8))], .95, 3);
+      return [`${L} ↔ ${P}`, [`${L === 'A' || L === 'T' ? 2 : 3} liaisons hydrogène`, `mot ${cd[0]} → ${AMINO[cd[1]]}`, '4 lettres, lues 3 par 3 : 64 mots', 'une erreur de lecture = une mutation']];
+    }
+    if (Math.hypot(w[0], w[1]) < 1) return ['un chromosome', ["l'ADN d'une cellule : ≈ 2 m", 'replié dans 6 millièmes de mm', '46 chromosomes chez nous']];
+    return null;
+  }
+  // l'atome : la probabilité, là, sous la souris
+  if (T > 72.5 && T < 76.8 && v[4].a > .5) {
+    const w = inv(v[4], x, y), X = w[0] / ORB_S, Z = -w[1] / (ORB_S * .96), d = orb3(X, 0, Z) / 95, n = nDet(T);
+    let k = 0; for (let i = 0; i < n; i++) { const q = MP(v[4], ORB[i][0], ORB[i][1]); if ((q[0] - x) ** 2 + (q[1] - y) ** 2 < 400) k++; }
+    lensRing([x, y], 20, 1);
+    return ['|ψ|² ici', [`densité : ${Math.round(Math.min(1, d) * 100)} % du maximum`, `tirages tombés dans ce cercle : ${k} / ${n}`, `distance au noyau : ${fx(Math.hypot(X, Z))} rayons de Bohr`, 'probable, jamais certain']];
+  }
+  // l'univers
+  if (T > 77 && T < 79.6) return ['t ≈ 10⁻³⁶ s', ['tout tenait dans un point', "puis l'expansion : v = H₀ · d", 'H₀ ≈ 70 km/s par mégaparsec']];
+  if (T > 79.6 && T < 84.4) return ['attracteur de Lorenz', ['dx/dt = 10 · (y − x)', 'dy/dt = x · (28 − z) − y', 'dz/dt = x · y − 8/3 · z', 'des règles simples, un futur imprévisible']];
+  if (T > 84.4 && T < 89.5) {
+    const th = Math.atan2(y - CY, x - CX), r0 = Math.hypot(x - CX, y - CY), P = [];
+    for (let q = -9; q <= 3; q += 0.08) { const r = r0 * Math.exp(0.22 * q); if (r < 3 * MM) P.push([CX + Math.cos(th + q) * r, CY + Math.sin(th + q) * r]); }
+    pen(P, .7, 1.2, [5, 4]); lensRing([x, y], 8, 1);
+    return ['un bras de la galaxie', ['r = a · e^(0,22 · θ) : spirale logarithmique', `ici θ = ${fx(((th % TAU) + TAU) % TAU, 2)} rad`, '≈ 200 milliards d’étoiles', 'la même spirale que la fleur']];
+  }
+  if (T > 89.5 && T < 100.5) {
+    const kw = kwOf(T); let b = -1, bd = (0.1 * MM) ** 2;
+    NODES.forEach((n, i) => { const p = nodeXY(i, kw), d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = i; } });
+    if (b < 0) return null;
+    const p = nodeXY(b, kw); lensRing(p, 14, 1); ADJ[b].forEach(([j]) => pen([p, nodeXY(j, kw)], .8, 1.6));
+    if (T < 96.5) return ['un amas de galaxies', [`${ADJ[b].length} filaments le relient`, 'la matière suit la gravité', 'la toile cosmique ressemble à…']];
+    const ws = ADJ[b].map(([, e]) => EDGES[e][2] * 2);
+    return [`un neurone`, [`${ADJ[b].length} synapses · poids ${ws.map(q => fx(q, 2)).join(' · ')}`, 'Σ poids × signal > seuil → il s’active', '…un cerveau']];
+  }
+  // le cerveau
+  if (T > 100.5 && T < 113.3 && !(T > 103.2 && T < 108)) {
+    const B = brainBox(), bx = (x - B.cx) / B.bw + .5, by = (y - B.cy) / B.bw + .35;
+    if (!inPoly(bx, by, BRAIN)) return null;
+    const nb = BIN.map((p, i) => [i, (p[0] - bx) ** 2 + (p[1] - by) ** 2]).sort((p, q) => p[1] - q[1]).slice(0, 4);
+    const ti = Math.floor(T * 2); let sum = 0; const terms = [];
+    nb.forEach(([i], k) => { const q = bmap(B, BIN[i][0], BIN[i][1]), xi = hash(i, ti) , wi = hash(i, 77) * 1.6 - .5; sum += xi * wi; terms.push(`${fx(xi)}×${fx(wi)}`); pen([[x, y], q], .8, 1.2); lensRing(q, 4, .9); });
+    lensRing([x, y], 9, 1);
+    return ['un neurone', [`Σ = ${terms.join(' + ')}`.replace(/\+ −/g, '− '), `  = ${fx(sum, 2)} ${sum > .5 ? '> 0,5 → il s’active' : '< 0,5 → il se tait'}`, 'et 86 milliards font pareil, en même temps']];
+  }
+  // le miroir
+  if (T > 115 && T < 128 && Math.abs(x - PCX) < 0.42 * W && Math.abs(y - PCY) < 0.4 * H) {
+    return x < PCX ? ['moi', ['≈ 37 °C, et il faut que je mange', '≈ 30 000 milliards de cellules', 'je ressens : la faim, le froid, la peur']] : ['une IA', ['≈ 10¹² paramètres : des nombres', 'pas de corps, pas de faim', 'elle calcule. Ressent-elle ?']];
+  }
+  // le bouquet
+  if (T > 130 && T < M0) {
+    let b = null, bd = (0.22 * MM) ** 2; FW.forEach(F => { const d = (F.x * W - x) ** 2 + (F.y * H - y) ** 2; if (T > F.t && d < bd) { bd = d; b = F; } });
+    if (!b) return null;
+    return ['une gerbe', ['chaque étincelle : une parabole', 'y = v₀·t − ½·g·t²', `ici t = ${fx(T - b.t, 2)} s`]];
+  }
+  if (T >= M0 && T < MEND) return ['la vie, en accéléré', ['étoiles → atomes → ADN → fleur → cerveau', '13,8 milliards d’années', 'en 6 secondes']];
+  if (T > MEND + 0.5) {
+    const c = MP(camera(74)[4], 0, 0);
+    if (Math.hypot(x - c[0], y - c[1]) > 0.45 * MM) return null;
+    return ["l'électron", ['charge : −1,602 × 10⁻¹⁹ C', 'quand il bouge : du courant', 'neurone ≈ 0,07 V · transistor ≈ 1 V', 'la même électricité, partout']];
+  }
+  return null;
+}
+function drawLens(T, V) {
+  if (MACT < 0.03 || SMX < -1e3) return;
+  const sv = DISP; DISP = false;
+  const r = lensLens(T, V);
+  if (r) lensBox(r[0], r[1], MACT);
+  DISP = sv;
 }
 
 /* ——— les phrases, écrites en particules dans le dessin ——— */
@@ -1387,21 +1621,22 @@ const CW = CAPS.map((c, k) => {
   const mS = fromPrev ? prev.t1 - 0.15 : c.t0 - 0.1;
   return { mS, fromPrev, toNext, start: mS, end: toNext ? c.t1 - 0.15 : c.t1 + 0.8 };
 });
+function capTop() { return LAND ? Math.max(88, H * 0.13) : 74; }
 function buildCaps() {
   try {
-    const fs = LAND ? Math.max(30, Math.min(50, W * 0.03)) : Math.max(22, Math.min(30, W * 0.066));
-    const x0 = LAND ? Math.max(20, Math.min(84, W * 0.05)) : 20;
+    const fs = LAND ? Math.max(34, Math.min(58, W * 0.031)) : Math.max(24, Math.min(34, W * 0.072));
+    const x0 = LAND ? Math.max(20, Math.min(84, W * 0.05)) : 20, top = capTop();
     const c = document.createElement('canvas'), x = c.getContext('2d');
     CAPL = CAPS.map((cp, k) => {
-      const f = cp.k === 'final' ? fs * 1.1 : fs, L = f * 1.2;
-      const maxW = LAND ? Math.min((cp.text.length > 60 ? 0.52 : 0.4) * W, 900) : W - 40;
-      x.font = `500 ${f}px ${DISPLAY}`;
+      const f = cp.k === 'final' ? fs * 1.08 : fs, L = f * 1.18;
+      const maxW = LAND ? Math.min((cp.text.length > 90 ? 0.56 : cp.text.length > 60 ? 0.5 : 0.42) * W, 1000) : W - 40;
+      x.font = `600 ${f}px ${DISPLAY}`;
       const lines = []; let cur = '';
       cp.text.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
       if (cur) lines.push(cur);
-      const bh = lines.length * L, top = LAND ? Math.max(92, Math.min(170, H * 0.16)) : H - 100 - bh;
+      const bw = Math.max(...lines.map(l => x.measureText(l).width)), bh = lines.length * L;
       c.width = Math.ceil(maxW + 24); c.height = Math.ceil(bh + 20);
-      x.font = `500 ${f}px ${DISPLAY}`; x.fillStyle = '#000'; x.textBaseline = 'middle'; x.textAlign = 'left';
+      x.font = `600 ${f}px ${DISPLAY}`; x.fillStyle = '#000'; x.textBaseline = 'middle'; x.textAlign = 'left';
       lines.forEach((l, j) => x.fillText(l, 4, 10 + L * (j + 0.5)));
       const d = x.getImageData(0, 0, c.width, c.height).data;
       let cnt = 0; for (let yy = 0; yy < c.height; yy++) for (let xx = 0; xx < c.width; xx++) if (d[(yy * c.width + xx) * 4 + 3] > 110) cnt++;
@@ -1409,7 +1644,7 @@ function buildCaps() {
       const pts = [];
       for (let yy = 0; yy < c.height; yy += step) for (let xx = 0; xx < c.width; xx += step) { const xi = Math.round(xx), yi = Math.round(yy); if (xi < c.width && yi < c.height && d[(yi * c.width + xi) * 4 + 3] > 110) pts.push([x0 - 4 + xx, top - 10 + yy]); }
       for (let i = pts.length - 1; i > 0; i--) { const j = Math.floor(hash(i + k * 977, 91) * (i + 1)); const t = pts[i]; pts[i] = pts[j]; pts[j] = t; }
-      return { pts, ds: Math.max(1.4, step * 0.95), lines, f, L, x0, top };
+      return { pts, ds: Math.max(1.4, step * 0.95), lines, f, L, x0, top, bw, bh };
     });
   } catch (e) { CAPL = []; }
 }
@@ -1419,17 +1654,21 @@ function drawCaps(T) {
   if (k < 0) return;
   const cp = CAPS[k], w = CW[k], L = CAPL[k], src = w.fromPrev ? CAPL[k - 1] : null, n = L.pts.length;
   if (!n) return;
-  const MD = 0.7;
-  const dissolve = !w.toNext && T > cp.t1 ? c01((T - cp.t1) / 0.7) : 0;
-  const clr = rv(T, w.mS + 0.3, 0.5) * (1 - rv(T, w.end - 0.9, 0.5));
-  if (clr > 0.01) { /* un voile de fond sous la phrase, pour qu'elle se lise sur n'importe quel dessin */
-    ctx.globalAlpha = 0.72 * clr; ctx.strokeStyle = BG; ctx.fillStyle = BG; ctx.lineJoin = 'round'; ctx.lineWidth = L.f * 0.42;
-    ctx.font = `500 ${L.f}px ${DISPLAY}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    L.lines.forEach((l, j) => { const y = L.top + L.L * (j + 0.5); ctx.strokeText(l, L.x0, y); ctx.fillText(l, L.x0, y); });
+  const MD = 0.6, sv = DISP;
+  const dissolve = !w.toNext && T > cp.t1 ? c01((T - cp.t1) / 0.6) : 0;
+  const crisp = rv(T, w.mS + MD + 0.25, 0.3) * (w.toNext ? 1 - rv(T, w.end - 0.3, 0.25) : 1 - rv(T, cp.t1, 0.15));
+  // un voile doux derrière la phrase : elle reste lisible sur n'importe quel dessin
+  const clr = rv(T, w.mS, 0.4) * (w.toNext ? 1 : 1 - rv(T, cp.t1 + 0.1, 0.5));
+  const bw = src && T < w.mS + MD ? Math.max(L.bw, src.bw) : L.bw, bh = src && T < w.mS + MD ? Math.max(L.bh, src.bh) : L.bh;
+  if (clr > 0.01) {
+    ctx.save(); ctx.translate(L.x0 + bw / 2, L.top + bh / 2); ctx.scale(1, (bh + 70) / (bw + 110));
+    const R = (bw + 110) * 0.62, g = ctx.createRadialGradient(0, 0, 0, 0, 0, R);
+    g.addColorStop(0, BGA(.86)); g.addColorStop(.62, BGA(.7)); g.addColorStop(1, BGA(0));
+    ctx.globalAlpha = clr; ctx.fillStyle = g; ctx.fillRect(-R, -R, 2 * R, 2 * R); ctx.restore(); ctx.globalAlpha = 1;
   }
   ctx.fillStyle = FG;
   for (let i = 0; i < CPN; i++) {
-    const tgt = L.pts[i % n], e = eio((T - w.mS - CR1[i] * 0.3) / MD);
+    const tgt = L.pts[i % n], e = eio((T - w.mS - CR1[i] * 0.25) / MD);
     let x, y, a, ds = L.ds;
     if (e < 1) {
       let sx, sy, sa;
@@ -1439,14 +1678,25 @@ function drawCaps(T) {
       x = lerp(sx, tgt[0], e) + sw; y = lerp(sy, tgt[1], e) - sw * 0.7; a = lerp(sa, 1, e);
     } else { x = tgt[0] + Math.sin(TR * 2.3 + i) * 0.35; y = tgt[1] + Math.cos(TR * 1.9 + i) * 0.35; a = 1; }
     if (dissolve > 0) { const r = dissolve * (0.04 + 0.26 * CRR[i]) * MM; x += CDX[i] * r; y += CDY[i] * r - dissolve * 0.08 * MM; a *= 1 - dissolve; }
+    a *= 1 - 0.72 * crisp;
     if (a < 0.02) continue;
-    if (DISP && MACT > 0.01) { dsp(x, y); x = DX; y = DY; }
-    if (CRR[i] > 0.93 && e > 0.3) { glyph(Math.floor(hash(i, Math.floor(TR * 6 + CR1[i] * 6)) * 26), x, y, ds * 4, a * .8); ctx.fillStyle = FG; continue; }
+    if (sv && MACT > 0.01) { dsp(x, y); x = DX; y = DY; }
+    if (CRR[i] > 0.94 && e > 0.3) { glyph(Math.floor(hash(i, Math.floor(TR * 6 + CR1[i] * 6)) * 26), x, y, ds * 4, a * .8); ctx.fillStyle = FG; continue; }
     ctx.globalAlpha = a * (0.78 + 0.22 * CR1[i]);
     ctx.fillRect(x - ds / 2, y - ds / 2, ds, ds);
   }
+  // une fois assemblée, la phrase se fixe : nette, à l'encre
+  if (crisp > 0.01) {
+    ctx.font = `600 ${L.f}px ${DISPLAY}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    L.lines.forEach((l, j) => {
+      const y = L.top + L.L * (j + 0.5);
+      ctx.globalAlpha = .9 * crisp; ctx.strokeStyle = BG; ctx.lineWidth = L.f * 0.2; ctx.strokeText(l, L.x0, y);
+      ctx.globalAlpha = crisp; ctx.fillStyle = FG; ctx.fillText(l, L.x0, y);
+    });
+  }
   ctx.globalAlpha = 1;
 }
+function capBottom(T) { let k = -1; for (let j = 0; j < CAPS.length; j++) if (T >= CW[j].start && T < CW[j].end) k = j; return k < 0 || !CAPL[k] ? 0 : CAPL[k].top + CAPL[k].bh; }
 
 /* ——— le son : les calculs qu'on entend (seulement après un clic) ——— */
 let AC = null, master = null, seaG = null, droneLP = null, NOISE = null, scanO = null, scanG = null, FOU = [], audioOn = false, aT = -1;
@@ -1512,7 +1762,8 @@ function audioFrame(T) {
   if (crossed(p, T, 31)) tone(1400, 1.2, .03, { to: 500 });
   if (T > 48.3 && T < 55) for (let n = 1; n <= NS; n += 5) if (crossed(p, T, 48.3 + n * 0.0105)) tone(PENT[Math.floor(((n * 137.508) % 360) / 36)] * 2, .35, .03, { pan: Math.cos(n * GA) * .7 });
   for (let i = 0; i < 12; i++) if (crossed(p, T, 65.4 + i / 2.3)) tone(i === 11 ? 330 : 660 + i * 22, i === 11 ? 1.2 : .18, .05, { type: 'triangle' });
-  if (T > 72 && T < 77 && Math.floor(T * 9) !== Math.floor(p * 9)) tone(2200 + Math.random() * 2400, .05, .012, { pan: Math.random() * 2 - 1 });
+  for (let i = 0; i < 6; i++) if (crossed(p, T, atd(i))) { tone(1320 + i * 110, .5, .06, { type: 'triangle' }); tone(2640 + i * 220, .2, .015); }
+  if (T > AT6 && T < AT6 + AD + .1 && nDet(T) !== nDet(p)) tone(1800 + Math.random() * 2600, .04, .006 + .01 * c01((T - AT6) / AD), { pan: Math.random() * 2 - 1 });
   if (crossed(p, T, 77)) { tone(36, 4.5, .45, { to: 28 }); noise(4, .3, { type: 'lowpass', f: 6000, to: 120, att: .02 }); }
   if (crossed(p, T, 79.6)) [146.8, 220, 293.7].forEach((f, k) => tone(f, 5, .04, { att: 1, delay: k * .3 }));
   if (T > 97.5 && T < 101.5) for (let q = 0; q < 16; q++) { const rate = 1.2 + hash(q, 3) * 0.8, a = Math.floor((p - 97.5) * rate + hash(q, 4) * 3), b = Math.floor((T - 97.5) * rate + hash(q, 4) * 3); if (b !== a) tone(700 + hash(q, 9) * 900, .09, .035, { pan: hash(q, 10) * 2 - 1 }); }
@@ -1646,6 +1897,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { bu
 })();
 
 function render(T) {
+  WSP = null;
   setNight(Math.max(1 - rv(T, 44.3, 3.4), rv(T, 76, 3) - rv(T, 115, 4), rv(T, 129.6, 1.4)));
   ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
   const v = camera(Math.min(T, 76.9));
@@ -1663,6 +1915,7 @@ function render(T) {
   }
   drawFinale(T);
   drawCaps(T);
+  drawLens(T, V);
   mouseStep(); DISP = false; drawCursor(); DISP = true;
   const logS = Math.log(v[0].S), speed = Math.abs(logS - prevLogS); prevLogS = logS;
   let k = reduced || jump ? 1 : Math.max(0.28, 0.62 - speed * 9);
