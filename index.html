@@ -123,11 +123,15 @@ const gauss = (u, v) => Math.sqrt(-2 * Math.log(u + 1e-9)) * Math.cos(TAU * v);
 const fr = s => s.replace(/ ([?:!;])/g, ' $1');
 
 /* ——— le temps ——— */
-const END = 134;
+const END = 142;
+const HOLD_AT = 9.3, HOLD = 3.2;
+const story = t => t < HOLD_AT ? t : t < HOLD_AT + HOLD ? HOLD_AT : t - HOLD;
+const realOf = s => s < HOLD_AT ? s : s + HOLD;
+let TR = 0;
 const QUESTIONS = ['comment marche une IA ?', 'et moi, comment je marche ?', "qu'est-ce qui me rend vivant ?"];
 let loopN = 0;
-const CH = [[0,'Ouverture'],[10,"L'IA"],[23.2,'Le monde'],[44,'La fleur'],[58.5,'Au fond'],[76.5,"L'univers"],[96.5,'Le cerveau'],[106,'Le miroir'],[120,'La question']];
-const REST = [8.8, 21, 41.5, 55, 69, 88, 104, 117, 132];
+const CH = [[0,'Ouverture'],[10,"L'IA"],[23.2,'Le monde'],[44,'La fleur'],[58.5,'Au fond'],[76.5,"L'univers"],[96.5,'Le cerveau'],[114,'Le miroir'],[128,'La question']];
+const REST = [8.8, 21, 41.5, 55, 69, 88, 111, 125, 140];
 const CAPS = [
   { t0: 11.2, t1: 14.0, text: "Pour une IA, chaque mot est un point dans l'espace." },
   { t0: 14.4, t1: 22.6, text: 'Une phrase est un chemin. Le mot suivant : un calcul, puis un tirage au sort.' },
@@ -143,12 +147,13 @@ const CAPS = [
   { t0: 79.8, t1: 84.6, text: 'Le monde se calcule. Il ne se prévoit pas.' },
   { t0: 85.2, t1: 89.6, text: 'Des spirales, de la fleur à la galaxie.' },
   { t0: 91.2, t1: 96.2, text: "Et si l'univers n'était qu'un grand algorithme ?" },
-  { t0: 97.6, t1: 102.4, text: 'Et moi ? Des signaux entre 86 milliards de neurones.' },
-  { t0: 102.8, t1: 106.8, text: 'Un cerveau qui prédit la suite. Comme une IA ?' },
-  { t0: 109.2, t1: 112.8, text: 'Suis-je une IA ?' },
-  { t0: 113.2, t1: 117.6, text: 'Pas un LLM. Un corps qui a appris à parler en dernier.' },
-  { t0: 118, t1: 122.4, text: 'Un corps qui se maintient seul, et qui ressent.' },
-  { t0: 123, t1: 1e9, k: 'final', text: "Si tout est calcul, pourquoi est-ce que ça fait quelque chose d'être moi ?" }
+  { t0: 97.6, t1: 101.4, text: 'Et moi ? Des signaux entre 86 milliards de neurones.' },
+  { t0: 101.8, t1: 107.8, text: "Un neurone additionne les signaux qu'il reçoit, chacun avec son poids. Un neurone artificiel fait le même calcul." },
+  { t0: 108.2, t1: 113.4, text: 'Et mon cerveau passe son temps à prédire la suite. Comme un LLM.' },
+  { t0: 117.2, t1: 120.8, text: 'Suis-je une IA ?' },
+  { t0: 121.2, t1: 125.6, text: 'Pas un LLM. Un corps qui a appris à parler en dernier.' },
+  { t0: 126, t1: 130.4, text: 'Un corps qui se maintient seul, et qui ressent.' },
+  { t0: 131, t1: 1e9, k: 'final', text: "Si tout est calcul, pourquoi est-ce que ça fait quelque chose d'être moi ?" }
 ];
 CAPS.forEach(c => { c.text = fr(c.text); });
 document.getElementById('sr-list').innerHTML = CAPS.map(c => `<li>${c.text}</li>`).join('');
@@ -280,6 +285,16 @@ function pen(P, a, w, dash, prog) {
     else { const f = rem / l; ctx.lineTo(P[i - 1][0] + (P[i][0] - P[i - 1][0]) * f, P[i - 1][1] + (P[i][1] - P[i - 1][1]) * f); rem = 0; }
   }
   ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+}
+function along(P, p) {
+  let L = 0; const seg = [];
+  for (let i = 1; i < P.length; i++) { const l = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]); seg.push(l); L += l; }
+  let rem = L * c01(p);
+  for (let i = 1; i < P.length; i++) {
+    if (seg[i - 1] >= rem) { const f = rem / (seg[i - 1] || 1); return [P[i - 1][0] + (P[i][0] - P[i - 1][0]) * f, P[i - 1][1] + (P[i][1] - P[i - 1][1]) * f]; }
+    rem -= seg[i - 1];
+  }
+  return P[P.length - 1].slice();
 }
 function txt(s, x, y, px, f, a, align, halo) {
   if (a <= 0.004 || px > 500 || px < 1) return;
@@ -762,6 +777,122 @@ const INS = [];
 for (let k = 0; INS.length < 700 && k < 20000; k++) { const x = 60 + hash(k, 61) * 190, y = 40 + hash(k, 62) * 380; if (inPoly(x, y, HEADPOLY)) INS.push([x, y]); }
 const lmap = (x, y) => [PCX - PGAP / 2 - (236 - x) * SP, PCY + (y - 251) * SP];
 const rmap = (x, y) => { const p = lmap(x, y); return [2 * PCX - p[0], p[1]]; };
+/* ——— le cerveau : comment il marche, et pourquoi ça ressemble à un LLM ——— */
+const BRAIN = [[0.08,0.52],[0.04,0.40],[0.06,0.27],[0.14,0.15],[0.27,0.07],[0.42,0.03],[0.58,0.04],[0.72,0.09],[0.84,0.18],[0.92,0.30],[0.94,0.42],[0.90,0.52],[0.82,0.58],[0.70,0.60],[0.62,0.66],[0.52,0.64],[0.44,0.60],[0.32,0.62],[0.20,0.60],[0.12,0.57]];
+const BIN = []; for (let k = 0; BIN.length < 1400 && k < 30000; k++) { const x = hash(k, 301), y = hash(k, 302) * 0.7; if (inPoly(x, y, BRAIN)) BIN.push([x, y]); }
+const FOLDS = [];
+for (let k = 0; FOLDS.length < 16 && k < 600; k++) {
+  let x = 0.14 + hash(k, 311) * 0.72, y = 0.1 + hash(k, 312) * 0.44, an = hash(k, 313) * TAU; if (!inPoly(x, y, BRAIN)) continue;
+  const P = [[x, y]];
+  for (let s = 0; s < 9; s++) { an += (hash(k, s + 320) - .5) * 1.6; const nx = x + Math.cos(an) * 0.035, ny = y + Math.sin(an) * 0.035; if (!inPoly(nx, ny, BRAIN) || !inPoly(nx + 0.03, ny, BRAIN) || !inPoly(nx - 0.03, ny, BRAIN)) break; x = nx; y = ny; P.push([x, y]); }
+  if (P.length > 4) FOLDS.push(P);
+}
+function brainBox() { return { cx: LAND ? W * 0.47 : W / 2, cy: LAND ? H * 0.56 : H * 0.36, bw: LAND ? Math.min(0.36 * W, 0.95 * H) : 0.86 * W }; }
+const bmap = (B, x, y) => [B.cx + (x - 0.5) * B.bw, B.cy + (y - 0.35) * B.bw];
+const brainDim = T => 1 - 0.82 * rv(T, 103.4, .8) * (1 - rv(T, 107.8, .8));
+function probPanel(x0, y0, pw, head, line, rows, hot, grow, msg, pa) {
+  const rowH = 30, phh = 58 + rows.length * rowH + 30;
+  ctx.globalAlpha = .84 * pa; ctx.fillStyle = BG; ctx.fillRect(x0, y0, pw, phh);
+  ctx.globalAlpha = .3 * pa; ctx.strokeStyle = FG; ctx.lineWidth = 1; ctx.strokeRect(x0 + .5, y0 + .5, pw - 1, phh - 1); ctx.globalAlpha = 1;
+  const sv = DISP; DISP = false;
+  txt(head, x0 + 18, y0 + 20, 11, 'm', .6 * pa);
+  txt(line, x0 + 18, y0 + 44, 18, 'd', .95 * pa);
+  const bx = x0 + 120, bmax = pw - 190;
+  rows.forEach(([w, p], c) => {
+    const y = y0 + 76 + c * rowH, h = c === hot, bw = Math.max(2, p / 0.8 * bmax * grow);
+    if (h) txt('●', x0 + 8, y, 8, 'm', pa);
+    txt(w, x0 + 18, y, 17, 'd', (h ? 1 : .65) * pa);
+    ctx.globalAlpha = (h ? .95 : .35) * pa; ctx.fillStyle = FG; ctx.fillRect(bx, y - 5, bw, 10); ctx.globalAlpha = 1;
+    txt(`${Math.round(p * 100)} %`, bx + bw + 8, y, 12, 'm', .85 * pa);
+  });
+  txt(msg, x0 + 18, y0 + phh - 20, 12, 'm', .85 * pa);
+  DISP = sv;
+  return phh;
+}
+function drawBrain(T) {
+  if (T < 99.8 || T > 115) return;
+  const B = brainBox(), ba = rv(T, 100.4, 1.6) * (1 - rv(T, 113.3, 1.4)), al = ba * brainDim(T);
+  if (ba <= 0) return;
+  const m = (x, y) => bmap(B, x, y);
+  const O = BRAIN.map(p => m(p[0], p[1])); O.push(O[0]);
+  ribbon(O, 3.2, { alpha: .9 * al, prog: rv(T, 100.4, 1.8), taper: [.02,.02], dry: .3, seed: 51 });
+  const CB = []; for (let k = 0; k <= 30; k++) { const an = k / 30 * TAU; CB.push(m(0.78 + Math.cos(an) * 0.11, 0.655 + Math.sin(an) * 0.065)); }
+  ribbon(CB, 2.4, { alpha: .8 * al, prog: rv(T, 101, 1.2), taper: [.02,.02], dry: 0 });
+  for (let k = 0; k < 3; k++) { const P = []; for (let s = 0; s <= 10; s++) { const an = Math.PI * (0.15 + 0.7 * s / 10); P.push(m(0.78 + Math.cos(an) * (0.09 - k * 0.025), 0.625 + Math.sin(an) * (0.05 - k * 0.012))); } ribbon(P, 1.4, { alpha: .45 * al, dry: 0 }); }
+  ribbon([m(0.62, 0.64), m(0.615, 0.72), m(0.6, 0.8)], 0.05 * B.bw, { alpha: .75 * al, prog: rv(T, 101.2, 1), taper: [.05,.4], dry: .3 });
+  FOLDS.forEach((F, k) => ribbon(F.map(p => m(p[0], p[1])), 1.8, { alpha: .45 * al, prog: rv(T, 100.8 + k * 0.08, 1.2), taper: [.1,.4], dry: 0, seed: k }));
+  glow(true);
+  for (let k = 0; k < 12; k++) { const F = FOLDS[k % FOLDS.length]; if (!F) break; const u = (T * 0.6 + k * 0.37) % 1, p = along(F.map(q => m(q[0], q[1])), u); spr(p[0], p[1], 3, .9 * al * Math.sin(Math.PI * u), k); }
+  glow(false);
+  txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : 92, 12, 'm', .7 * ba * rv(T, 101.5, 1) * (1 - rv(T, 103, .6) * (1 - rv(T, 108, .6))), 'right');
+}
+function drawNeuronDemo(T) {
+  const da = rv(T, 103.3, .8) * (1 - rv(T, 107.9, .6));
+  if (da <= 0) return;
+  const U = LAND ? Math.min(W * 0.16, H * 0.28) : W * 0.3;
+  const LX = LAND ? W * 0.3 : W / 2, RX = LAND ? W * 0.72 : W / 2, LY = LAND ? H * 0.64 : H * 0.27, RY = LAND ? H * 0.64 : H * 0.56;
+  const c = ((T - 103.6) % 2.0 + 2.0) % 2.0, inP = c01(c / 0.8), sums = [.8, .3, .6], wts = [.9, .4, -.2];
+  const charge = c < 0.8 ? 0 : c < 1.1 ? (c - 0.8) / 0.3 : 1, fire = c >= 1.1 && c < 1.9;
+  // le neurone biologique
+  const soma = [LX + 0.1 * U, LY];
+  txt('NEURONE BIOLOGIQUE', LX, LY - 0.95 * U, 13, 'm', .65 * da, 'center');
+  const dends = [[LX - 1.0 * U, LY - 0.55 * U], [LX - 1.05 * U, LY], [LX - 1.0 * U, LY + 0.55 * U]].map((s, i) => [s, [(s[0] + soma[0]) / 2, s[1] * 0.6 + LY * 0.4 + (i - 1) * 0.08 * U], soma]);
+  dends.forEach((D, i) => {
+    ribbon(D, 3.2, { alpha: .85 * da, taper: [.1,.05], dry: 0, seed: i });
+    ribbon([D[0], [D[0][0] - 0.15 * U, D[0][1] - 0.18 * U]], 1.6, { alpha: .6 * da, dry: 0 });
+    ribbon([D[0], [D[0][0] - 0.2 * U, D[0][1] + 0.12 * U]], 1.6, { alpha: .6 * da, dry: 0 });
+    if (c < 0.8) { const p = along(D, inP); glow(true); spr(p[0], p[1], 3 + 6 * sums[i], .95 * da, i); glow(false); }
+  });
+  const axEnd = [LX + 1.05 * U, LY];
+  ribbon([soma, [LX + 0.55 * U, LY - 0.06 * U], axEnd], 3, { alpha: .85 * da, taper: [.05,.3], dry: 0 });
+  for (let k = -1; k <= 1; k++) ribbon([axEnd, [axEnd[0] + 0.18 * U, axEnd[1] + k * 0.16 * U]], 1.6, { alpha: .6 * da, dry: 0 });
+  spr(soma[0], soma[1], 0.13 * U * (0.7 + 0.5 * charge), (.55 + .45 * charge) * da, 3);
+  if (fire) { const u = c01((c - 1.1) / 0.5), p = along([soma, [LX + 0.55 * U, LY - 0.06 * U], axEnd], u); glow(true); spr(p[0], p[1], 8, .95 * da, 1); if (c > 1.6) spr(axEnd[0], axEnd[1], 14 * (1 - (c - 1.6) / 0.3), .8 * da, 2); glow(false); }
+  txt('dendrites : les entrées', LX - 1.05 * U, LY - 0.72 * U, 13, 'm', .8 * da);
+  txt('le corps additionne', soma[0], LY + 0.3 * U, 13, 'm', .8 * da, 'center');
+  txt('axone : la sortie', axEnd[0], LY - 0.25 * U, 13, 'm', .8 * da, 'right');
+  // le neurone artificiel
+  txt('NEURONE ARTIFICIEL', RX, RY - 0.95 * U, 13, 'm', .65 * da, 'center');
+  const sig = [RX + 0.05 * U, RY], outN = [RX + 0.8 * U, RY];
+  [0, 1, 2].forEach(i => {
+    const x = [RX - 1.0 * U, RY + (i - 1) * 0.55 * U];
+    pen([x, sig], .75 * da, 1 + Math.abs(wts[i]) * 4, wts[i] < 0 ? [5, 4] : null);
+    ctx.globalAlpha = da; ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(x[0], x[1], 0.12 * U, 0, TAU); ctx.fill(); ctx.strokeStyle = FG; ctx.lineWidth = 1.2; ctx.stroke(); ctx.globalAlpha = 1;
+    txt(String(sums[i]).replace('.', ','), x[0], x[1], 13, 'm', .95 * da, 'center');
+    const mid = [lerp(x[0], sig[0], .45), lerp(x[1], sig[1], .45) - 12];
+    txt(`× ${String(wts[i]).replace('.', ',').replace('-', '−')}`, mid[0], mid[1], 11, 'm', .8 * da, 'center', true);
+    if (c < 0.8) { const p = along([x, sig], inP); glow(true); spr(p[0], p[1], 3 + 6 * sums[i] * Math.abs(wts[i]) * 1.4, .95 * da, i); glow(false); }
+  });
+  pen([sig, outN], .8 * da, 2);
+  ctx.globalAlpha = da; ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(sig[0], sig[1], 0.17 * U, 0, TAU); ctx.fill(); ctx.strokeStyle = FG; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(outN[0], outN[1], 0.12 * U, 0, TAU); ctx.fillStyle = BG; ctx.fill(); ctx.stroke(); ctx.globalAlpha = 1;
+  if (charge > 0) { glow(true); spr(sig[0], sig[1], 0.12 * U * charge, .5 * da, 0); glow(false); }
+  txt('Σ', sig[0], sig[1], Math.round(0.16 * U), 'd', .95 * da, 'center');
+  txt(fire ? '1' : '0', outN[0], outN[1], 13, 'm', .95 * da, 'center');
+  if (fire) { const u = c01((c - 1.1) / 0.5), p = [lerp(sig[0], outN[0], u), RY]; glow(true); spr(p[0], p[1], 7, .95 * da, 1); glow(false); }
+  txt('0,8×0,9 + 0,3×0,4 + 0,6×(−0,2) = 0,72', RX, RY + 0.85 * U, 14, 'm', .85 * da * c01(charge * 2 + (c > 1.1 ? 1 : 0)), 'center', true);
+  txt('0,72 > seuil → le neurone s’active', RX, RY + 0.85 * U + 22, 14, 'm', .85 * da * (fire ? 1 : .25), 'center', true);
+  if (LAND) txt('≈', (LX + RX) / 2 + 0.05 * U, LY, Math.round(0.35 * U), 'd', .85 * da, 'center');
+}
+function drawBrainPredict(T) {
+  const pa = rv(T, 108.4, .6) * (1 - rv(T, 113.2, .8));
+  if (pa <= 0) return;
+  const rows = [['lait', .78], ['café', .09], ['thé', .07], ['sang', .02]];
+  const grow = rv(T, 109.2, .6), hot = T >= 110.2 ? 0 : -1, seen = T >= 111;
+  const msg = seen ? 'le mot arrive : « lait ». Prévu, aucune surprise.' : T >= 110.2 ? 'prédiction : lait' : 'ton cerveau prédit…';
+  const pw = Math.min(380, W * 0.86), x0 = LAND ? W - pw - 40 : (W - pw) / 2, y0 = LAND ? H - 244 - 150 : H * 0.56;
+  probPanel(x0, y0, pw, 'ce que ton cerveau prédit', 'Le chat boit du ___', rows, hot, grow, msg, pa);
+  const s = 'Le chat boit du'.slice(0, Math.floor(c01((T - 108.5) / 0.8) * 15)), px = Math.round(Math.min(34, W * 0.06)), y = LAND ? H - 120 : 118;
+  ctx.font = `500 ${px}px ${DISPLAY}`;
+  const w1 = ctx.measureText(s).width, extra = seen ? ' lait' : '', w2 = extra ? ctx.measureText(extra).width : 0, xs = W / 2 - (w1 + w2) / 2;
+  const sv = DISP; DISP = false;
+  txt(s, xs, y, px, 'd', .95 * pa, 'left', true);
+  if (extra) txt(extra, xs + w1, y, px, 'd', .95 * pa * rv(T, 111, .4), 'left', true);
+  else if (Math.floor(T * 3) % 2 === 0) { ctx.globalAlpha = .8 * pa; ctx.fillStyle = FG; ctx.fillRect(xs + w1 + 6, y - px * .45, 3, px * .9); ctx.globalAlpha = 1; }
+  if (seen) txt('✓ prévu', xs + w1 + w2 + 12, y, 14, 'm', .8 * pa * rv(T, 111.3, .5), 'left', true);
+  DISP = sv;
+}
+
 const LZ = (() => {
   const L = x0 => { const o = []; let x = x0, y = 1, z = 1; for (let i = 0; i < 5200; i++) { const dx = 10 * (y - x), dy = x * (28 - z) - y, dz = x * y - 8 / 3 * z; x += dx * .005; y += dy * .005; z += dz * .005; if (i % 2 === 0) o.push([x, z]); } return o; };
   const a = L(1), b = L(1.001); let split = a.length - 1;
@@ -782,10 +913,10 @@ function drawSpace(T) {
       txt('attracteur de Lorenz · 1963', CX, CY + 0.43 * MM, 12, 'm', .6 * la, 'center');
     }
   }
-  if (T > 89 && T < 108) {
+  if (T > 89 && T < 102.5) {
     const kw = kwOf(T), ha = rv(T, 90, 3) * (1 - rv(T, 96.5, 2));
     if (ha > 0) NODES.forEach((n, i) => { const p = nodeXY(i, kw); spr(p[0], p[1], (10 + hash(i, 3) * 14) * Math.min(1.6, kw), .18 * ha, i); });
-    const na = rv(T, 96.8, 2.2) * (1 - rv(T, 105.5, 2));
+    const na = rv(T, 96.8, 2.2) * (1 - rv(T, 100, 1.6));
     if (na > 0) {
       EDGES.forEach((E, e) => {
         const P = []; for (let s = 0; s <= 10; s++) { const q = edgePt(e, s / 10, kw); P.push([q[0], q[1]]); }
@@ -819,26 +950,26 @@ function drawSpace(T) {
         ctx.globalCompositeOperation = 'source-over';
       }
     }
-    const la = rv(T, 98, 1.5) * (1 - rv(T, 105, 1.5));
+    const la = rv(T, 98, 1.5) * (1 - rv(T, 100, 1));
     txt('≈ 86 000 000 000 neurones · ≈ 20 W', W - 24, LAND ? H - 70 : 92, 12, 'm', .7 * la, 'right');
   }
-  if (T > 105.5 && T < 122) {
-    const pa = rv(T, 107, 1) * (1 - rv(T, 119, 1.5));
+  if (T > 113.5 && T < 130) {
+    const pa = rv(T, 115, 1) * (1 - rv(T, 127, 1.5));
     PROF_KEYS.forEach((key, i) => {
       const w = key === 'ear' || key === 'eye' ? 4 : key === 'back' ? 9 : 7;
-      ribbon(PROFILE[key].map(q => lmap(q[0], q[1])), w * SP * 1.1, { alpha: .92 * pa, prog: rv(T, 107 + i * 0.5, 1.6), taper: [.08,.35], dry: .35, seed: i + 30 });
+      ribbon(PROFILE[key].map(q => lmap(q[0], q[1])), w * SP * 1.1, { alpha: .92 * pa, prog: rv(T, 115 + i * 0.5, 1.6), taper: [.08,.35], dry: .35, seed: i + 30 });
     });
-    txt('≈', PCX, PCY - 0.02 * H, Math.round(0.07 * MM), 'd', .8 * rv(T, 109, 1.5) * (1 - rv(T, 118.5, 1.5)), 'center');
-    const da = rv(T, 109.5, 1.5) * (1 - rv(T, 118.5, 1.5));
+    txt('≈', PCX, PCY - 0.02 * H, Math.round(0.07 * MM), 'd', .8 * rv(T, 117, 1.5) * (1 - rv(T, 126.5, 1.5)), 'center');
+    const da = rv(T, 117.5, 1.5) * (1 - rv(T, 126.5, 1.5));
     if (da > 0) {
       const DIG = '0.71−0.350.920.08−0.440.13';
       for (let k = 0; k < OUTL.length; k += 4) { const p = rmap(OUTL[k][0], OUTL[k][1]); txt(DIG[(k + Math.floor(T * 7)) % DIG.length], p[0] + 7, p[1], 11, 'm', .7 * da, 'center'); }
     }
   }
-  if (T > 120.3) {
-    const br = 1 + 0.02 * Math.sin((T - 123.5) * 1.4) * rv(T, 123.5, 1.5);
-    ribbon(ensoPts(CF[0], CF[1], RF * br, 200, 320, 50, 0.02, 7), 0.06 * RF, { alpha: .93, prog: rv(T, 120.5, 3), taper: [.04,.55], dry: .6, seed: 7 });
-    const ea = rv(T, 124.5, 1.5);
+  if (T > 128.3) {
+    const br = 1 + 0.02 * Math.sin((T - 131.5) * 1.4) * rv(T, 131.5, 1.5);
+    ribbon(ensoPts(CF[0], CF[1], RF * br, 200, 320, 50, 0.02, 7), 0.06 * RF, { alpha: .93, prog: rv(T, 128.5, 3), taper: [.04,.55], dry: .6, seed: 7 });
+    const ea = rv(T, 132.5, 1.5);
     if (ea > 0) {
       for (let k = 0; k < 7; k++) {
         const u = (T * 0.32 + k / 7) % 1, sn = Math.sin(Math.PI * u);
@@ -977,8 +1108,8 @@ function shape(name, i, T, V, o) {
     }
     case 'title': {
       const n = TPTS.length; if (!n) { o.x = W / 2; o.y = H / 2; o.s = 0; o.a = 0; return; }
-      const p = TPTS[i % n]; o.x = p[0] + Math.sin(T * 2 + i) * 0.6; o.y = p[1] + Math.cos(T * 1.7 + i) * 0.6;
-      o.s = TGS; o.a = .95; o.g = Math.floor(hash(i, Math.floor(T * 5 + PA[i] * 5)) * 26); return;
+      const p = TPTS[i % n]; o.x = p[0] + Math.sin(TR * 2 + i) * 0.6; o.y = p[1] + Math.cos(TR * 1.7 + i) * 0.6;
+      o.s = TGS; o.a = .95; o.g = Math.floor(hash(i, Math.floor(TR * 5 + PA[i] * 5)) * 26); return;
     }
     case 'space': {
       const C = V.c3; if (!C) { o.a = 0; o.s = 0; return; }
@@ -1029,6 +1160,11 @@ function shape(name, i, T, V, o) {
       else { const q = edgePt(i % EDGES.length, PA[i], kw), sg = (neu ? 0.0015 : 0.007) * MM * GZ[i]; o.x = q[0] + q[2] * sg; o.y = q[1] + q[3] * sg; }
       o.s = neu ? 0.9 : 0.6 + Math.pow(PC[i], 3) * 1.6; o.a = neu ? .75 : .5 + .35 * PD[i]; return;
     }
+    case 'brain': {
+      const B = brainBox(), q = BIN[i % BIN.length], p = bmap(B, q[0], q[1]);
+      o.x = p[0] + GX[i] * 1.2; o.y = p[1] + GY[i] * 1.2; o.s = 1.1;
+      o.a = (.3 + (hash(i, Math.floor(T * 5 + PA[i] * 5)) > .93 ? .6 : 0)) * brainDim(T); return;
+    }
     case 'profile': {
       if (i < NP * 0.55) { const q = OUTL[i % OUTL.length], p = rmap(q[0], q[1]); o.x = p[0] + GX[i] * 1.2; o.y = p[1] + GY[i] * 1.2; o.s = 1.3; o.a = .9; }
       else { const q = INS[i % INS.length], p = rmap(q[0], q[1]); o.x = p[0]; o.y = p[1]; o.s = 0.9; o.a = .32; }
@@ -1043,7 +1179,7 @@ function shape(name, i, T, V, o) {
 const KF = [
   { t: 1.6, s: 'swirl', d: .05 }, { t: 5.2, s: 'title', d: 2.6 }, { t: 9.4, s: 'space', d: 2.4 }, { t: 23.6, s: 'stars', d: 2.2 },
   { t: 46.5, s: 'seed', d: .1 }, { t: 71, s: 'atom', d: .1 }, { t: 77, s: 'bang', d: 2.5 }, { t: 81.2, s: 'galaxy', d: 4 },
-  { t: 89.5, s: 'web', d: 3.5 }, { t: 96.5, s: 'neurons', d: 2 }, { t: 105.5, s: 'profile', d: 3 }, { t: 118.5, s: 'enso', d: 2.5 }, { t: 124.5, s: 'hidden', d: 2.5 }
+  { t: 89.5, s: 'web', d: 3.5 }, { t: 96.5, s: 'neurons', d: 2 }, { t: 100.2, s: 'brain', d: 2.4 }, { t: 113.5, s: 'profile', d: 3 }, { t: 126.5, s: 'enso', d: 2.5 }, { t: 132.5, s: 'hidden', d: 2.5 }
 ];
 function drawParticles(T, V) {
   let j = -1; for (let k = 0; k < KF.length; k++) if (KF[k].t <= T) j = k;
@@ -1235,9 +1371,12 @@ function audioFrame(T) {
   if (T > 72 && T < 77 && Math.floor(T * 9) !== Math.floor(p * 9)) tone(2200 + Math.random() * 2400, .05, .012, { pan: Math.random() * 2 - 1 });
   if (crossed(p, T, 77)) { tone(36, 4.5, .45, { to: 28 }); noise(4, .3, { type: 'lowpass', f: 6000, to: 120, att: .02 }); }
   if (crossed(p, T, 79.6)) [146.8, 220, 293.7].forEach((f, k) => tone(f, 5, .04, { att: 1, delay: k * .3 }));
-  if (T > 97.5 && T < 106) for (let q = 0; q < 16; q++) { const rate = 1.2 + hash(q, 3) * 0.8, a = Math.floor((p - 97.5) * rate + hash(q, 4) * 3), b = Math.floor((T - 97.5) * rate + hash(q, 4) * 3); if (b !== a) tone(700 + hash(q, 9) * 900, .09, .035, { pan: hash(q, 10) * 2 - 1 }); }
-  if (crossed(p, T, 109.2)) { tone(196, 3, .05); tone(294, 3, .03, { delay: .4 }); }
-  if (crossed(p, T, 120.5)) { tone(98, 7, .14, { att: .02 }); tone(196.4, 6, .05); tone(294.2, 5, .025); }
+  if (T > 97.5 && T < 101.5) for (let q = 0; q < 16; q++) { const rate = 1.2 + hash(q, 3) * 0.8, a = Math.floor((p - 97.5) * rate + hash(q, 4) * 3), b = Math.floor((T - 97.5) * rate + hash(q, 4) * 3); if (b !== a) tone(700 + hash(q, 9) * 900, .09, .035, { pan: hash(q, 10) * 2 - 1 }); }
+  if (T > 103.6 && T < 107.8) { const c0 = ((p - 103.6) % 2 + 2) % 2, c1 = ((T - 103.6) % 2 + 2) % 2; if (c0 < 1.1 && c1 >= 1.1) { tone(520, .5, .06, { type: 'triangle' }); noise(.05, .1, { f: 2500 }); } if (c1 < c0) [0, .08, .16].forEach(d => tone(330 + d * 800, .12, .03, { delay: d })); }
+  if (crossed(p, T, 110.2)) tone(PENT[5], 1.6, .07);
+  if (crossed(p, T, 111)) { tone(PENT[7], 1.2, .05); tone(PENT[9], 1.4, .03, { delay: .12 }); }
+  if (crossed(p, T, 117.2)) { tone(196, 3, .05); tone(294, 3, .03, { delay: .4 }); }
+  if (crossed(p, T, 128.5)) { tone(98, 7, .14, { att: .02 }); tone(196.4, 6, .05); tone(294.2, 5, .025); }
 }
 
 /* ——— la souris déforme la matière, sans arrêter le film ——— */
@@ -1282,7 +1421,7 @@ const chapEl = document.getElementById('chap');
 CH.forEach(([t, name], i) => {
   const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', `Chapitre ${i + 1} : ${name}`);
   b.innerHTML = `<span class="lbl">${name}</span><span class="bar"><i></i></span>`;
-  b.addEventListener('click', () => seek(reduced ? REST[i] : t + 0.01, true));
+  b.addEventListener('click', () => seek(realOf(reduced ? REST[i] : t + 0.01), true));
   chapEl.appendChild(b);
 });
 const chapBtns = [...chapEl.children], chapFill = chapBtns.map(b => b.querySelector('i'));
@@ -1302,14 +1441,14 @@ function updateChap(T) {
 }
 
 /* ——— la boucle ——— */
-let T = reduced ? 9 : 0, playing = !reduced, last = performance.now(), prevLogS = 0, slow = 0;
+let T = reduced ? realOf(8.8) : 0, playing = !reduced, last = performance.now(), prevLogS = 0, slow = 0;
 const endEl = document.getElementById('end'), ppBtn = document.getElementById('pp');
 function setPlaying(p) { playing = p; ppBtn.textContent = p ? 'Pause' : 'Lecture'; jump = true; }
-function seek(t, play) { T = Math.max(0, Math.min(END, t)); jump = true; if (play && !reduced) setPlaying(true); }
-ppBtn.addEventListener('click', () => { if (T >= END) seek(0); setPlaying(!playing); });
+function seek(t, play) { T = Math.max(0, Math.min(END + HOLD, t)); jump = true; if (play && !reduced) setPlaying(true); }
+ppBtn.addEventListener('click', () => { if (T >= END + HOLD) seek(0); setPlaying(!playing); });
 if (reduced) ppBtn.textContent = 'Lecture';
 document.getElementById('again').addEventListener('click', () => { seek(0); setPlaying(!reduced); });
-document.getElementById('rst').addEventListener('click', () => { loopN = 0; live.forEach(el => el.remove()); live.clear(); seek(reduced ? REST[0] : 0); if (!reduced) setPlaying(true); });
+document.getElementById('rst').addEventListener('click', () => { loopN = 0; live.forEach(el => el.remove()); live.clear(); seek(reduced ? realOf(REST[0]) : 0); if (!reduced) setPlaying(true); });
 document.getElementById('snd').addEventListener('click', e => {
   if (!AC && !initAudio()) return;
   audioOn = !audioOn; e.currentTarget.setAttribute('aria-pressed', String(audioOn)); e.currentTarget.textContent = 'Son'; e.currentTarget.classList.add('used');
@@ -1323,10 +1462,10 @@ window.addEventListener('touchmove', e => { if (ty === null) return; const y = e
 window.addEventListener('touchend', () => { ty = null; }, { passive: true });
 window.addEventListener('keydown', e => {
   if (e.target && e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
-  const ci = chapterAt(T);
+  const ci = chapterAt(story(T));
   if (e.key === ' ') { e.preventDefault(); setPlaying(!playing); }
-  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); const n = Math.min(CH.length - 1, ci + 1); seek(reduced ? REST[n] : CH[n][0] + 0.01); }
-  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); const n = Math.max(0, ci - 1); seek(reduced ? REST[n] : CH[n][0] + 0.01); }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); const n = Math.min(CH.length - 1, ci + 1); seek(realOf(reduced ? REST[n] : CH[n][0] + 0.01)); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); const n = Math.max(0, ci - 1); seek(realOf(reduced ? REST[n] : CH[n][0] + 0.01)); }
 });
 
 function resize() {
@@ -1359,16 +1498,18 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { bu
 })();
 
 function render(T) {
-  setNight(Math.max(1 - rv(T, 44.3, 3.4), rv(T, 76, 3) - rv(T, 107, 4)));
+  setNight(Math.max(1 - rv(T, 44.3, 3.4), rv(T, 76, 3) - rv(T, 115, 4)));
   ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
   const v = camera(Math.min(T, 76.9));
   const V = { v, c3: T > 8.5 && T < 29.5 ? cam3(T) : null };
   if (T < 79) { drawCoast(v[0], T); drawFlower(v[1], T); drawSeed(v[2], T); drawNucleus(v[3], T); drawAtom(v[4], T); }
   drawPrompt(T);
   drawSpace(T);
+  drawBrain(T);
   DISP = false; drawParticles(T, V); DISP = true;
   if (T < 62) drawFlowerOverlay(v[1], T);
   drawWordSpace(T, V.c3);
+  drawNeuronDemo(T); drawBrainPredict(T);
   mouseStep(); DISP = false; drawCursor(); DISP = true;
   const logS = Math.log(v[0].S), speed = Math.abs(logS - prevLogS); prevLogS = logS;
   let k = reduced || jump ? 1 : Math.max(0.28, 0.62 - speed * 9);
@@ -1386,20 +1527,20 @@ function render(T) {
   }
   jump = false;
   updateCaps(T); updateChap(T); audioFrame(T);
-  endEl.classList.toggle('on', T >= 131);
+  endEl.classList.toggle('on', T >= 139);
 }
 
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (playing && T < END) T = Math.min(END, T + dt);
-  if (playing && T >= END) { loopN++; seek(0); }
+  if (playing && T < END + HOLD) T = Math.min(END + HOLD, T + dt);
+  if (playing && T >= END + HOLD) { loopN++; seek(0); }
   if (playing && dt > 0.034 && DPR > 1) { if (++slow > 90) { dprCap = 1; slow = 0; resize(); } } else slow = Math.max(0, slow - 1);
   if (!playing && (Math.abs(SMX - MX) > .5 || Math.abs(SMY - MY) > .5 || Math.abs(MACT - MIN) > .01)) needs = true;
-  if (playing || jump || needs) { render(T); needs = false; }
+  if (playing || jump || needs) { TR = T; render(story(T)); needs = false; }
   requestAnimationFrame(frame);
 }
-window.__seek = t => { T = t; jump = true; render(T); };
-window.__frame = t => { T = t; render(T); };
+window.__seek = t => { T = realOf(t); TR = T; jump = true; render(story(T)); };
+window.__frame = t => { T = t; TR = T; render(story(T)); };
 window.__pause = () => setPlaying(false);
 requestAnimationFrame(frame);
 })();
