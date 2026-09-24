@@ -512,5 +512,9 @@
   "close": "Close",
   "card_bg": "Card background",
   "q_prev": "Previous question",
-  "q_next": "Next question"
+  "q_next": "Next question",
+  "text_l": "Text",
+  "you": "You",
+  "post_on": "Post on {0}",
+  "preview_l": "Preview"
 }

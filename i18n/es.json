@@ -512,5 +512,9 @@
   "close": "Cerrar",
   "card_bg": "Fondo de la tarjeta",
   "q_prev": "Pregunta anterior",
-  "q_next": "Pregunta siguiente"
+  "q_next": "Pregunta siguiente",
+  "text_l": "Texto",
+  "you": "Tú",
+  "post_on": "Publicar en {0}",
+  "preview_l": "Vista previa"
 }

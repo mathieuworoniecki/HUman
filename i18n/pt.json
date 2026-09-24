@@ -512,5 +512,9 @@
   "close": "Fechar",
   "card_bg": "Fundo do card",
   "q_prev": "Pergunta anterior",
-  "q_next": "Próxima pergunta"
+  "q_next": "Próxima pergunta",
+  "text_l": "Texto",
+  "you": "Você",
+  "post_on": "Publicar no {0}",
+  "preview_l": "Prévia"
 }

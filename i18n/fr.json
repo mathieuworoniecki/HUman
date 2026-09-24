@@ -512,5 +512,9 @@
   "close": "Fermer",
   "card_bg": "Fond de la carte",
   "q_prev": "Question précédente",
-  "q_next": "Question suivante"
+  "q_next": "Question suivante",
+  "text_l": "Texte",
+  "you": "Toi",
+  "post_on": "Publier sur {0}",
+  "preview_l": "Aperçu"
 }
