@@ -1,0 +1,5 @@
+# secrets locaux (vercel env pull) : jamais dans le dépôt
+.env
+.env.*
+.vercel/
+node_modules/
