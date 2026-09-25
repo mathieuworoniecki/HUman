@@ -3,7 +3,8 @@
 //   GET  /api/atoms?challenge=1      → un petit calcul à résoudre avant d'écrire (preuve de travail)
 //   POST /api/atoms                  → ajouter son atome
 //   POST /api/atoms?report=<id>      → signaler un atome (masqué à partir de 3 signalements)
-// Variables d'environnement : SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ATOMS_SECRET (sel et signature),
+// Variables d'environnement : celles de l'intégration Vercel × Supabase suffisent (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET) ;
+// ATOMS_SECRET remplace SUPABASE_JWT_SECRET comme sel si on le définit ;
 // facultatives : TURNSTILE_SECRET_KEY (Cloudflare), ATOMS_MODERATION=1 (tout passe en attente), ATOMS_ORIGINS.
 const crypto = require('crypto');
 
@@ -12,7 +13,8 @@ const PER_10MIN = 2, PER_DAY = 6;
 const ORIGINS = (process.env.ATOMS_ORIGINS || 'https://areweai.dev,https://www.areweai.dev').split(',').map(s => s.trim()).filter(Boolean);
 const BLOCK = ['nigger', 'nigga', 'faggot', 'kike', 'retard', 'pute', 'salope', 'enculé', 'encule', 'connard', 'fdp', 'ntm', 'viagra', 'casino', 'porn', 'xxx', 'onlyfans', 'crypto giveaway', 'airdrop', 'bitcoin', 'forex', 'telegram', 'whatsapp'];
 
-const secret = () => process.env.ATOMS_SECRET || 'dev-secret-change-me';
+const env = (...k) => k.map(n => process.env[n]).find(Boolean);
+const secret = () => env('ATOMS_SECRET', 'SUPABASE_JWT_SECRET') || 'dev-secret-change-me';
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
 const hmac = s => crypto.createHmac('sha256', secret()).update(s).digest('hex').slice(0, 32);
 const json = (res, code, body, cache) => {
@@ -24,7 +26,7 @@ const json = (res, code, body, cache) => {
 };
 
 function db(path, opts = {}) {
-  const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = env('SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL'), key = env('SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_SECRET_KEY', 'SUPABASE_SERVICE_KEY');
   if (!url || !key) throw Object.assign(new Error('database not configured'), { code: 503 });
   return fetch(`${url.replace(/\/$/, '')}/rest/v1/${path}`, {
     ...opts,

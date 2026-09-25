@@ -253,13 +253,11 @@ function drawAtom(x, g, px, py, r, shape, c, t, seed, det, alpha) {
 }
 
 /* ——— les données : l'API, sinon un aperçu ——— */
-const SAMPLE_N = ['Léa', 'Kenji', 'Amara', 'Mateo', 'Sofia', 'Noah', 'Aisha', 'Lucas', 'Mei', 'Omar', 'Ingrid', 'Ravi', 'Chloé', 'Yuki', 'Diego', 'Nadia', 'Tomás', 'Hana', 'Elias', 'Zoé', 'Arjun', 'Maya', 'Jonas', 'Laila', 'Hugo', 'Sven', 'Priya', 'Ali', 'Clara', 'Kofi', 'Ana', 'Leo', 'Sara', 'Ivan', 'Mira', 'Paul', 'Lina', 'Theo', 'Nour', 'Emma'];
-const SAMPLE_C = ['FR', 'JP', 'NG', 'AR', 'IT', 'US', 'MA', 'BR', 'CN', 'EG', 'NO', 'IN', 'CA', 'KR', 'MX', 'DE', 'ES', 'GB', 'SE', 'PT', 'BE', 'CH', 'GH', 'RU', 'AU', 'TN', 'SN', 'CO'];
-const SAMPLE_M = ['Maybe consciousness is what math feels like from the inside.', "Je crois qu'on est des calculs qui ont appris à s'émerveiller.", 'The universe is not math. Math is how we fall in love with it.', 'Prédire, oui. Mais choisir ce qu’on aime, c’est autre chose.', 'I am a strange loop, and so are you.', 'What makes me human? My mother’s voice in my head.', 'We are the cosmos asking itself a question.', '人は予測するだけじゃない。忘れることもできる。', 'Un tournesol ne sait pas compter, et pourtant.', 'If I am calculable, I still want to be surprised.', 'La conscience, c’est peut-être juste l’univers qui se regarde.', 'Hunger came before words. So did love.', '¿Y si el alma fuera el error de redondeo?', 'An AI never had to survive winter.', 'Somos poeira de estrelas com medo do escuro.', 'Tell me why the sunset makes me cry.', 'Мы — вопрос, который Вселенная задаёт себе.', '20 watts and still dreaming.', 'Le libre arbitre, c’est le bruit dans le calcul.', 'My grandmother would have loved this question.', 'I think, therefore I predict.', 'Nous sommes plus lents qu’une IA, et c’est très bien.', 'Das Leben ist mehr als die Summe seiner Atome.', 'Carbon, oxygen, and a lot of hope.', 'हम गणित हैं, पर गीत भी हैं।', 'I left my atom next to someone I’ll never meet. That’s beautiful.', 'Consciousness: the bug we don’t want fixed.', 'Mi cuerpo sabe cosas que mis palabras no.', 'What if the prompt is love?', 'On est tous faits des mêmes étoiles.'];
+// l'aperçu (sans base) : les dix mêmes premiers atomes que supabase/seed.sql
+const SEED = [{"id": 1, "name": "Léa", "country": "FR", "message": "Je crois qu'on est des calculs qui ont appris à s'émerveiller.", "shape": 2, "color": 1, "d": 9}, {"id": 2, "name": "Kenji", "country": "JP", "message": "人は予測するだけじゃない。忘れることもできる。", "shape": 4, "color": 6, "d": 8}, {"id": 3, "name": "Amara", "country": "NG", "message": "Hunger came before words. So did love.", "shape": 3, "color": 4, "d": 7}, {"id": 4, "name": "Mateo", "country": "AR", "message": "¿Y si el alma fuera el error de redondeo?", "shape": 5, "color": 5, "d": 6}, {"id": 5, "name": "Sofia", "country": "IT", "message": "The universe isn't math. Math is how we fall in love with it.", "shape": 1, "color": 0, "d": 5}, {"id": 6, "name": "Omar", "country": "MA", "message": "We are the cosmos asking itself a question.", "shape": 0, "color": 3, "d": 4}, {"id": 7, "name": "Priya", "country": "IN", "message": "20 watts and still dreaming.", "shape": 2, "color": 7, "d": 3}, {"id": 8, "name": "Jonas", "country": "DE", "message": "An AI never had to survive a winter.", "shape": 1, "color": 2, "d": 2}, {"id": 9, "name": "Ana", "country": "BR", "message": "Somos poeira de estrelas com medo do escuro.", "shape": 4, "color": 1, "d": 1}, {"id": 10, "name": "Noah", "country": "CA", "message": "If I'm calculable, I still want to be surprised.", "shape": 5, "color": 6, "d": 0}];
 function demoAtoms() {
-  const out = [], now = Date.now();
-  for (let i = 0; i < 180; i++) out.push({ id: 100000 + i, created_at: new Date(now - hash(i, 11) * 30 * 86400e3).toISOString(), name: SAMPLE_N[(hash(i, 1) * SAMPLE_N.length) | 0], country: hash(i, 5) < .1 ? null : SAMPLE_C[(hash(i, 2) * SAMPLE_C.length) | 0], message: SAMPLE_M[(hash(i, 3) * SAMPLE_M.length) | 0], shape: (hash(i, 4) * 6) | 0, color: (hash(i, 6) * 8) | 0, demo: true });
-  return out.concat(store.get('human-atoms-demo', []));
+  const now = Date.now();
+  return SEED.map(a => ({ ...a, created_at: new Date(now - (a.d * 24 + a.d * 3 + 2) * 3600e3).toISOString(), demo: true })).concat(store.get('human-atoms-demo', []));
 }
 let DEMO = false;
 async function load() {
@@ -619,6 +617,13 @@ resize(); sync(); requestAnimationFrame(frame);
 setTimeout(dismissIntro, 6500);
 load().then(list => {
   A = list.filter(a => a && a.name && a.message); layout();
+  // cadrer : peu d'atomes, on s'approche ; beaucoup, on recule (sans jamais passer sous 1)
+  if (A.length) {
+    // à l'écran x = W/2 + (wx − cam.x·z)·cam.z·z : le centre qui annule l'écart moyen est Σ wx·z / Σ z²
+    let mx = 0, my = 0, zz = 0; for (const q of A) { mx += q.wx * q.z; my += q.wy * q.z; zz += q.z * q.z; } mx /= zz; my /= zz;
+    let ext = .05; for (const q of A) ext = Math.max(ext, Math.abs(q.wx - mx * q.z) * q.z / (W * (W < 640 ? .36 : .34)), Math.abs(q.wy - my * q.z) * q.z / (H * .28));
+    cam.x = mx; cam.y = my; cam.z = Math.max(1, Math.min(3, 1 / ext));
+  }
   if (DEMO) { const d = $('demo'); d.hidden = false; d.textContent = T.demo; }
   if (mineId && A.some(a => a.id === mineId)) $('mine').hidden = false;
   if (/[#&]add\b/.test(location.hash)) setTimeout(openMake, 900);
