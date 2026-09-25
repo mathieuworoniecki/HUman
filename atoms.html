@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The constellation · HUman, everyone who asked the question</title>
+<meta name="description" content="Everyone who asked the question left an atom here. Choose yours, leave a thought, and watch it float among the others.">
+<link rel="canonical" href="https://areweai.dev/atoms">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://areweai.dev/atoms">
+<meta property="og:site_name" content="HUman">
+<meta property="og:title" content="The constellation · HUman">
+<meta property="og:description" content="Everyone who asked the question left an atom here. Leave yours.">
+<meta property="og:image" content="https://areweai.dev/media/og-en.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://areweai.dev/media/og-en.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><g fill='none' stroke='%239db4ff' stroke-opacity='.55' stroke-width='2'><ellipse cx='32' cy='32' rx='27' ry='10' transform='rotate(-30 32 32)'/><ellipse cx='32' cy='32' rx='27' ry='10' transform='rotate(30 32 32)'/></g><circle cx='32' cy='32' r='7' fill='%23f8f7ff'/><circle cx='52' cy='21' r='5' fill='%239db4ff'/><circle cx='13' cy='42' r='4.5' fill='%23ff7a5c'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:rgb(8,8,10);--fg:rgb(236,233,226);--soft:rgba(236,233,226,.62);--line:rgba(236,233,226,.16);--blue:157,180,255;--display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--mono);-webkit-font-smoothing:antialiased}
+body{touch-action:none;overscroll-behavior:none}
+button,input,textarea{font:inherit;color:inherit}
+a{color:inherit}
+#sky{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab}
+#sky.drag{cursor:grabbing}#sky.hot{cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* l'en-tête, comme sur le site */
+header{position:fixed;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(16px,3vw,36px);pointer-events:none}
+header>*{pointer-events:auto}
+.brand{font:800 1.15rem/1 var(--display);text-decoration:none}.brand i{font-weight:500}
+.nav{display:flex;gap:.5rem}
+.pill{display:inline-flex;align-items:center;gap:.5rem;font:500 .64rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(236,233,226,.55);border-radius:999px;padding:.58rem .95rem;background:rgba(8,8,10,.35);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.pill:hover,.pill:focus-visible{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+/* l'intro : le titre apparaît puis laisse la place au ciel */
+.intro{position:fixed;left:0;right:0;top:22vh;z-index:3;text-align:center;pointer-events:none;padding:0 20px;transition:opacity 1.6s ease,transform 1.6s ease}
+.intro h1{margin:0;font:800 clamp(2.2rem,6vw,4.6rem)/1.02 var(--display);letter-spacing:-.01em;text-shadow:0 0 40px rgba(8,8,10,.9)}
+.intro p{margin:1rem auto 0;max-width:34rem;font:500 clamp(1rem,1.6vw,1.2rem)/1.5 var(--display);color:var(--soft);text-shadow:0 0 20px rgba(8,8,10,.9)}
+.intro.gone{opacity:0;transform:translateY(-12px)}
+#stats{position:fixed;left:clamp(16px,3vw,36px);bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:3;font:500 .62rem/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--soft);pointer-events:none}
+#demo{display:block;margin-top:.3rem;letter-spacing:.06em;text-transform:none;opacity:.8}
+/* l'appel : un bouton qui respire */
+.dock{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4;display:flex;gap:.6rem;align-items:center}
+.cta{position:relative;display:inline-flex;align-items:center;gap:.7rem;font:500 .74rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--fg);border-radius:999px;padding:1rem 1.5rem 1rem 1.2rem;background:rgba(8,8,10,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);cursor:pointer;box-shadow:0 0 34px rgba(var(--blue),.22),inset 0 0 18px rgba(var(--blue),.08);transition:transform .25s,background .2s,color .2s}
+.cta:hover,.cta:focus-visible{background:var(--fg);color:var(--bg);transform:translateY(-2px)}
+.cta .dot{width:.55rem;height:.55rem;border-radius:50%;background:rgb(var(--blue));box-shadow:0 0 .6rem .2rem rgba(var(--blue),.7);animation:tw 2.4s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.55;transform:scale(.85)}to{opacity:1;transform:scale(1.15)}}
+#mine[hidden]{display:none}
+/* la carte d'un atome */
+#card{position:fixed;z-index:6;width:min(320px,calc(100vw - 32px));padding:1.1rem 1.2rem 1rem;border-radius:18px;border:1px solid var(--line);background:rgba(10,10,14,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 18px 60px rgba(0,0,0,.5),0 0 40px rgba(var(--c,var(--blue)),.14);opacity:0;visibility:hidden;transform:translateY(6px) scale(.98);transition:opacity .25s,transform .25s,visibility 0s .25s;pointer-events:none}
+#card.on{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s;pointer-events:auto}
+#card .who{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem}
+#card .nm{font:700 1.18rem/1.2 var(--display);overflow-wrap:anywhere}
+#card .you{display:inline-block;margin-left:.5rem;padding:.18rem .45rem;border-radius:999px;font:500 .55rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;background:rgb(var(--c,var(--blue)));color:#0b0b0e;vertical-align:middle}
+#card .when{font:400 .58rem/1 var(--mono);letter-spacing:.1em;color:var(--soft);white-space:nowrap}
+#card .ct{margin-top:.35rem;font:500 .62rem/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+#card blockquote{margin:.8rem 0 .7rem;font:500 1.05rem/1.5 var(--display);overflow-wrap:anywhere}
+#card blockquote::before{content:"“"}#card blockquote::after{content:"”"}
+#card .row{display:flex;justify-content:space-between;align-items:center;font:400 .56rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+#card .rep{all:unset;cursor:pointer;opacity:.6}#card .rep:hover{opacity:1;text-decoration:underline}
+#card .x{position:absolute;right:.55rem;top:.45rem;all:unset;cursor:pointer;width:1.6rem;height:1.6rem;text-align:center;line-height:1.6rem;opacity:.55;position:absolute}
+/* la fabrique : un panneau de verre, l'atome vivant en haut */
+#veil{position:fixed;inset:0;z-index:7;background:radial-gradient(ellipse at 30% 50%,rgba(8,8,10,.1),rgba(8,8,10,.7));opacity:0;visibility:hidden;transition:opacity .5s,visibility 0s .5s}
+#veil.on{opacity:1;visibility:visible;transition:opacity .5s}
+#make{position:fixed;z-index:8;top:0;right:0;bottom:0;width:min(440px,100vw);display:flex;flex-direction:column;border-left:1px solid var(--line);background:linear-gradient(180deg,rgba(14,14,20,.86),rgba(10,10,14,.92));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transform:translateX(104%);transition:transform .6s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+#make.on{transform:none}
+#make .hd{display:flex;align-items:center;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top,0px)) 22px 0}
+#make h2{margin:0;font:800 1.5rem/1 var(--display)}
+#make .close{all:unset;cursor:pointer;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--line);text-align:center;line-height:2.1rem;font-size:1.1rem}
+#make .close:hover{border-color:var(--fg)}
+#pv{display:block;width:100%;height:210px;flex:none}
+.pvl{text-align:center;margin:-.6rem 0 .6rem;min-height:2.6rem;padding:0 22px}
+.pvl .n{font:700 1.02rem/1.3 var(--display)}.pvl .n span{font:500 .6rem/1 var(--mono);letter-spacing:.14em;color:var(--soft);margin-left:.4rem}
+.pvl .m{font:500 .92rem/1.45 var(--display);color:var(--soft);font-style:italic;overflow-wrap:anywhere}
+.body{flex:1;overflow-y:auto;padding:4px 22px 22px;scrollbar-width:thin}
+.lab{display:flex;justify-content:space-between;margin:1.15rem 0 .55rem;font:500 .6rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+.shapes{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.shp{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.35rem .2rem .55rem;border-radius:14px;border:1px solid var(--line);transition:border-color .2s,background .2s}
+.shp canvas{width:58px;height:58px}
+.shp b{font:700 .82rem/1.1 var(--display)}.shp small{font:400 .56rem/1.2 var(--mono);letter-spacing:.06em;color:var(--soft);text-align:center}
+.shp:hover{border-color:rgba(236,233,226,.4)}
+.shp[aria-checked="true"]{border-color:rgb(var(--c,var(--blue)));background:rgba(var(--c,var(--blue)),.08);box-shadow:0 0 22px rgba(var(--c,var(--blue)),.18)}
+.cols{display:flex;flex-wrap:wrap;gap:.55rem}
+.col{all:unset;cursor:pointer;width:2rem;height:2rem;border-radius:50%;position:relative;background:radial-gradient(circle at 50% 50%,rgb(var(--k)) 0 22%,rgba(var(--k),.35) 40%,rgba(var(--k),0) 70%);outline:1px solid var(--line);outline-offset:2px;transition:transform .2s}
+.col:hover{transform:scale(1.1)}
+.col[aria-checked="true"]{outline:1.5px solid rgb(var(--k));outline-offset:3px;transform:scale(1.12)}
+.colname{font:400 .6rem/1 var(--mono);letter-spacing:.1em;color:rgb(var(--c,var(--blue)));text-transform:none}
+.fld{width:100%;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);padding:.8rem .9rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.fld:focus{border-color:rgb(var(--c,var(--blue)));box-shadow:0 0 0 3px rgba(var(--c,var(--blue)),.15)}
+input.fld{font:600 1.05rem/1.2 var(--display)}
+textarea.fld{resize:none;height:5.6rem;font:500 1rem/1.5 var(--display)}
+.cnt{font:400 .58rem/1 var(--mono);letter-spacing:.06em}
+.cnt.hot{color:rgb(255,122,92)}
+.chk{display:flex;align-items:center;gap:.6rem;margin-top:1rem;font:500 .64rem/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft);cursor:pointer}
+.chk input{appearance:none;width:2.1rem;height:1.2rem;border-radius:999px;border:1px solid var(--line);position:relative;cursor:pointer;transition:background .2s,border-color .2s;flex:none}
+.chk input::after{content:"";position:absolute;top:2px;left:2px;width:.8rem;height:.8rem;border-radius:50%;background:var(--soft);transition:transform .2s,background .2s}
+.chk input:checked{background:rgba(var(--c,var(--blue)),.25);border-color:rgb(var(--c,var(--blue)))}
+.chk input:checked::after{transform:translateX(.9rem);background:rgb(var(--c,var(--blue)))}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.go{position:relative;width:100%;margin-top:1.3rem;display:flex;align-items:center;justify-content:center;gap:.7rem;padding:1.05rem 1rem;border-radius:999px;border:1px solid rgb(var(--c,var(--blue)));background:rgba(var(--c,var(--blue)),.14);font:500 .72rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 30px rgba(var(--c,var(--blue)),.22);transition:background .2s,color .2s,opacity .2s}
+.go:hover:not(:disabled){background:rgb(var(--c,var(--blue)));color:#0b0b0e}
+.go:disabled{cursor:progress}
+.go svg{width:1.05rem;height:1.05rem;transform:rotate(-90deg)}
+.go svg circle{fill:none;stroke:currentColor;stroke-width:2.2}
+.go svg .bg{opacity:.25}
+.small{margin:.8rem 0 0;text-align:center;font:400 .56rem/1.5 var(--mono);letter-spacing:.08em;color:var(--soft)}
+.err{min-height:1.2rem;margin:.7rem 0 0;text-align:center;font:500 .7rem/1.4 var(--mono);color:rgb(255,160,130)}
+#toast{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));z-index:9;transform:translate(-50%,-8px);padding:.6rem 1rem;border-radius:999px;border:1px solid var(--line);background:rgba(10,10,14,.85);font:500 .66rem/1 var(--mono);letter-spacing:.08em;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+/* les boutons en étoiles */
+.stars{position:absolute;left:-16px;top:-16px;width:calc(100% + 32px);height:calc(100% + 32px);pointer-events:none}
+.sp{position:relative;border-color:transparent!important;background:radial-gradient(closest-side,rgba(8,8,10,.55),transparent)!important;box-shadow:none!important}
+.sp>span,.sp>i{position:relative}
+.pill.sp:hover,.cta.sp:hover{background:radial-gradient(closest-side,rgba(157,180,255,.18),transparent)!important;color:var(--fg)}
+#gh{position:fixed;z-index:4;right:clamp(16px,3vw,36px);bottom:calc(22px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:.5rem;padding:.42rem .8rem .42rem .55rem;border-radius:999px;color:var(--fg);font:500 .6rem/1 var(--mono);letter-spacing:.06em;text-decoration:none;opacity:.85}
+#gh:hover{opacity:1}#gh svg{width:.95rem;height:.95rem;fill:currentColor;opacity:0;position:relative}#gh span{position:relative}
+@media (max-width:640px){#gh{display:none}
+  #make{top:auto;left:0;width:100%;height:min(88vh,760px);border-left:0;border-top:1px solid var(--line);border-radius:22px 22px 0 0;transform:translateY(104%)}
+  #pv{height:170px}
+  .dock{width:calc(100% - 32px);justify-content:center}
+  #stats{bottom:auto;top:calc(58px + env(safe-area-inset-top,0px))}
+  .nav .pill.opt{display:none}
+}
+@media (prefers-reduced-motion:reduce){.cta .dot{animation:none}#make{transition:none}}
+[dir=rtl] #card blockquote,[dir=rtl] .fld{direction:rtl}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-label="The constellation"></canvas>
+<header>
+  <a class="brand" href="./">HU<i>man</i></a>
+  <nav class="nav"><a class="pill sp opt" id="lk-read" href="essay"></a><a class="pill sp" id="lk-film" href="./"></a></nav>
+</header>
+<div class="intro" id="intro"><h1 id="t-title"></h1><p id="t-intro"></p></div>
+<div id="stats"><span id="t-count"></span><span id="demo" hidden></span></div>
+<div class="dock"><button class="cta sp" id="add" type="button"><span class="dot"></span><span id="t-add"></span></button><button class="pill" id="mine" type="button" hidden></button></div>
+
+<div id="card" role="dialog" aria-live="polite">
+  <button class="x" type="button" aria-label="Close">×</button>
+  <div class="who"><div class="nm"></div><div class="when"></div></div>
+  <div class="ct"></div>
+  <blockquote></blockquote>
+  <div class="row"><span class="kind"></span><button class="rep" type="button"></button></div>
+</div>
+
+<div id="veil"></div>
+<aside id="make" aria-labelledby="t-sheet" aria-hidden="true">
+  <div class="hd"><h2 id="t-sheet"></h2><button class="close" type="button" aria-label="Close">×</button></div>
+  <canvas id="pv" aria-hidden="true"></canvas>
+  <div class="pvl"><div class="n"></div><div class="m"></div></div>
+  <form class="body" id="form" autocomplete="off" novalidate>
+    <div class="lab"><span id="t-shape"></span></div>
+    <div class="shapes" id="shapes" role="radiogroup"></div>
+    <div class="lab"><span id="t-color"></span><span class="colname" id="colname"></span></div>
+    <div class="cols" id="cols" role="radiogroup"></div>
+    <div class="lab"><label for="f-name" id="t-name"></label><span class="cnt" id="c-name"></span></div>
+    <input class="fld" id="f-name" maxlength="24" required>
+    <div class="lab"><label for="f-msg" id="t-thought"></label><span class="cnt" id="c-msg"></span></div>
+    <textarea class="fld" id="f-msg" maxlength="140" required></textarea>
+    <input class="hp" id="f-web" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label class="chk"><input type="checkbox" id="f-country" checked><span id="t-country"></span><span id="flag"></span></label>
+    <button class="go" id="go" type="submit"><svg viewBox="0 0 20 20" aria-hidden="true"><circle class="bg" cx="10" cy="10" r="8"/><circle class="fg" cx="10" cy="10" r="8" stroke-dasharray="50.3" stroke-dashoffset="50.3"/></svg><span id="t-submit"></span></button>
+    <p class="err" id="err" role="alert"></p>
+    <p class="small" id="t-kind"></p>
+  </form>
+</aside>
+<div id="toast" role="status"></div>
+<a id="gh" class="ghb" href="https://github.com/mathieuworoniecki" target="_blank" rel="noopener" aria-label="GitHub · mathieuworoniecki"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>mathieuworoniecki</span></a>
+<ul class="sr" id="list" aria-label="Messages"></ul>
+
+<script>
+(function () {
+'use strict';
+const I18N = {"en":{"title":"The constellation","intro":"Everyone who asked the question left an atom here.","count":"{0} atoms · {1} countries","add":"Add your atom","find":"Find mine","film":"The film","read":"Read the full reflection","you":"This is you","report":"Report","reported":"Thanks, noted.","sheet":"Your atom","shape":"Its nature","color":"Its light","name":"Your name","name_ph":"First name or pseudonym","thought":"Your thought","thought_ph":["What makes you human?","Is the universe math?","Your answer to the last question…","What would you ask an AI?"],"country":"Show my country","submit":"Release it into the constellation","charging":"Charging the nucleus…","kind":"Be kind · no links · messages can be reported","demo":"Preview mode: your atom stays in this browser","shapes":[["Hydrogen","the first"],["Helium","the star"],["Carbon","life"],["Oxygen","breath"],["Quantum","the cloud"],["Loop","a strange loop"]],"colors":["White dwarf","Blue giant","Pale sky","Warm light","Amber","Red dwarf","Nebula","Aurora"],"err":{"fast":"A little slower: take a moment to write.","pow":"The nucleus didn't charge, try again.","rate":"You've released a few atoms already. Come back a bit later.","link":"Links aren't allowed here.","words":"Let's keep it kind.","duplicate":"This thought is already floating out there.","caps":"No need to shout :)","spam":"That looks like spam.","name":"Your name: 1 to 24 characters.","message":"Your thought: 3 to 140 characters.","style":"Choose a shape and a color.","server":"Something went wrong, try again.","offline":"Can't reach the constellation right now."}},"fr":{"title":"La constellation","intro":"Chaque personne qui s'est posé la question a laissé un atome ici.","count":"{0} atomes · {1} pays","add":"Ajoute ton atome","find":"Retrouver le mien","film":"Le film","read":"Lire toute la réflexion","you":"C'est toi","report":"Signaler","reported":"Merci, c'est noté.","sheet":"Ton atome","shape":"Sa nature","color":"Sa lumière","name":"Ton nom","name_ph":"Prénom ou pseudo","thought":"Ta pensée","thought_ph":["Qu'est-ce qui te rend humain ?","L'univers est-il mathématique ?","Ta réponse à la dernière question…","Que demanderais-tu à une IA ?"],"country":"Afficher mon pays","submit":"Le lâcher dans la constellation","charging":"Chargement du noyau…","kind":"Bienveillance · pas de liens · les messages peuvent être signalés","demo":"Mode aperçu : ton atome reste dans ce navigateur","shapes":[["Hydrogène","le premier"],["Hélium","l'étoile"],["Carbone","la vie"],["Oxygène","le souffle"],["Quantique","le nuage"],["Boucle","une boucle étrange"]],"colors":["Naine blanche","Géante bleue","Ciel pâle","Lumière chaude","Ambre","Naine rouge","Nébuleuse","Aurore"],"err":{"fast":"Doucement : prends le temps d'écrire.","pow":"Le noyau ne s'est pas chargé, réessaie.","rate":"Tu as déjà lâché quelques atomes. Reviens un peu plus tard.","link":"Les liens ne sont pas autorisés ici.","words":"Restons bienveillants.","duplicate":"Cette pensée flotte déjà quelque part.","caps":"Pas besoin de crier :)","spam":"Ça ressemble à du spam.","name":"Ton nom : 1 à 24 caractères.","message":"Ta pensée : 3 à 140 caractères.","style":"Choisis une forme et une couleur.","server":"Un souci, réessaie.","offline":"La constellation est injoignable pour l'instant."}},"es":{"title":"La constelación","intro":"Cada persona que se hizo la pregunta dejó aquí un átomo.","count":"{0} átomos · {1} países","add":"Añade tu átomo","find":"Encontrar el mío","film":"La película","read":"Leer la reflexión completa","you":"Eres tú","report":"Denunciar","reported":"Gracias, anotado.","sheet":"Tu átomo","shape":"Su naturaleza","color":"Su luz","name":"Tu nombre","name_ph":"Nombre o seudónimo","thought":"Tu pensamiento","thought_ph":["¿Qué te hace humano?","¿Es el universo matemático?","Tu respuesta a la última pregunta…","¿Qué le preguntarías a una IA?"],"country":"Mostrar mi país","submit":"Soltarlo en la constelación","charging":"Cargando el núcleo…","kind":"Con amabilidad · sin enlaces · los mensajes pueden denunciarse","demo":"Modo vista previa: tu átomo se queda en este navegador","shapes":[["Hidrógeno","el primero"],["Helio","la estrella"],["Carbono","la vida"],["Oxígeno","el aliento"],["Cuántico","la nube"],["Bucle","un bucle extraño"]],"colors":["Enana blanca","Gigante azul","Cielo pálido","Luz cálida","Ámbar","Enana roja","Nebulosa","Aurora"],"err":{"fast":"Más despacio: tómate un momento para escribir.","pow":"El núcleo no se cargó, inténtalo de nuevo.","rate":"Ya has soltado varios átomos. Vuelve un poco más tarde.","link":"Aquí no se permiten enlaces.","words":"Mantengámoslo amable.","duplicate":"Este pensamiento ya flota por ahí.","caps":"No hace falta gritar :)","spam":"Parece spam.","name":"Tu nombre: de 1 a 24 caracteres.","message":"Tu pensamiento: de 3 a 140 caracteres.","style":"Elige una forma y un color.","server":"Algo salió mal, inténtalo de nuevo.","offline":"No se puede llegar a la constelación ahora."}},"pt":{"title":"A constelação","intro":"Cada pessoa que se fez a pergunta deixou aqui um átomo.","count":"{0} átomos · {1} países","add":"Adicione o seu átomo","find":"Encontrar o meu","film":"O filme","read":"Ler a reflexão completa","you":"É você","report":"Denunciar","reported":"Obrigado, anotado.","sheet":"O seu átomo","shape":"A sua natureza","color":"A sua luz","name":"O seu nome","name_ph":"Nome ou apelido","thought":"O seu pensamento","thought_ph":["O que te torna humano?","O universo é matemático?","A sua resposta à última pergunta…","O que perguntaria a uma IA?"],"country":"Mostrar o meu país","submit":"Soltá-lo na constelação","charging":"Carregando o núcleo…","kind":"Com gentileza · sem links · as mensagens podem ser denunciadas","demo":"Modo de pré-visualização: o seu átomo fica neste navegador","shapes":[["Hidrogênio","o primeiro"],["Hélio","a estrela"],["Carbono","a vida"],["Oxigênio","o fôlego"],["Quântico","a nuvem"],["Laço","um laço estranho"]],"colors":["Anã branca","Gigante azul","Céu pálido","Luz quente","Âmbar","Anã vermelha","Nebulosa","Aurora"],"err":{"fast":"Mais devagar: tire um momento para escrever.","pow":"O núcleo não carregou, tente de novo.","rate":"Você já soltou alguns átomos. Volte um pouco mais tarde.","link":"Links não são permitidos aqui.","words":"Vamos manter a gentileza.","duplicate":"Esse pensamento já está flutuando por aí.","caps":"Não precisa gritar :)","spam":"Isso parece spam.","name":"O seu nome: de 1 a 24 caracteres.","message":"O seu pensamento: de 3 a 140 caracteres.","style":"Escolha uma forma e uma cor.","server":"Algo deu errado, tente de novo.","offline":"Não é possível alcançar a constelação agora."}},"ru":{"title":"Созвездие","intro":"Каждый, кто задал себе этот вопрос, оставил здесь атом.","count":"Атомов: {0} · стран: {1}","add":"Добавить свой атом","find":"Найти мой","film":"Фильм","read":"Читать размышление целиком","you":"Это ты","report":"Пожаловаться","reported":"Спасибо, учтено.","sheet":"Твой атом","shape":"Его природа","color":"Его свет","name":"Твоё имя","name_ph":"Имя или псевдоним","thought":"Твоя мысль","thought_ph":["Что делает тебя человеком?","Вселенная — это математика?","Твой ответ на последний вопрос…","Что бы ты спросил у ИИ?"],"country":"Показывать мою страну","submit":"Отпустить в созвездие","charging":"Ядро заряжается…","kind":"Доброжелательно · без ссылок · на сообщения можно пожаловаться","demo":"Режим предпросмотра: твой атом остаётся в этом браузере","shapes":[["Водород","первый"],["Гелий","звезда"],["Углерод","жизнь"],["Кислород","дыхание"],["Квант","облако"],["Петля","странная петля"]],"colors":["Белый карлик","Голубой гигант","Бледное небо","Тёплый свет","Янтарь","Красный карлик","Туманность","Сияние"],"err":{"fast":"Не спеши: удели минуту словам.","pow":"Ядро не зарядилось, попробуй ещё раз.","rate":"Ты уже отпустил несколько атомов. Загляни чуть позже.","link":"Ссылки здесь запрещены.","words":"Давай будем добрее.","duplicate":"Эта мысль уже где-то летает.","caps":"Не нужно кричать :)","spam":"Похоже на спам.","name":"Имя: от 1 до 24 символов.","message":"Мысль: от 3 до 140 символов.","style":"Выбери форму и цвет.","server":"Что-то пошло не так, попробуй ещё раз.","offline":"Созвездие сейчас недоступно."}},"zh":{"title":"星座","intro":"每一个问过这个问题的人，都在这里留下了一颗原子。","count":"{0} 颗原子 · {1} 个国家","add":"留下你的原子","find":"找到我的","film":"影片","read":"阅读完整的思考","you":"这是你","report":"举报","reported":"谢谢，已记录。","sheet":"你的原子","shape":"它的本质","color":"它的光","name":"你的名字","name_ph":"名字或昵称","thought":"你的想法","thought_ph":["是什么让你成为人？","宇宙是数学吗？","你对最后一个问题的回答……","你会问 AI 什么？"],"country":"显示我的国家","submit":"把它放进星座","charging":"正在为原子核充能……","kind":"友善 · 不含链接 · 消息可被举报","demo":"预览模式：你的原子只保存在这个浏览器里","shapes":[["氢","第一个"],["氦","恒星"],["碳","生命"],["氧","呼吸"],["量子","云"],["环","奇异的环"]],"colors":["白矮星","蓝巨星","淡空","暖光","琥珀","红矮星","星云","极光"],"err":{"fast":"慢一点：花点时间写下来。","pow":"原子核没有充能成功，请再试一次。","rate":"你已经放出了几颗原子，稍后再来吧。","link":"这里不允许链接。","words":"请保持友善。","duplicate":"这个想法已经在某处漂浮了。","caps":"不用大喊 :)","spam":"这看起来像垃圾信息。","name":"名字：1 到 24 个字符。","message":"想法：3 到 140 个字符。","style":"请选择形状和颜色。","server":"出了点问题，请再试一次。","offline":"暂时无法连接到星座。"}},"ja":{"title":"星座","intro":"この問いを抱いた人は皆、ここに一つの原子を残していきました。","count":"{0} 個の原子 · {1} か国","add":"あなたの原子を置く","find":"自分の原子を探す","film":"映像","read":"考察の全文を読む","you":"これがあなた","report":"報告","reported":"ありがとう、受け付けました。","sheet":"あなたの原子","shape":"その性質","color":"その光","name":"あなたの名前","name_ph":"名前またはニックネーム","thought":"あなたの考え","thought_ph":["何があなたを人間にしている？","宇宙は数学？","最後の問いへのあなたの答え…","AIに何を聞いてみたい？"],"country":"国を表示する","submit":"星座へ放つ","charging":"原子核を充電中…","kind":"思いやりを · リンク禁止 · メッセージは報告できます","demo":"プレビューモード：あなたの原子はこのブラウザにだけ残ります","shapes":[["水素","はじまり"],["ヘリウム","星"],["炭素","生命"],["酸素","息"],["量子","雲"],["ループ","奇妙なループ"]],"colors":["白色矮星","青色巨星","淡い空","あたたかな光","琥珀","赤色矮星","星雲","オーロラ"],"err":{"fast":"ゆっくりで大丈夫。少し時間をかけて書いてみて。","pow":"原子核の充電に失敗しました。もう一度どうぞ。","rate":"もういくつか原子を放ちました。少し時間をおいてまた来てね。","link":"ここではリンクは使えません。","words":"やさしい言葉でいきましょう。","duplicate":"その考えはもうどこかに浮かんでいます。","caps":"叫ばなくても大丈夫 :)","spam":"スパムのようです。","name":"名前：1〜24文字。","message":"考え：3〜140文字。","style":"形と色を選んでください。","server":"問題が起きました。もう一度どうぞ。","offline":"いまは星座につながりません。"}},"hi":{"title":"नक्षत्र","intro":"जिस किसी ने भी यह सवाल पूछा, उसने यहाँ एक परमाणु छोड़ा।","count":"{0} परमाणु · {1} देश","add":"अपना परमाणु जोड़ें","find":"मेरा ढूँढें","film":"फ़िल्म","read":"पूरा विचार पढ़ें","you":"यह आप हैं","report":"रिपोर्ट करें","reported":"धन्यवाद, दर्ज कर लिया।","sheet":"आपका परमाणु","shape":"उसका स्वभाव","color":"उसकी रोशनी","name":"आपका नाम","name_ph":"नाम या उपनाम","thought":"आपका विचार","thought_ph":["आपको इंसान क्या बनाता है?","क्या ब्रह्मांड गणित है?","आख़िरी सवाल का आपका जवाब…","आप किसी AI से क्या पूछेंगे?"],"country":"मेरा देश दिखाएँ","submit":"इसे नक्षत्र में छोड़ें","charging":"नाभिक चार्ज हो रहा है…","kind":"विनम्र रहें · कोई लिंक नहीं · संदेशों की रिपोर्ट की जा सकती है","demo":"प्रीव्यू मोड: आपका परमाणु इसी ब्राउज़र में रहेगा","shapes":[["हाइड्रोजन","पहला"],["हीलियम","तारा"],["कार्बन","जीवन"],["ऑक्सीजन","साँस"],["क्वांटम","बादल"],["लूप","एक अजीब लूप"]],"colors":["श्वेत बौना","नीला दानव","फीका आकाश","गर्म रोशनी","अंबर","लाल बौना","नीहारिका","ध्रुवीय ज्योति"],"err":{"fast":"थोड़ा धीरे: लिखने के लिए एक पल लें।","pow":"नाभिक चार्ज नहीं हुआ, फिर से कोशिश करें।","rate":"आप कुछ परमाणु छोड़ चुके हैं। थोड़ी देर बाद आइए।","link":"यहाँ लिंक की अनुमति नहीं है।","words":"आइए विनम्र रहें।","duplicate":"यह विचार पहले से कहीं तैर रहा है।","caps":"चिल्लाने की ज़रूरत नहीं :)","spam":"यह स्पैम जैसा लगता है।","name":"नाम: 1 से 24 अक्षर।","message":"विचार: 3 से 140 अक्षर।","style":"एक आकार और एक रंग चुनें।","server":"कुछ गड़बड़ हुई, फिर से कोशिश करें।","offline":"अभी नक्षत्र तक नहीं पहुँचा जा सकता।"}},"bn":{"title":"নক্ষত্রপুঞ্জ","intro":"যে-ই এই প্রশ্নটা করেছে, সে এখানে একটি পরমাণু রেখে গেছে।","count":"{0}টি পরমাণু · {1}টি দেশ","add":"তোমার পরমাণু যোগ করো","find":"আমারটা খুঁজুন","film":"চলচ্চিত্র","read":"পুরো ভাবনাটি পড়ুন","you":"এটা তুমি","report":"রিপোর্ট","reported":"ধন্যবাদ, নথিভুক্ত হলো।","sheet":"তোমার পরমাণু","shape":"এর স্বভাব","color":"এর আলো","name":"তোমার নাম","name_ph":"নাম বা ছদ্মনাম","thought":"তোমার ভাবনা","thought_ph":["কী তোমাকে মানুষ করে?","মহাবিশ্ব কি গণিত?","শেষ প্রশ্নের তোমার উত্তর…","তুমি একটি AI-কে কী জিজ্ঞেস করবে?"],"country":"আমার দেশ দেখাও","submit":"নক্ষত্রপুঞ্জে ছেড়ে দাও","charging":"নিউক্লিয়াস চার্জ হচ্ছে…","kind":"সদয় থাকো · কোনো লিঙ্ক নয় · বার্তা রিপোর্ট করা যায়","demo":"প্রিভিউ মোড: তোমার পরমাণু এই ব্রাউজারেই থাকবে","shapes":[["হাইড্রোজেন","প্রথম"],["হিলিয়াম","তারা"],["কার্বন","জীবন"],["অক্সিজেন","নিঃশ্বাস"],["কোয়ান্টাম","মেঘ"],["লুপ","এক অদ্ভুত লুপ"]],"colors":["শ্বেত বামন","নীল দানব","ফিকে আকাশ","উষ্ণ আলো","অ্যাম্বার","লাল বামন","নীহারিকা","মেরুজ্যোতি"],"err":{"fast":"একটু ধীরে: লেখার জন্য একটু সময় নাও।","pow":"নিউক্লিয়াস চার্জ হয়নি, আবার চেষ্টা করো।","rate":"তুমি ইতিমধ্যে কয়েকটি পরমাণু ছেড়েছ। একটু পরে আবার এসো।","link":"এখানে লিঙ্ক দেওয়া যায় না।","words":"চলো সদয় থাকি।","duplicate":"এই ভাবনা ইতিমধ্যে কোথাও ভাসছে।","caps":"চিৎকার করার দরকার নেই :)","spam":"এটা স্প্যামের মতো দেখাচ্ছে।","name":"নাম: ১ থেকে ২৪ অক্ষর।","message":"ভাবনা: ৩ থেকে ১৪০ অক্ষর।","style":"একটি আকার ও একটি রং বেছে নাও।","server":"কিছু একটা গোলমাল হয়েছে, আবার চেষ্টা করো।","offline":"এখন নক্ষত্রপুঞ্জে পৌঁছানো যাচ্ছে না।"}},"ar":{"title":"الكوكبة","intro":"كل من طرح على نفسه هذا السؤال ترك هنا ذرّة.","count":"{0} ذرّة · {1} دولة","add":"أضف ذرّتك","find":"اعثر على ذرّتي","film":"الفيلم","read":"اقرأ التأمل كاملًا","you":"هذا أنت","report":"إبلاغ","reported":"شكرًا، تم التسجيل.","sheet":"ذرّتك","shape":"طبيعتها","color":"ضوؤها","name":"اسمك","name_ph":"الاسم أو اسم مستعار","thought":"فكرتك","thought_ph":["ما الذي يجعلك إنسانًا؟","هل الكون رياضيات؟","جوابك عن السؤال الأخير…","ماذا كنت ستسأل ذكاءً اصطناعيًا؟"],"country":"إظهار بلدي","submit":"أطلقها في الكوكبة","charging":"جارٍ شحن النواة…","kind":"بلطف · بلا روابط · يمكن الإبلاغ عن الرسائل","demo":"وضع المعاينة: تبقى ذرّتك في هذا المتصفح","shapes":[["هيدروجين","الأول"],["هيليوم","النجم"],["كربون","الحياة"],["أكسجين","النَّفَس"],["كمّي","السحابة"],["حلقة","حلقة غريبة"]],"colors":["قزم أبيض","عملاق أزرق","سماء شاحبة","ضوء دافئ","كهرماني","قزم أحمر","سديم","شفق"],"err":{"fast":"على مهل: خذ لحظة لتكتب.","pow":"لم تُشحن النواة، حاول مجددًا.","rate":"لقد أطلقت عدة ذرّات. عد بعد قليل.","link":"الروابط غير مسموح بها هنا.","words":"لنبقَ لطفاء.","duplicate":"هذه الفكرة تسبح في مكان ما بالفعل.","caps":"لا داعي للصراخ :)","spam":"يبدو هذا كرسالة مزعجة.","name":"الاسم: من 1 إلى 24 حرفًا.","message":"الفكرة: من 3 إلى 140 حرفًا.","style":"اختر شكلًا ولونًا.","server":"حدث خطأ ما، حاول مجددًا.","offline":"تعذّر الوصول إلى الكوكبة الآن."}}};
+const API = '/api/atoms';
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pickLang = () => { let q = null; try { q = (location.hash.match(/lang=([a-z]{2})/) || [])[1] || localStorage.getItem('human-lang'); } catch (e) {}
+  if (q && I18N[q]) return q; for (const l of (navigator.languages || [navigator.language || 'en'])) { const c = String(l).slice(0, 2).toLowerCase(); if (I18N[c]) return c; } return 'en'; };
+const LANG = pickLang(), T = I18N[LANG], RTL = LANG === 'ar';
+document.documentElement.lang = LANG; if (RTL) document.documentElement.dir = 'rtl';
+const $ = id => document.getElementById(id);
+[['t-title', T.title], ['t-intro', T.intro], ['t-add', T.add], ['lk-film', T.film], ['lk-read', T.read], ['t-sheet', T.sheet], ['t-shape', T.shape], ['t-color', T.color], ['t-name', T.name], ['t-thought', T.thought], ['t-country', T.country], ['t-submit', T.submit], ['t-kind', T.kind], ['mine', T.find]].forEach(([id, v]) => { $(id).textContent = v; });
+$('f-name').placeholder = T.name_ph;
+document.querySelector('#card .rep').textContent = T.report;
+document.title = `${T.title} · HUman`;
+// sur areweai.dev, les jolies adresses ; ailleurs (fichier local, aperçu), les fichiers
+if (!/areweai\.dev$/.test(location.hostname)) { $('lk-read').href = location.protocol === 'file:' ? 'essay.html' : 'https://areweai.dev/essay'; $('lk-film').href = location.protocol === 'file:' ? 'index.html' : 'https://areweai.dev/'; }
+
+/* ——— outils ——— */
+const TAU = Math.PI * 2;
+const hash = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const COLS = [[248, 247, 255], [157, 180, 255], [202, 216, 255], [255, 236, 214], [255, 196, 128], [255, 122, 92], [196, 160, 255], [140, 255, 200]];
+const rgb = (c, a) => `rgba(${COLS[c][0]},${COLS[c][1]},${COLS[c][2]},${a})`;
+const flag = cc => cc && /^[A-Z]{2}$/.test(cc) ? String.fromCodePoint(...[...cc].map(ch => 0x1f1e6 + ch.charCodeAt(0) - 65)) : '';
+let DN = null; try { DN = new Intl.DisplayNames([LANG], { type: 'region' }); } catch (e) {}
+const cname = cc => { try { return cc ? (DN ? DN.of(cc) : cc) : ''; } catch (e) { return cc; } };
+let RT = null; try { RT = new Intl.RelativeTimeFormat(LANG, { numeric: 'auto' }); } catch (e) {}
+const ago = iso => { const s = (Date.parse(iso) - Date.now()) / 1000; if (!RT || !isFinite(s)) return ''; const a = Math.abs(s);
+  return a < 60 ? RT.format(Math.round(s), 'second') : a < 3600 ? RT.format(Math.round(s / 60), 'minute') : a < 86400 ? RT.format(Math.round(s / 3600), 'hour') : a < 2592000 ? RT.format(Math.round(s / 86400), 'day') : RT.format(Math.round(s / 2592000), 'month'); };
+const toast = m => { const e = $('toast'); e.textContent = m; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2600); };
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+
+/* ——— dessiner un atome : six natures, huit lumières ——— */
+const GLOW = {};
+function glowSprite(c) {
+  if (GLOW[c]) return GLOW[c];
+  const s = document.createElement('canvas'); s.width = s.height = 64; const x = s.getContext('2d'), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, rgb(c, 1)); g.addColorStop(.12, rgb(c, .75)); g.addColorStop(.35, rgb(c, .18)); g.addColorStop(1, rgb(c, 0)); x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  return (GLOW[c] = s);
+}
+const ORB = [[0], [0, 1.05], [0, 1.05, 2.1], [0, .785, 1.57, 2.36]];
+// x, y : centre ; r : rayon à l'écran ; t : temps ; seed : pour que chacun tourne à sa façon ; det : niveau de détail (0 à 1)
+function drawAtom(x, g, px, py, r, shape, c, t, seed, det, alpha) {
+  if (r < .6) return;
+  const sp = glowSprite(c), ph = seed * TAU, rot = t * .12 + ph;
+  x.globalAlpha = alpha * .9; x.drawImage(sp, px - r * 1.1, py - r * 1.1, r * 2.2, r * 2.2);
+  if (det < .05) { x.globalAlpha = alpha; x.fillStyle = rgb(c, 1); x.fillRect(px - .8, py - .8, 1.6, 1.6); return; }
+  x.lineWidth = Math.max(.5, r * .028);
+  if (shape <= 3) {
+    const os = ORB[shape];
+    for (let k = 0; k < os.length; k++) {
+      const a = os[k] + rot, e = .34;
+      x.globalAlpha = alpha * det * .5; x.strokeStyle = rgb(c, 1); x.beginPath(); x.ellipse(px, py, r, r * e, a, 0, TAU); x.stroke();
+      const u = t * (1.2 + .25 * k) + ph * (k + 1), ex = Math.cos(u) * r, ey = Math.sin(u) * r * e, qx = px + ex * Math.cos(a) - ey * Math.sin(a), qy = py + ex * Math.sin(a) + ey * Math.cos(a), es = Math.max(1, r * .09);
+      x.globalAlpha = alpha * det; x.drawImage(sp, qx - es * 2.5, qy - es * 2.5, es * 5, es * 5); x.fillStyle = '#fff'; x.beginPath(); x.arc(qx, qy, es * .45, 0, TAU); x.fill();
+    }
+    if (shape === 3) { x.globalAlpha = alpha * det * .22; x.beginPath(); x.arc(px, py, r * 1.22, 0, TAU); x.stroke(); }
+  } else if (shape === 4) {
+    // le nuage : l'électron n'est nulle part et partout
+    const n = Math.round(10 + 34 * det);
+    for (let k = 0; k < n; k++) {
+      const a = hash(k, seed * 1e4 | 0) * TAU + t * (.2 + hash(k, 3) * .4), d = Math.sqrt(-2 * Math.log(Math.max(1e-4, hash(k, 7)))) * r * .38 * (.85 + .15 * Math.sin(t * 2 + k)), lobe = 1 + .6 * Math.cos(2 * a + ph);
+      x.globalAlpha = alpha * det * (.35 + .5 * hash(k, 9)); x.fillStyle = rgb(c, 1); const s2 = Math.max(.7, r * .045);
+      x.fillRect(px + Math.cos(a) * d * lobe - s2 / 2, py + Math.sin(a) * d * lobe * .75 - s2 / 2, s2, s2);
+    }
+  } else {
+    // la boucle : un anneau d'électrons qui court sur lui-même
+    const n = Math.round(8 + 14 * det), a0 = rot * .6;
+    x.globalAlpha = alpha * det * .35; x.strokeStyle = rgb(c, 1); x.beginPath(); x.ellipse(px, py, r, r * .42, a0, 0, TAU); x.stroke();
+    for (let k = 0; k < n; k++) {
+      const u = k / n * TAU + t * .9, ex = Math.cos(u) * r, ey = Math.sin(u) * r * .42, qx = px + ex * Math.cos(a0) - ey * Math.sin(a0), qy = py + ex * Math.sin(a0) + ey * Math.cos(a0), front = Math.sin(u) > 0;
+      x.globalAlpha = alpha * det * (front ? .95 : .4); x.fillStyle = front ? '#fff' : rgb(c, 1); x.beginPath(); x.arc(qx, qy, Math.max(.6, r * (front ? .06 : .04)), 0, TAU); x.fill();
+    }
+  }
+  // le noyau
+  x.globalAlpha = alpha; x.fillStyle = '#fff'; x.beginPath(); x.arc(px, py, Math.max(.8, r * .1), 0, TAU); x.fill();
+  x.globalAlpha = 1;
+}
+
+/* ——— les données : l'API, sinon un aperçu ——— */
+// l'aperçu (sans base) : les dix mêmes premiers atomes que supabase/seed.sql
+const SEED = [{"id": 1, "name": "Léa", "country": "FR", "message": "Je crois qu'on est des calculs qui ont appris à s'émerveiller.", "shape": 2, "color": 1, "d": 9}, {"id": 2, "name": "Kenji", "country": "JP", "message": "人は予測するだけじゃない。忘れることもできる。", "shape": 4, "color": 6, "d": 8}, {"id": 3, "name": "Amara", "country": "NG", "message": "Hunger came before words. So did love.", "shape": 3, "color": 4, "d": 7}, {"id": 4, "name": "Mateo", "country": "AR", "message": "¿Y si el alma fuera el error de redondeo?", "shape": 5, "color": 5, "d": 6}, {"id": 5, "name": "Sofia", "country": "IT", "message": "The universe isn't math. Math is how we fall in love with it.", "shape": 1, "color": 0, "d": 5}, {"id": 6, "name": "Omar", "country": "MA", "message": "We are the cosmos asking itself a question.", "shape": 0, "color": 3, "d": 4}, {"id": 7, "name": "Priya", "country": "IN", "message": "20 watts and still dreaming.", "shape": 2, "color": 7, "d": 3}, {"id": 8, "name": "Jonas", "country": "DE", "message": "An AI never had to survive a winter.", "shape": 1, "color": 2, "d": 2}, {"id": 9, "name": "Ana", "country": "BR", "message": "Somos poeira de estrelas com medo do escuro.", "shape": 4, "color": 1, "d": 1}, {"id": 10, "name": "Noah", "country": "CA", "message": "If I'm calculable, I still want to be surprised.", "shape": 5, "color": 6, "d": 0}];
+function demoAtoms() {
+  const now = Date.now();
+  return SEED.map(a => ({ ...a, created_at: new Date(now - (a.d * 24 + a.d * 3 + 2) * 3600e3).toISOString(), demo: true })).concat(store.get('human-atoms-demo', []));
+}
+let DEMO = false;
+async function load() {
+  try {
+    if (location.protocol === 'file:') throw 0;
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch(API, { signal: ctl.signal, headers: { Accept: 'application/json' } }); clearTimeout(tm);
+    if (!r.ok || !/json/.test(r.headers.get('content-type') || '')) throw 0;
+    return (await r.json()).atoms || [];
+  } catch (e) { DEMO = true; return demoAtoms(); }
+}
+
+/* ——— le monde : chaque atome a sa place, sa profondeur, ses voisins ——— */
+const sky = $('sky'), g = sky.getContext('2d');
+let W = 0, H = 0, DPR = 1, A = [], R0 = 600, BG = null;
+const cam = { x: 0, y: 0, z: innerWidth < 640 ? 1.25 : 1.5, vx: 0, vy: 0, tx: null, ty: null, tz: null };
+function place(a, i) {
+  // une spirale douce, perturbée : les premiers au cœur, les nouveaux autour
+  const h1 = hash(a.id, 21), h2 = hash(a.id, 22), h3 = hash(a.id, 23);
+  // une spirale de Fermat : chaque place est fixe, les nouveaux arrivent au bord sans bousculer personne
+  const ang = i * 2.39996 + (h1 - .5) * .9, rad = 46 * Math.sqrt(i + .6) * (.8 + .4 * h2);
+  a.wx = Math.cos(ang) * rad * 1.3; a.wy = Math.sin(ang) * rad * .82; a.z = .45 + .55 * h3; a.seed = hash(a.id, 24); if (!a.born) a.born = performance.now() + 60 + Math.min(i, 400) * 6;
+}
+function layout() {
+  A.sort((p, q) => p.id - q.id);
+  A.forEach((a, i) => place(a, i));
+  // les voisins : deux liens par atome, une toile de personnes
+  for (const a of A) { let b1 = null, b2 = null, d1 = 1e18, d2 = 1e18; for (const b of A) { if (b === a) continue; const d = (a.wx - b.wx) ** 2 + (a.wy - b.wy) ** 2; if (d < d1) { d2 = d1; b2 = b1; d1 = d; b1 = b; } else if (d < d2) { d2 = d; b2 = b; } } a.nb = [b1, b2].filter(Boolean); }
+  A.sort((p, q) => p.z - q.z);
+  const cs = new Set(A.map(a => a.country).filter(Boolean));
+  $('t-count').textContent = T.count.replace('{0}', A.length.toLocaleString(LANG)).replace('{1}', cs.size.toLocaleString(LANG));
+  const ul = $('list'); ul.textContent = ''; A.slice(-200).forEach(a => { const li = document.createElement('li'); li.textContent = `${a.name}${a.country ? ' (' + cname(a.country) + ')' : ''}: ${a.message}`; ul.appendChild(li); });
+}
+function starfield() {
+  const c = document.createElement('canvas'); c.width = Math.ceil(W * DPR); c.height = Math.ceil(H * DPR); const x = c.getContext('2d');
+  const gr = x.createRadialGradient(c.width * .5, c.height * .45, 0, c.width * .5, c.height * .5, Math.max(c.width, c.height) * .7);
+  gr.addColorStop(0, 'rgb(18,18,30)'); gr.addColorStop(.55, 'rgb(10,10,14)'); gr.addColorStop(1, 'rgb(6,6,8)'); x.fillStyle = gr; x.fillRect(0, 0, c.width, c.height);
+  for (let k = 0; k < 2; k++) { const nx = c.width * (.25 + .5 * hash(k, 41)), ny = c.height * (.3 + .4 * hash(k, 42)), nr = Math.max(c.width, c.height) * (.25 + .15 * hash(k, 43)), ng = x.createRadialGradient(nx, ny, 0, nx, ny, nr); ng.addColorStop(0, k ? 'rgba(196,160,255,.07)' : 'rgba(120,150,255,.08)'); ng.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = ng; x.fillRect(0, 0, c.width, c.height); }
+  const n = Math.round(W * H / 2600);
+  for (let k = 0; k < n; k++) { const s = hash(k, 51); x.globalAlpha = .15 + .6 * hash(k, 52) ** 2; x.fillStyle = s < .12 ? '#ffd9c0' : s < .3 ? '#c8d6ff' : '#fff'; const r = (.3 + hash(k, 53) ** 3 * 1.2) * DPR; x.beginPath(); x.arc(hash(k, 54) * c.width, hash(k, 55) * c.height, r, 0, TAU); x.fill(); }
+  x.globalAlpha = 1; return c;
+}
+function resize() {
+  W = innerWidth; H = innerHeight; DPR = Math.max(1, Math.min(devicePixelRatio || 1, 2, Math.sqrt(4e6 / (W * H))));
+  sky.width = Math.round(W * DPR); sky.height = Math.round(H * DPR); BG = starfield();
+}
+let rzT = 0; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(resize, 120); });
+
+/* ——— l'écran ——— */
+const toScreen = a => { const k = cam.z * a.z; return [W / 2 + (a.wx - cam.x * a.z) * k, H / 2 + (a.wy - cam.y * a.z) * k, 9 * k + 2]; };
+let hover = null, sel = null, mineId = store.get('human-atom-mine', null), t0 = performance.now(), last = t0, flyer = null;
+const P = { x: -1e4, y: -1e4, in: false };
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now; const t = (now - t0) / 1000;
+  // la caméra : inertie, dérive lente, vol vers une cible
+  if (cam.tx !== null) { cam.x += (cam.tx - cam.x) * .06; cam.y += (cam.ty - cam.y) * .06; cam.z += (cam.tz - cam.z) * .06; if (Math.abs(cam.tx - cam.x) < .5 && Math.abs(cam.tz - cam.z) < .002) cam.tx = null; }
+  else if (!drag) { cam.x += cam.vx; cam.y += cam.vy; cam.vx *= .92; cam.vy *= .92; if (!still && !sel) { cam.x += Math.sin(t * .05) * .06; cam.y += Math.cos(t * .043) * .04; } }
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+  const px = (cam.x * .04) % 40, py = (cam.y * .04) % 40;
+  g.drawImage(BG, -px * DPR - 40 * DPR, -py * DPR - 40 * DPR, sky.width + 80 * DPR, sky.height + 80 * DPR);
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  // les liens entre voisins
+  g.lineWidth = .6; g.strokeStyle = 'rgb(200,212,255)';
+  for (const a of A) {
+    const S = a.S = toScreen(a); a.vis = S[0] > -60 && S[0] < W + 60 && S[1] > -60 && S[1] < H + 60;
+    a.in = Math.min(1, Math.max(0, (now - a.born) / 900)); a.in = a.in * a.in * (3 - 2 * a.in);
+  }
+  for (const a of A) { if (!a.vis) continue; for (const b of a.nb) { if (b.id < a.id && b.vis) continue; const d = Math.hypot(a.S[0] - b.S[0], a.S[1] - b.S[1]); if (d > 220 * cam.z) continue; g.globalAlpha = .08 * Math.min(a.z, b.z) * Math.min(a.in, b.in) * (1 - d / (220 * cam.z)) * 2; g.beginPath(); g.moveTo(a.S[0], a.S[1]); g.lineTo(b.S[0], b.S[1]); g.stroke(); } }
+  // les atomes, du plus lointain au plus proche
+  g.globalCompositeOperation = 'lighter';
+  for (const a of A) {
+    if (!a.vis || a === flyer?.a) continue;
+    let [sx, sy, r] = a.S; const near = Math.hypot(sx - P.x, sy - P.y), lift = P.in ? Math.max(0, 1 - near / 120) : 0;
+    const boost = a === hover || a === sel ? 1.5 : 1 + .3 * lift, e = a.in;
+    // arrivée : chacun vient du centre
+    sx = W / 2 + (sx - W / 2) * e; sy = H / 2 + (sy - H / 2) * e;
+    drawAtom(g, null, sx, sy, r * boost * (.4 + .6 * e), a.shape, a.color, t, a.seed, Math.min(1, (r - 3) / 9) * (a === hover || a === sel ? 1 : .85), (.35 + .65 * a.z) * e);
+  }
+  g.globalCompositeOperation = 'source-over';
+  // les noms des plus proches
+  g.textAlign = 'center'; g.textBaseline = 'top'; g.font = LBLF;
+  let shown = 0;
+  for (let i = A.length - 1; i >= 0 && shown < 36; i--) { const a = A[i]; if (!a.vis || a.S[2] < 11 || a.in < 1) continue; shown++; g.globalAlpha = Math.min(1, (a.S[2] - 11) / 8) * .75 * (a === hover ? 1.3 : 1); g.fillStyle = '#ece9e2'; g.fillText(`${a.name}${a.country ? ' ' + flag(a.country) : ''}`, a.S[0], a.S[1] + a.S[2] * 1.35 + 4); }
+  // les miens : un anneau qui pulse
+  const me = mineId && A.find(a => a.id === mineId);
+  if (me && me.vis && !flyer) { const k = (t % 2.4) / 2.4; g.globalAlpha = .5 * (1 - k); g.strokeStyle = rgb(me.color, 1); g.lineWidth = 1.2; g.beginPath(); g.arc(me.S[0], me.S[1], me.S[2] * (1.6 + 1.2 * k), 0, TAU); g.stroke(); }
+  // un nouvel atome qui vole vers sa place
+  if (flyer) {
+    const u = Math.min(1, (now - flyer.t) / 1600), e = u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, S = toScreen(flyer.a);
+    const x = flyer.x + (S[0] - flyer.x) * e, y = flyer.y + (S[1] - flyer.y) * e - Math.sin(Math.PI * e) * 80, r = flyer.r + (S[2] * 1.5 - flyer.r) * e;
+    g.globalCompositeOperation = 'lighter'; drawAtom(g, null, x, y, r, flyer.a.shape, flyer.a.color, t, flyer.a.seed, 1, 1); g.globalCompositeOperation = 'source-over';
+    if (u >= 1) { flyer = null; openCard(A.find(a => a.id === mineId)); }
+  }
+  g.globalAlpha = 1;
+  if (sel && cardOn) posCard(sel);
+}
+
+/* ——— la carte ——— */
+const card = $('card'); let cardOn = false, CW = 320, CH = 180;
+const LBLF = '500 11px "IBM Plex Mono", ui-monospace, monospace';
+function openCard(a) {
+  if (!a) return; sel = a; cardOn = true;
+  card.style.setProperty('--c', COLS[a.color].join(','));
+  card.querySelector('.nm').textContent = a.name; if (a.id === mineId) { const y = document.createElement('span'); y.className = 'you'; y.textContent = T.you; card.querySelector('.nm').appendChild(y); }
+  card.querySelector('.when').textContent = ago(a.created_at);
+  card.querySelector('.ct').textContent = a.country ? `${flag(a.country)}  ${cname(a.country)}` : '';
+  card.querySelector('blockquote').textContent = a.message;
+  card.querySelector('.kind').textContent = `${T.shapes[a.shape][0]} · ${T.colors[a.color]}`;
+  const rep = card.querySelector('.rep'); rep.hidden = a.id === mineId || !!a.demo; rep.disabled = false; rep.textContent = T.report;
+  card.classList.add('on'); CW = card.offsetWidth; CH = card.offsetHeight; posCard(a);
+}
+function closeCard() { card.classList.remove('on'); cardOn = false; sel = null; }
+function posCard(a) {
+  const S = a.S || toScreen(a), cw = CW, ch = CH;
+  let x = S[0] + S[2] * 1.8 + 14, y = S[1] - ch / 2;
+  if (x + cw > W - 12) x = S[0] - S[2] * 1.8 - 14 - cw;
+  if (W < 640) { x = (W - cw) / 2; y = S[1] > H / 2 ? 70 : H - ch - 90; }
+  card.style.left = Math.max(12, Math.min(W - cw - 12, x)) + 'px'; card.style.top = Math.max(64, Math.min(H - ch - 80, y)) + 'px';
+}
+card.querySelector('.x').addEventListener('click', closeCard);
+card.querySelector('.rep').addEventListener('click', async e => {
+  const b = e.currentTarget, a = sel; if (!a || DEMO) return; b.disabled = true;
+  try { const ch = await challenge(); const nonce = await solve(ch); await fetch(`${API}?report=${a.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ challenge: ch.challenge, nonce }) }); } catch (er) {}
+  b.textContent = T.reported;
+});
+
+/* ——— se déplacer : glisser, pincer, la molette ——— */
+let drag = null, moved = 0; const pts = new Map();
+const pick = (x, y) => { let best = null, bd = 1e9; for (const a of A) { if (!a.vis || a.in < .6) continue; const d = Math.hypot(a.S[0] - x, a.S[1] - y), lim = Math.max(14, a.S[2] * 1.6); if (d < lim && d / lim < bd) { bd = d / lim; best = a; } } return best; };
+sky.addEventListener('pointerdown', e => { sky.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); drag = { x: e.clientX, y: e.clientY }; moved = 0; cam.tx = null; sky.classList.add('drag'); dismissIntro(); });
+sky.addEventListener('pointermove', e => {
+  P.x = e.clientX; P.y = e.clientY; P.in = e.pointerType === 'mouse';
+  if (pts.has(e.pointerId)) {
+    const prev = pts.get(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 2) { const [p1, p2] = [...pts.values()], d = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]); if (drag.pd) cam.z = Math.max(.35, Math.min(3.5, cam.z * d / drag.pd)); drag.pd = d; return; }
+    const dx = e.clientX - prev[0], dy = e.clientY - prev[1]; moved += Math.abs(dx) + Math.abs(dy);
+    cam.x -= dx / cam.z / .75; cam.y -= dy / cam.z / .75; cam.vx = -dx / cam.z / .75 * .9; cam.vy = -dy / cam.z / .75 * .9;
+  } else { hover = pick(e.clientX, e.clientY); sky.classList.toggle('hot', !!hover); }
+});
+const up = e => { pts.delete(e.pointerId); if (pts.size) return; sky.classList.remove('drag');
+  if (drag && moved < 6) { const a = pick(e.clientX, e.clientY); if (a) openCard(a); else closeCard(); } drag = null; };
+sky.addEventListener('pointerup', up); sky.addEventListener('pointercancel', up);
+sky.addEventListener('pointerleave', () => { P.in = false; hover = null; });
+sky.addEventListener('wheel', e => { e.preventDefault(); dismissIntro(); const k = Math.exp(-e.deltaY * .0015); cam.tx = null; cam.z = Math.max(.35, Math.min(3.5, cam.z * k)); }, { passive: false });
+addEventListener('keydown', e => { if (e.key === 'Escape') { closeCard(); closeMake(); } });
+const flyTo = (a, z) => { cam.tx = a.wx / a.z; cam.ty = a.wy / a.z; cam.tz = z; };
+$('mine').addEventListener('click', () => { const a = A.find(q => q.id === mineId); if (a) { flyTo(a, 2.2 / a.z); setTimeout(() => openCard(a), 700); } });
+let introT = 0; const dismissIntro = () => $('intro').classList.add('gone');
+
+/* ——— la fabrique ——— */
+const make = $('make'), veil = $('veil'), pv = $('pv'), pg = pv.getContext('2d');
+const S = { shape: store.get('human-atom-shape', 2), color: store.get('human-atom-color', 1) };
+let makeOn = false, opened = 0, phI = 0;
+function setAccent() { const c = COLS[S.color].join(','); make.style.setProperty('--c', c); $('colname').textContent = T.colors[S.color]; }
+T.shapes.forEach(([nm, sub], i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'shp'; b.setAttribute('role', 'radio'); b.dataset.i = i;
+  const c = document.createElement('canvas'); c.width = c.height = 116; b.appendChild(c);
+  const bb = document.createElement('b'); bb.textContent = nm; const sm = document.createElement('small'); sm.textContent = sub; b.append(bb, sm);
+  b.addEventListener('click', () => { S.shape = i; store.set('human-atom-shape', i); sync(); }); $('shapes').appendChild(b);
+});
+COLS.forEach((k, i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'col'; b.setAttribute('role', 'radio'); b.setAttribute('aria-label', T.colors[i]); b.title = T.colors[i]; b.style.setProperty('--k', k.join(',')); b.addEventListener('click', () => { S.color = i; store.set('human-atom-color', i); sync(); }); $('cols').appendChild(b); });
+const guessCC = () => { const l = (navigator.languages || [navigator.language || ''])[0] || ''; const m = /[-_]([A-Za-z]{2})$/.exec(l); return m ? m[1].toUpperCase() : null; };
+function sync() {
+  document.querySelectorAll('.shp').forEach((b, i) => b.setAttribute('aria-checked', String(i === S.shape)));
+  document.querySelectorAll('.col').forEach((b, i) => b.setAttribute('aria-checked', String(i === S.color)));
+  setAccent();
+  const n = $('f-name').value.trim(), m = $('f-msg').value.trim(), cc = $('f-country').checked ? guessCC() : null;
+  const nl = document.querySelector('.pvl .n'); nl.textContent = n || T.name_ph; if (cc) { const s = document.createElement('span'); s.textContent = `${flag(cc)} ${cname(cc)}`; nl.appendChild(s); }
+  document.querySelector('.pvl .m').textContent = m ? `“${m}”` : '';
+  $('c-name').textContent = `${$('f-name').value.length}/24`; const ml = $('f-msg').value.length; $('c-msg').textContent = `${ml}/140`; $('c-msg').classList.toggle('hot', ml > 125);
+  $('flag').textContent = cc ? flag(cc) : '';
+}
+['f-name', 'f-msg', 'f-country'].forEach(id => $(id).addEventListener('input', sync));
+function openMake() { makeOn = true; opened = performance.now(); make.classList.add('on'); veil.classList.add('on'); make.setAttribute('aria-hidden', 'false'); closeCard(); dismissIntro(); sync(); $('err').textContent = ''; setTimeout(() => $('f-name').focus({ preventScroll: true }), 450); requestAnimationFrame(pvFrame); }
+function closeMake() { makeOn = false; make.classList.remove('on'); veil.classList.remove('on'); make.setAttribute('aria-hidden', 'true'); }
+$('add').addEventListener('click', openMake); veil.addEventListener('click', closeMake); make.querySelector('.close').addEventListener('click', closeMake);
+setInterval(() => { phI = (phI + 1) % T.thought_ph.length; $('f-msg').placeholder = T.thought_ph[phI]; }, 3200); $('f-msg').placeholder = T.thought_ph[0];
+function pvFrame(now) {
+  if (!makeOn) return; requestAnimationFrame(pvFrame);
+  const t = now / 1000, w = pv.clientWidth, h = pv.clientHeight, d = Math.min(2, devicePixelRatio || 1);
+  if (pv.width !== Math.round(w * d)) { pv.width = Math.round(w * d); pv.height = Math.round(h * d); }
+  pg.setTransform(d, 0, 0, d, 0, 0); pg.clearRect(0, 0, w, h);
+  const bg = pg.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, h * .8); bg.addColorStop(0, rgb(S.color, .12)); bg.addColorStop(1, rgb(S.color, 0)); pg.fillStyle = bg; pg.fillRect(0, 0, w, h);
+  pg.globalCompositeOperation = 'lighter'; drawAtom(pg, null, w / 2, h / 2, Math.min(h * .34, 70) * (1 + .03 * Math.sin(t * 2)), S.shape, S.color, t, .37, 1, 1); pg.globalCompositeOperation = 'source-over';
+  document.querySelectorAll('.shp canvas').forEach((c, i) => { const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, 116, 116); x.globalCompositeOperation = 'lighter'; drawAtom(x, null, 58, 58, 34, i, S.color, t * (i === S.shape ? 1 : .35), .2 + i * .13, 1, i === S.shape ? 1 : .6); x.globalCompositeOperation = 'source-over'; });
+}
+
+/* ——— la preuve de travail, dans un worker : le noyau se charge ——— */
+const WORKER = `
+const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+const Wd=new Uint32Array(64);
+function sha(s){const n=s.length,l=((n+9+63)>>6)<<6,b=new Uint8Array(l);for(let i=0;i<n;i++)b[i]=s.charCodeAt(i);b[n]=128;const bits=n*8;b[l-4]=bits>>>24;b[l-3]=bits>>>16;b[l-2]=bits>>>8;b[l-1]=bits;
+let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+for(let o=0;o<l;o+=64){for(let i=0;i<16;i++)Wd[i]=(b[o+4*i]<<24)|(b[o+4*i+1]<<16)|(b[o+4*i+2]<<8)|b[o+4*i+3];
+for(let i=16;i<64;i++){const x=Wd[i-15],y=Wd[i-2];const s0=((x>>>7)|(x<<25))^((x>>>18)|(x<<14))^(x>>>3),s1=((y>>>17)|(y<<15))^((y>>>19)|(y<<13))^(y>>>10);Wd[i]=(Wd[i-16]+s0+Wd[i-7]+s1)|0;}
+let a=h0,bb=h1,c=h2,d=h3,e=h4,f=h5,g=h6,h=h7;
+for(let i=0;i<64;i++){const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7)),ch=(e&f)^(~e&g),t1=(h+S1+ch+K[i]+Wd[i])|0,S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10)),mj=(a&bb)^(a&c)^(bb&c),t2=(S0+mj)|0;h=g;g=f;f=e;e=(d+t1)|0;d=c;c=bb;bb=a;a=(t1+t2)|0;}
+h0=(h0+a)|0;h1=(h1+bb)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+h)|0;}
+return [h0,h1,h2,h3,h4,h5,h6,h7];}
+function lz(h){let z=0;for(const w of h){if(w===0){z+=32;continue;}return z+Math.clz32(w);}return z;}
+onmessage=e=>{const c=e.data.c,bits=e.data.bits,exp=Math.pow(2,bits);for(let n=0;;n++){if(lz(sha(c+':'+n))>=bits){postMessage({nonce:n});return;}if(n%1500===0)postMessage({p:Math.min(.97,1-Math.exp(-n/exp))});}};`;
+function solve(ch, onp) {
+  return new Promise((res, rej) => {
+    let w; try { w = new Worker(URL.createObjectURL(new Blob([WORKER], { type: 'text/javascript' }))); } catch (e) { return solveHere(ch, onp).then(res, rej); }
+    w.onmessage = e => { if ('nonce' in e.data) { w.terminate(); res(e.data.nonce); } else onp && onp(e.data.p); };
+    w.onerror = er => { er.preventDefault && er.preventDefault(); w.terminate(); solveHere(ch, onp).then(res, rej); };
+    w.postMessage({ c: ch.challenge, bits: ch.bits });
+  });
+}
+// sans worker (page très protégée) : le même calcul ici, par petits paquets, avec WebCrypto
+async function solveHere(ch, onp) {
+  const enc = new TextEncoder(), exp = Math.pow(2, ch.bits);
+  for (let n = 0; ; n++) {
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(ch.challenge + ':' + n)));
+    let z = 0; for (const b of h) { if (b === 0) { z += 8; continue; } z += Math.clz32(b) - 24; break; }
+    if (z >= ch.bits) return n;
+    if (n % 800 === 0) { onp && onp(Math.min(.97, 1 - Math.exp(-n / exp))); await new Promise(r => setTimeout(r, 0)); }
+  }
+}
+async function challenge() {
+  if (DEMO) return { challenge: `demo.${Date.now()}.${Math.random().toString(16).slice(2)}`, bits: 15 };
+  const r = await fetch(`${API}?challenge=1`, { headers: { Accept: 'application/json' } }); if (!r.ok) throw new Error('offline'); return r.json();
+}
+const ring = $('go').querySelector('.fg'), setRing = p => { ring.style.strokeDashoffset = String(50.3 * (1 - p)); };
+$('form').addEventListener('submit', async e => {
+  e.preventDefault(); const go = $('go'); if (go.disabled) return;
+  const name = $('f-name').value.trim(), message = $('f-msg').value.trim(); $('err').textContent = '';
+  if (name.length < 1 || name.length > 24) { $('err').textContent = T.err.name; $('f-name').focus(); return; }
+  if (message.length < 3 || message.length > 140) { $('err').textContent = T.err.message; $('f-msg').focus(); return; }
+  go.disabled = true; $('t-submit').textContent = T.charging; setRing(.03);
+  try {
+    const ch = await challenge(), nonce = await solve(ch, setRing); setRing(1);
+    const body = { name, message, shape: S.shape, color: S.color, lang: LANG, hideCountry: !$('f-country').checked, website: $('f-web').value, elapsed: Math.round(performance.now() - opened), challenge: ch.challenge, nonce };
+    let atom;
+    if (DEMO) {
+      if (body.elapsed < 2500) throw { error: 'fast' };
+      atom = { id: Date.now(), created_at: new Date().toISOString(), name, message, shape: S.shape, color: S.color, country: body.hideCountry ? null : guessCC(), demo: true };
+      store.set('human-atoms-demo', store.get('human-atoms-demo', []).concat([atom]).slice(-6));
+    } else {
+      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json().catch(() => ({})); if (!r.ok) throw d; atom = d.atom;
+    }
+    release(atom);
+  } catch (er) { $('err').textContent = (er && T.err[er.error]) || (er && er.message === 'offline' ? T.err.offline : T.err.server); }
+  go.disabled = false; $('t-submit').textContent = T.submit; setRing(0);
+});
+function release(atom) {
+  mineId = atom.id; store.set('human-atom-mine', atom.id);
+  const r = pv.getBoundingClientRect();
+  A.push(atom); layout(); atom.born = performance.now() - 2000;
+  closeMake(); $('f-msg').value = ''; sync(); $('mine').hidden = false;
+  flyer = { a: atom, x: r.left + r.width / 2, y: r.top + r.height / 2, r: Math.min(r.height * .34, 70), t: performance.now() + 250 };
+  flyTo(atom, 1.8 / atom.z);
+}
+
+/* ——— les boutons en étoiles : la pilule (et parfois un logo) dessinés en points qui brillent, s'écartent sous la souris, s'illuminent au survol ——— */
+const STARPILL = (function () {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches, PAD = 16, list = [];
+  const hh = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  const STAR = [[248, 247, 255], [157, 180, 255], [202, 216, 255], [255, 244, 234], [255, 206, 158], [255, 122, 92]];
+  const INK = [[20, 19, 18], [38, 78, 214], [70, 110, 220], [60, 55, 50], [196, 120, 40], [206, 58, 40]];
+  const pickC = u => u < .4 ? 0 : u < .62 ? 1 : u < .76 ? 2 : u < .86 ? 3 : u < .94 ? 4 : 5;
+  const SPR = {}, sprite = (col, a) => { const k = col + a; if (SPR[k]) return SPR[k]; const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'), r = x.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, `rgba(${col},${a})`); r.addColorStop(.2, `rgba(${col},${a * .45})`); r.addColorStop(1, `rgba(${col},0)`); x.fillStyle = r; x.fillRect(0, 0, 32, 32); return (SPR[k] = c); };
+  let mx = -1e4, my = -1e4, t0 = performance.now(), running = false, tick = 0;
+  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+  document.addEventListener('pointerleave', () => { mx = my = -1e4; });
+  const remeasure = () => list.forEach(s => { s.rc = null; });
+  addEventListener('resize', remeasure, { passive: true }); addEventListener('scroll', remeasure, { passive: true, capture: true });
+  const ro = window.ResizeObserver ? new ResizeObserver(es => es.forEach(e => { const s = list.find(q => q.el === e.target); if (s) s.rc = null; })) : null;
+  function build(s) {
+    const r = s.rc, W = r.width, H = r.height, dpr = s.dpr = Math.min(2.5, devicePixelRatio || 1);
+    s.W = W; s.H = H; s.cv.width = Math.round((W + 2 * PAD) * dpr); s.cv.height = Math.round((H + 2 * PAD) * dpr);
+    const old = s.P, pts = [], rr = Math.min(H / 2, W / 2), per = 2 * (W - 2 * rr) + 2 * Math.PI * rr, n = Math.max(12, Math.round(per / (s.o.gap || 4.2)));
+    for (let k = 0; k < n; k++) {
+      let d = k / n * per, x, y; const L = W - 2 * rr;
+      if (d < L) { x = rr + d; y = 0; } else if ((d -= L) < Math.PI * rr) { const a = -Math.PI / 2 + d / rr; x = W - rr + Math.cos(a) * rr; y = rr + Math.sin(a) * rr; }
+      else if ((d -= Math.PI * rr) < L) { x = W - rr - d; y = H; } else { d -= L; const a = Math.PI / 2 + d / rr; x = rr + Math.cos(a) * rr; y = rr + Math.sin(a) * rr; }
+      pts.push([x, y, 0, k / n]);
+    }
+    // le logo en constellation : un semis irrégulier, plus dense sur les bords pour que la silhouette se lise
+    if (s.o.mark) {
+      const svg = s.el.querySelector('svg'), sb = svg ? svg.getBoundingClientRect() : null;
+      if (sb && sb.width) {
+        const sc = sb.width / 16, ox = sb.left - r.left, oy = sb.top - r.top, tmp = document.createElement('canvas').getContext('2d'), M = s.o.mark, cap = Math.round(95 * Math.min(2.2, sc));
+        for (let j = 0, m = 0; j < 4000 && m < cap; j++) {
+          const x = hh(j, 21) * 16, y = hh(j, 22) * 16; if (!tmp.isPointInPath(M, x, y)) continue;
+          const edge = !tmp.isPointInPath(M, x + .9, y) || !tmp.isPointInPath(M, x - .9, y) || !tmp.isPointInPath(M, x, y + .9) || !tmp.isPointInPath(M, x, y - .9);
+          if (!edge && hh(j, 23) > .35) continue;
+          if (pts.some(q => q[2] && Math.hypot(q[0] - (ox + x * sc), q[1] - (oy + y * sc)) < (edge ? 1.05 : 1.6) * sc)) continue;
+          pts.push([ox + x * sc, oy + y * sc, 1, 0]); m++;
+        }
+      }
+    }
+    s.P = pts.map((q, i) => {
+      const o = old[i], u = hh(i + s.seed, 3), tint = s.o.tint && hh(i, 13) < .62;
+      return { hx: q[0], hy: q[1], m: q[2], a: q[3], c: tint ? -1 : q[2] ? pickC(hh(i, 5) * .7) : pickC(u), s: q[2] ? 0.55 + hh(i, 6) * 0.3 : 0.7 + hh(i, 7) * 0.7, tw: hh(i, 8),
+        x: o ? o.x : still ? q[0] : W / 2 + (hh(i, 9) - .5) * (W + 120), y: o ? o.y : still ? q[1] : H / 2 + (hh(i, 10) - .5) * 110, vx: 0, vy: 0 };
+    });
+  }
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (document.hidden) return;
+    tick++; const t = (now - t0) / 1000;
+    // toutes les lectures d'abord (une seule mise en page), puis le dessin
+    for (const s of list) if (!s.rc || (s.o.live && tick % 2 === 0) || tick % 45 === 0) s.rc = s.el.getBoundingClientRect();
+    for (const s of list) {
+      const r = s.rc; if (!r || !r.width || (s.o.when && !s.o.when())) continue;
+      const k = `${r.width | 0}x${r.height | 0}`; if (k !== s.sig) { s.sig = k; build(s); }
+      const nt = s.o.night ? s.o.night() : true, ph = still ? 0 : ((t + s.seed) / 6) % 1, g = s.g;
+      s.hov += (s.hovT - s.hov) * 0.1;
+      const lx = mx - r.left, ly = my - r.top, R = 54 + 10 * s.hov, W = s.W, H = s.H;
+      for (const p of s.P) {
+        p.vx += (p.hx - p.x) * 0.055; p.vy += (p.hy - p.y) * 0.055;
+        const dx = p.x - lx, dy = p.y - ly, d = Math.hypot(dx, dy);
+        if (!still && d < R && d > 0.01) { const f = Math.pow(1 - d / R, 2) * (p.m ? 0.8 : 1.5); p.vx += dx / d * f; p.vy += dy / d * f; }
+        p.vx *= 0.82; p.vy *= 0.82; p.x += p.vx; p.y += p.vy;
+      }
+      g.setTransform(s.dpr, 0, 0, s.dpr, 0, 0); g.clearRect(0, 0, W + 2 * PAD, H + 2 * PAD); g.translate(PAD, PAD);
+      g.lineWidth = 0.6; g.beginPath(); let first = true;
+      for (const p of s.P) { if (p.m) break; if (first) { g.moveTo(p.x, p.y); first = false; } else g.lineTo(p.x, p.y); }
+      g.closePath(); g.globalAlpha = (0.16 + 0.24 * s.hov) * (s.o.strong ? 1.5 : 1); g.strokeStyle = s.o.tint ? `rgb(${s.o.tint})` : nt ? 'rgb(200,212,255)' : 'rgb(20,19,18)'; g.stroke();
+      g.globalCompositeOperation = nt ? 'lighter' : 'source-over';
+      for (const p of s.P) {
+        const tw = 0.72 + 0.28 * Math.sin(t * (2 + p.tw * 3) + p.tw * 20);
+        let wave = 0; if (!p.m) { let dd = Math.abs(p.a - ph); dd = Math.min(dd, 1 - dd); wave = Math.max(0, 1 - dd / 0.06); }
+        const lit = 1 + 0.9 * s.hov + 1.4 * wave, sz = p.s * (1 + 0.35 * s.hov + 0.6 * wave) * (s.o.size || 1);
+        const col = p.c < 0 ? s.o.tint : (nt ? STAR : INK)[p.c].join(','), hs = sz * (p.m ? 3.4 : 5.4) * tw * (0.8 + 0.4 * s.hov);
+        g.globalAlpha = Math.min(1, (nt ? 0.5 : 0.55) * lit * 0.6);
+        g.drawImage(sprite(col, nt ? 1 : .5), p.x - hs / 2, p.y - hs / 2, hs, hs);
+        g.globalAlpha = Math.min(1, (0.6 + 0.4 * tw) * (0.75 + 0.25 * lit));
+        g.fillStyle = `rgb(${col})`; g.beginPath(); g.arc(p.x, p.y, Math.max(0.42, sz * 0.5), 0, 6.2832); g.fill();
+      }
+      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+    }
+  }
+  // el : le bouton (position relative, absolue ou fixe) ; o : { mark: Path2D 16×16, tint: 'r,g,b', night: () => bool, when: () => bool, live, strong, size, gap }
+  function add(el, o = {}) {
+    if (!el || list.some(s => s.el === el)) return;
+    const cv = document.createElement('canvas'); cv.className = 'stars'; cv.setAttribute('aria-hidden', 'true'); cv.style.zIndex = '-1'; el.style.isolation = 'isolate'; el.prepend(cv);
+    const s = { el, o, cv, g: cv.getContext('2d'), P: [], rc: null, sig: '', hov: 0, hovT: 0, seed: list.length * 7.3 };
+    el.addEventListener('pointerenter', () => { s.hovT = 1; }); el.addEventListener('pointerleave', () => { s.hovT = 0; });
+    el.addEventListener('pointerdown', e => { const r = s.rc || el.getBoundingClientRect(); s.P.forEach(p => { const dx = p.x - (e.clientX - r.left), dy = p.y - (e.clientY - r.top), d = Math.hypot(dx, dy) + 1; p.vx += dx / d * 5; p.vy += dy / d * 5; }); });
+    el.addEventListener('transitionend', () => { s.rc = null; });
+    if (ro) ro.observe(el);
+    list.push(s); if (!running) { running = true; requestAnimationFrame(frame); }
+    return s;
+  }
+  const GITHUB = new Path2D('M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z');
+  return { add, GITHUB };
+})();
+
+STARPILL.add($('gh'), { mark: STARPILL.GITHUB });
+document.querySelectorAll('.sp').forEach(el => STARPILL.add(el, { strong: el.classList.contains('cta'), tint: el.classList.contains('cta') ? '157,180,255' : null }));
+/* ——— départ ——— */
+resize(); sync(); requestAnimationFrame(frame);
+setTimeout(dismissIntro, 6500);
+load().then(list => {
+  A = list.filter(a => a && a.name && a.message); layout();
+  // cadrer : peu d'atomes, on s'approche ; beaucoup, on recule (sans jamais passer sous 1)
+  if (A.length) {
+    // à l'écran x = W/2 + (wx − cam.x·z)·cam.z·z : le centre qui annule l'écart moyen est Σ wx·z / Σ z²
+    let mx = 0, my = 0, zz = 0; for (const q of A) { mx += q.wx * q.z; my += q.wy * q.z; zz += q.z * q.z; } mx /= zz; my /= zz;
+    let ext = .05; for (const q of A) ext = Math.max(ext, Math.abs(q.wx - mx * q.z) * q.z / (W * (W < 640 ? .36 : .34)), Math.abs(q.wy - my * q.z) * q.z / (H * .28));
+    cam.x = mx; cam.y = my; cam.z = Math.max(1, Math.min(3, 1 / ext));
+  }
+  if (DEMO) { const d = $('demo'); d.hidden = false; d.textContent = T.demo; }
+  if (mineId && A.some(a => a.id === mineId)) $('mine').hidden = false;
+  if (/[#&]add\b/.test(location.hash)) setTimeout(openMake, 900);
+});
+})();
+</script>
+</body>
+</html>
